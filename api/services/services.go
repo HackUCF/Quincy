@@ -1,7 +1,7 @@
 /*
 Package services contains the logic for templating and serving checks to agents.
 Using the specifications from the config, this package creates a queue containing all services for all boxes for all teams.
-This queue is then randomized, then served one a time.
+This queue is then randomized, then served using a lock-free atomic counter for concurrent access.
 Users are randomly pulled from the database when needed.
 */
 package services
@@ -9,17 +9,16 @@ package services
 import (
 	"fmt"
 	"math/rand/v2"
-	"sync"
+	"sync/atomic"
 
 	"github.com/HackUCF/Quincy/api/config"
 	"github.com/HackUCF/Quincy/common/types"
 )
 
 var (
-	services      []types.ServiceTemplate // a list of all possible services
-	servicesIdx   int                     // an index of the next check to be run
-	servicesLen   int                     // prevents useless len() calls
-	servicesMutex sync.Mutex              // mutex to control access to services
+	services    []types.ServiceTemplate // a list of all possible services
+	servicesIdx atomic.Uint64           // an index of the next check to be run
+	servicesLen uint64                  // avoid repeated len calls
 )
 
 // InitServices reads the config and generates a list containing every service for every team.
@@ -28,9 +27,6 @@ func InitServices() error {
 	if err != nil {
 		return fmt.Errorf("could not get config: %w", err)
 	}
-
-	servicesMutex.Lock()
-	defer servicesMutex.Unlock()
 
 	// loop through every box, its checks, for every team
 	for _, box := range cfg.Boxes {
@@ -42,14 +38,12 @@ func InitServices() error {
 		}
 	}
 
-	servicesLen = len(services)
+	servicesLen = uint64(len(services))
 
 	// shuffle the array
-	rand.Shuffle(servicesLen, func(i, j int) {
+	rand.Shuffle(len(services), func(i, j int) {
 		services[i], services[j] = services[j], services[i]
 	})
-
-	servicesIdx = -1 // so the first iteration gives 0
 
 	return nil
 }

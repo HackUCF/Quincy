@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/HackUCF/Quincy/common/types"
+	"github.com/google/uuid"
 )
 
 type scriptPath string
@@ -23,7 +23,7 @@ var (
 	scriptCacheMutex sync.RWMutex
 )
 
-func (r *runner) getScript(id types.CheckID) (scriptPath, error) {
+func (cfg *agentConfig) getScript(id types.CheckID) (scriptPath, error) {
 	scriptCacheMutex.RLock()
 	cachedPath, ok := scriptCache[id]
 	scriptCacheMutex.RUnlock()
@@ -34,9 +34,9 @@ func (r *runner) getScript(id types.CheckID) (scriptPath, error) {
 	}
 
 	// list all files in the check directory
-	scripts, err := os.ReadDir(r.checksDir)
+	scripts, err := os.ReadDir(cfg.checksDir)
 	if err != nil {
-		err = fmt.Errorf("couldn't list directory '%s': %s", r.checksDir, err.Error())
+		err = fmt.Errorf("couldn't list directory '%s': %s", cfg.checksDir, err.Error())
 		return "", err
 	}
 
@@ -50,7 +50,7 @@ func (r *runner) getScript(id types.CheckID) (scriptPath, error) {
 
 			// script is found
 			// construct full path
-			joinedPath := filepath.Join(r.checksDir, script.Name())
+			joinedPath := filepath.Join(cfg.checksDir, script.Name())
 			{
 				// add to cache
 				scriptCacheMutex.Lock()
@@ -72,7 +72,7 @@ type scriptOutput struct {
 	stderr bytes.Buffer
 }
 
-func (r *runner) runScript(script scriptPath, c types.Service) (scriptOutput, error) {
+func (cfg *agentConfig) runScript(script scriptPath, c types.Service) (scriptOutput, error) {
 	var output scriptOutput
 
 	// create a temporary file called {{uuid}}.json
@@ -82,7 +82,7 @@ func (r *runner) runScript(script scriptPath, c types.Service) (scriptOutput, er
 		return output, err
 	}
 	tempFileName := uid.String() + ".json"
-	tempFilePath := filepath.Join(r.tempDir, tempFileName)
+	tempFilePath := filepath.Join(cfg.tempDir, tempFileName)
 
 	// convert service to json
 	bytes, err := json.MarshalIndent(c, "", "  ")

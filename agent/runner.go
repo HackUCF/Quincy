@@ -11,27 +11,9 @@ import (
 	"github.com/HackUCF/Quincy/common/types"
 )
 
-// a runner contains all of the configuration for the agent.
-type runner struct {
-	// url to get a new check from
-	checkURL string
-
-	// url to post a completed scorecheck to
-	scoreURL string
-
-	// directory to store temp files used to communcate with check scripts
-	tempDir string
-
-	// directory to find check scripts
-	checksDir string
-
-	// how long to sleep before looping
-	loopTime time.Duration
-}
-
-func (r *runner) run(id string) {
+func (cfg *agentConfig) run(id string) {
 	// get next check from api server
-	resp, err := http.Get(r.checkURL)
+	resp, err := http.Get(cfg.checkURL)
 	if err != nil {
 		log.Error(
 			"failed to get a new request from api server",
@@ -64,7 +46,7 @@ func (r *runner) run(id string) {
 	}
 
 	// identify script from check id
-	scriptPath, err := r.getScript(check.CheckID)
+	scriptPath, err := cfg.getScript(check.CheckID)
 	if err != nil {
 		log.Error(
 			"failed to get script path from check",
@@ -75,7 +57,7 @@ func (r *runner) run(id string) {
 		return
 	}
 
-	out, err := r.runScript(scriptPath, check)
+	out, err := cfg.runScript(scriptPath, check)
 	if err != nil {
 		log.Error(
 			"failed to run check",
@@ -108,7 +90,7 @@ func (r *runner) run(id string) {
 		return
 	}
 
-	resp, err = http.Post(r.scoreURL, "application/json", bytes.NewReader(data))
+	resp, err = http.Post(cfg.scoreURL, "application/json", bytes.NewReader(data))
 	if err != nil {
 		log.Error(
 			"failed to post completed scorecheck to api server",
@@ -129,9 +111,9 @@ func (r *runner) run(id string) {
 	}
 }
 
-func (r *runner) loop(id string) {
+func (cfg *agentConfig) loop(id string) {
 	for {
-		time.Sleep(r.loopTime)
-		r.run(id)
+		time.Sleep(cfg.loopTime)
+		cfg.run(id)
 	}
 }

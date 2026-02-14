@@ -1,36 +1,57 @@
 /*
 Package log configures a global logger and exports common logging functions. It is a very light wrapper over [Zap].
 This logger utilizes an init() function and has no internal dependencies. This makes it easy to import and start using.
-This package might need environment variables to configure some common settings, like log level and stack traces.
+Logs are always written to stdout. If the QU_LOG_FILE environment variable is set, logs are also appended to that file.
+Each process instance is tagged with a unique "restart" UUID so log entries can be correlated across restarts.
+This package might need more environment variables to configure some common settings, like log level and stack traces.
 
 [Zap]: https://github.com/uber-go/zap
 */
 package log
 
 import (
+	"os"
+
+	"github.com/google/uuid"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
+
+const level = zap.DebugLevel
 
 var logger *zap.SugaredLogger
 
-func init() {
-	zapConfig := zap.NewProductionConfig()
+// build the base logger object
+// takes an optional filepath that can be used
+func buildLogger(level zapcore.Level, logFilePath string) *zap.Logger {
+	encoderConfig := zap.NewProductionEncoderConfig()
 
-	// we don't want big ugly stack traces
-	zapConfig.DisableStacktrace = true
-
-	// show all logs for now
-	zapConfig.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
-
-	baseLogger, err := zapConfig.Build(
-		zap.AddCallerSkip(1), // skip marking calls from this file
-	)
-	if err != nil {
-		panic(err)
+	// list of destinations for logs
+	cores := []zapcore.Core{
+		// always contains stdout
+		zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig), zapcore.AddSync(os.Stdout), level),
 	}
 
-	logger = baseLogger.Sugar()
+	// optionally contains a file
+	if logFilePath != "" {
+		file, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			panic(err)
+		}
+		cores = append(cores, zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig), zapcore.AddSync(file), level))
+	}
 
+	return zap.New(zapcore.NewTee(cores...),
+		zap.AddCaller(),
+		zap.AddCallerSkip(1),
+	)
+}
+
+func init() {
+	baseLogger := buildLogger(level, os.Getenv("QU_LOG_FILE"))
+	// add a uuid to identify logs between restarts
+	instanceID := uuid.New().String()
+	logger = baseLogger.Sugar().With("restart", instanceID)
 	Info("logger initialized")
 }
 

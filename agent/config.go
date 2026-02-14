@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/HackUCF/Quincy/common/log"
@@ -26,12 +27,18 @@ const (
 	// can be absolute or relative
 	// defaults to 'scripts'
 	envScriptsDir = "QU_CHECKS_DIR"
+
+	// time in seconds to wait before fetching and running the next check.
+	envLoopTime = "QU_LOOP_TIME"
+
+	// number of concurrent scoring threads to run
+	envNumThreads = "QU_NUM_THREADS"
 )
 
 // default values for environment variables
 const (
 	// default url for local api
-	// should only be uised for development
+	// should only be used for development
 	defaultAPIURL = "http://127.0.0.1:8888"
 
 	// directory used to generate temporary files for communication with scripts
@@ -41,15 +48,85 @@ const (
 	// directory used to search for scripts
 	// platform independent ./scripts or .\scripts
 	defaultScriptsDir = "scripts"
+
+	// a small default loop time for development
+	defaultLoopTime = 1 * time.Second
+
+	// a large default number of threads for development
+	defaultNumThreads = 15
 )
 
-// getRunner calculates and returns the runner configuration object.
+// contains all of the configuration for the agent.
+type agentConfig struct {
+	// url to get a new check from
+	checkURL string
+
+	// url to post a completed scorecheck to
+	scoreURL string
+
+	// directory to store temp files used to communcate with check scripts
+	tempDir string
+
+	// directory to find check scripts
+	checksDir string
+
+	// how long to sleep before looping
+	loopTime time.Duration
+
+	// how many agents to spawn
+	numThreads int
+}
+
+// getConfig generates and returns the configuration object.
 // It pulls from environment variables and does some construction.
 // It will panic if anything here fails.
-func getRunner() runner {
-	var r runner
+func getConfig() agentConfig {
+	var cfg agentConfig
 
-	r.loopTime = 3 * time.Second
+	// load the loop time env var
+	// ugly
+	strLoopTime := os.Getenv(envLoopTime)
+	if strLoopTime == "" {
+		cfg.loopTime = defaultLoopTime
+	} else {
+		// convert to time duration if it exists
+		intLoopTime, err := strconv.Atoi(strLoopTime)
+
+		if err != nil {
+			// check that the env var doesn't have nonsense in it
+			log.Warn(
+				"loop time environment variable could not be parsed as an integer, using the default.",
+				"var", envLoopTime,
+				"value", strLoopTime,
+				"default", defaultLoopTime,
+			)
+			cfg.loopTime = defaultLoopTime
+		} else {
+			cfg.loopTime = time.Duration(intLoopTime) * time.Second
+		}
+	}
+
+	// load the number of threads
+	strNumThreads := os.Getenv(envNumThreads)
+	if strNumThreads == "" {
+		cfg.numThreads = defaultNumThreads
+	} else {
+		// convert to integer
+		intNumThreads, err := strconv.Atoi(strNumThreads)
+
+		if err != nil {
+			// check that the env var doesn't have nonsense in it
+			log.Warn(
+				"num threads environment variable could not be parsed as an integer, using the default.",
+				"var", envNumThreads,
+				"value", strNumThreads,
+				"default", defaultNumThreads,
+			)
+			cfg.numThreads = defaultNumThreads
+		} else {
+			cfg.numThreads = intNumThreads
+		}
+	}
 
 	relTempDir := os.Getenv(envTempDir)
 	if relTempDir == "" {
@@ -57,7 +134,7 @@ func getRunner() runner {
 	}
 
 	var err error
-	r.tempDir, err = filepath.Abs(relTempDir)
+	cfg.tempDir, err = filepath.Abs(relTempDir)
 	if err != nil {
 		log.Panic(
 			"failed to create absolute path from relative temporary directory",
@@ -71,7 +148,7 @@ func getRunner() runner {
 		relChecksDir = defaultScriptsDir
 	}
 
-	r.checksDir, err = filepath.Abs(relChecksDir)
+	cfg.checksDir, err = filepath.Abs(relChecksDir)
 	if err != nil {
 		log.Panic(
 			"failed to create absolute path from relative checks directory",
@@ -91,7 +168,7 @@ func getRunner() runner {
 	}
 
 	checksURL := "/api/v1/checks"
-	r.checkURL, err = url.JoinPath(apiURL, checksURL)
+	cfg.checkURL, err = url.JoinPath(apiURL, checksURL)
 	if err != nil {
 		log.Panic(
 			"failed to construct checks url endpoint",
@@ -101,7 +178,7 @@ func getRunner() runner {
 	}
 
 	scoresURL := "/api/v1/scores"
-	r.scoreURL, err = url.JoinPath(apiURL, scoresURL)
+	cfg.scoreURL, err = url.JoinPath(apiURL, scoresURL)
 	if err != nil {
 		log.Panic(
 			"failed to construct scores url endpoint",
@@ -110,5 +187,5 @@ func getRunner() runner {
 		)
 	}
 
-	return r
+	return cfg
 }

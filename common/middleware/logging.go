@@ -1,5 +1,7 @@
 /*
-Package middleware implements some common gin middleware that can be shared between the API and a potential golang frontend
+Package middleware implements some common gin middleware that can be shared between the API and a potential golang frontend.
+Includes panic recovery and request logging. Request logs contain both a raw duration (for machine parsing) and a
+human-readable pretty_duration field.
 */
 package middleware
 
@@ -7,8 +9,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/HackUCF/Quincy/common/log"
+	"github.com/gin-gonic/gin"
 )
 
 // prettyDuration prints how long a request takes in human readable format.
@@ -44,7 +46,8 @@ func Logging(c *gin.Context) {
 	// log it!
 	log.Debug(
 		"request",
-		"duration", prettyDuration(duration),
+		"duration", duration,
+		"pretty_duration", prettyDuration(duration),
 		"method", c.Request.Method,
 		"status", c.Writer.Status(),
 		"agent", c.Request.UserAgent(),
