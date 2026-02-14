@@ -2,6 +2,7 @@
 
 - To get started running Quincy see [USAGE.md](/USAGE.md)
 - For information about the source code or development see [DEVELOPMENT.md](/DEVELOPMENT.md)
+- The API specification is available here: [api/API_SPEC.md](/api/API_SPEC.md) (this is nowhere near final, just what has been implemented so far)
 
 ## About
 
