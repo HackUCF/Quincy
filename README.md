@@ -23,7 +23,7 @@
     - The planned architecture for plinko will completely offload authentication and API interaction to the frontend. Users will have no network access to the API.
     - This may change in the future.
 
-## Slop Warning
+### Slop Statement
 
-- AI is used for the some documentation, testing automation, troubleshooting, and research.
-- AI was not and should not be used for the writing of any application source code.
+- AI is used for *some* but not all documentation, scripting, troubleshooting, and research.
+- AI was not (and should not) be used for the writing of any application source code.
