@@ -26,4 +26,4 @@
 ### Slop Statement
 
 - AI is used for *some* but not all documentation, scripting, troubleshooting, and research.
-- AI was not (and should not) be used for the writing of any application source code.
+- AI was not (and should not be) used for the writing of any application source code.
