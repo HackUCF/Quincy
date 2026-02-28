@@ -455,3 +455,5 @@ Triggers a deliberate panic for testing error recovery. Logs at all levels (debu
 **Response (500):** Empty body (returned by recovery middleware).
 
 ---
+
+> TODO: missing graph APIs

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix"></script>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	  const xLabels = {{.XLabels}};
+		const yLabels = {{.YLabels}};
+		const c = document.getElementById('c');
+		c.width = xLabels.length * 40 + 100;
+		c.height = yLabels.length * 40 + 100;
+
+		new Chart(document.getElementById('c'),{
+			type:'matrix',
+			data:{datasets:[{
+				data:{{.DataPoints}},
+				backgroundColor:function(c){return c.raw.v ? '#22BB22':'#BB2222'},
+			}]},
+			options:{
+			  responsive:false,
+				maintainAspectRatio:false,
+				scales:{
+					x:{type:'category',labels:xLabels,offset:true,grid:{display:false}},
+					y:{type:'category',labels:yLabels,offset:true,grid:{display:false}}
+				},
+				plugins:{
+					legend:{display:false},
+					tooltip:{
+						callbacks:{
+							title: function(items){ return items[0].raw.x + ' / ' + items[0].raw.y; },
+							label: function(item){
+								var lines = item.raw.msg.split('\n');
+								var date = new Date(item.raw.ts / 1000);
+								lines.push('Time: ' + date.toLocaleString());
+								return lines;
+							}
+						}
+					}
+				}
+			}
+		});
+	</script>
+</body>
+</html>
