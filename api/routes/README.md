@@ -12,3 +12,4 @@ Defines and serves the Gin HTTP router. Sets up all API endpoints under `/api/v1
 - **misc/** - Config and 404 handlers.
 - **scoring/** - Score submission, check serving, and score viewing handlers.
 - **users/** - User listing and password change request handlers.
+- **graphs/** - Visualizations of the scoring data.

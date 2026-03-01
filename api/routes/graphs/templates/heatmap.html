@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix"></script>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+	  const xLabels = {{.XLabels}};
+		const yLabels = {{.YLabels}};
+		const c = document.getElementById('c');
+		c.width = xLabels.length * 40 + 100;
+		c.height = yLabels.length * 40 + 100;
+
+		new Chart(document.getElementById('c'), {
+			type: 'matrix',
+			data: { datasets: [{
+				data: {{.DataPoints}},
+				backgroundColor: function(c) {
+					var v = c.raw.v;
+					var r = Math.round(0xBB * (1 - v) + 0x22 * v);
+					var g = Math.round(0x22 * (1 - v) + 0xBB * v);
+					return 'rgb(' + r + ',' + g + ',34)';
+				},
+			}] },
+			options: {
+			  responsive: false,
+				maintainAspectRatio: false,
+				scales: {
+					x: { type: 'category', labels: xLabels, offset: true, grid: { display: false } },
+					y: { type: 'category', labels: yLabels, offset: true, grid: { display: false } }
+				},
+				plugins: {
+					legend: { display: false },
+					tooltip: {
+						callbacks: {
+							title: function(items) { return items[0].raw.x + ' / ' + items[0].raw.y; },
+							label: function(item) { return 'uptime: ' + (item.raw.v * 100).toFixed(1) + '%'; }
+						}
+					}
+				}
+			}
+		});
+	</script>
+</body>
+</html>

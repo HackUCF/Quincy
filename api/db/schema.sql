@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS scores (
 );
 
 CREATE INDEX IF NOT EXISTS idx_scores_team_status ON scores(team_num, status);
+CREATE INDEX IF NOT EXISTS idx_scores_team_ts_status ON scores(team_num, timestamp, status);
 
 -- recent scores table
 -- nearly identical: stores only the most recent of each check

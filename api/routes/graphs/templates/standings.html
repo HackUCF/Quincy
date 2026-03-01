@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+		new Chart(document.getElementById('c'), {
+			type: 'bar',
+			data: {
+				labels: {{.Labels}},
+				datasets: [{ label: 'checks passed', data: {{.Data}} }]
+			},
+			options: {
+				interaction: { mode: 'index', intersect: false },
+			}
+		});
+	</script>
+</body>
+</html>
