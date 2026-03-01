@@ -22,6 +22,7 @@ type rawScoresData struct {
 	Data   []scoresDataset
 }
 
+// ScoresData returns the template data needed to render the final scores length
 type ScoresData struct {
 	Labels   template.JS
 	Datasets template.JS
@@ -35,9 +36,12 @@ const labelFmt = "team %d"
 // pauses and other gaps will mean this is a ceiling that almost never gets hit.
 const numIntervals = 100
 
+// GetScoresData contains the data required to render a line chart with all team scores.
 func GetScoresData() (*ScoresData, error) {
 	db := conn.Get()
 
+	// get microsecond intervals for this competition
+	// compeition duration divided, in microseconds
 	duration, err := misc.GetCompDuration()
 	if err != nil {
 		return nil, err

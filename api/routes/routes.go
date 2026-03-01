@@ -54,6 +54,8 @@ func initRoutes() *gin.Engine {
 		{
 			graphsGroup.GET("scoreboard", graphs.GetScoreboard) // /api/v1/graphs/scoreboard
 			graphsGroup.GET("scores", graphs.GetScores)         // /api/v1/graphs/scores
+			graphsGroup.GET("standings", graphs.GetStandings)   // /api/v1/graphs/standings
+			graphsGroup.GET("heatmap", graphs.GetHeatmap)       // /api/v1/graphs/heatmap
 		}
 
 		v1.GET("/config", misc.GetConfig) // /api/v1/config
