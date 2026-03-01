@@ -16,3 +16,6 @@ Contains all SQLite database logic and queries. Organized into subpackages by do
 - **conn/** - Database connection management.
 - **scoring/** - Score insertion and aggregation queries.
 - **users/** - User/credential queries and initialization.
+- **graphs/** - Graph template data generation
+- **misc/** - Random functions that don't fit in elsewhere
+

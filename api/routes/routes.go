@@ -48,12 +48,12 @@ func initRoutes() *gin.Engine {
 		checkGroup := v1.Group("/checks")
 		{
 			checkGroup.GET("", scoring.GetCheck) // /api/v1/checks
-			// put a check request
 		}
 
 		graphsGroup := v1.Group("/graphs")
 		{
-			graphsGroup.GET("scoreboard", graphs.GetScoreboard)
+			graphsGroup.GET("scoreboard", graphs.GetScoreboard) // /api/v1/graphs/scoreboard
+			graphsGroup.GET("scores", graphs.GetScores)         // /api/v1/graphs/scores
 		}
 
 		v1.GET("/config", misc.GetConfig) // /api/v1/config

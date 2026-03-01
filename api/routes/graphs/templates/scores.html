@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix"></script>
+</head>
+<body>
+	<canvas id="c"></canvas>
+	<script>
+		new Chart(document.getElementById('c'), {
+			type: 'line',
+			data: { labels: {{.Labels}}, datasets: {{.Datasets}} },
+			options: {
+				interaction: { mode: 'index', intersect: false },
+			}
+		});
+	</script>
+</body>
+</html>
