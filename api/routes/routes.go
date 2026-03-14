@@ -12,8 +12,8 @@ import (
 	"github.com/HackUCF/Quincy/api/routes/misc"
 	"github.com/HackUCF/Quincy/api/routes/scoring"
 	"github.com/HackUCF/Quincy/api/routes/users"
-	"github.com/HackUCF/Quincy/common/log"
 	"github.com/HackUCF/Quincy/common/middleware"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,8 +24,7 @@ func initRoutes() *gin.Engine {
 
 	router.Use(middleware.Recovery)
 	router.Use(middleware.Logging)
-
-	router.NoRoute(misc.NoRoute)
+	router.Use(cors.Default()) // insecure, allows all cross-origin requests
 
 	v1 := router.Group("/api/v1")
 	{
@@ -61,14 +60,7 @@ func initRoutes() *gin.Engine {
 		v1.GET("/config", misc.GetConfig) // /api/v1/config
 	}
 
-	// lol
-	router.GET("/panic", func(c *gin.Context) {
-		log.Debug("debug log test")
-		log.Info("info log test")
-		log.Warn("warn log test")
-		log.Error("error log test")
-		log.Panic("user requested forced panic endpoint")
-	})
+	router.NoRoute(misc.NoRoute(router))
 
 	return router
 }
