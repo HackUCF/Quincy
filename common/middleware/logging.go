@@ -33,25 +33,27 @@ func prettyDuration(d time.Duration) string {
 
 // Logging is a middleware that tracks request information.
 // It shows how long requests take, as well as some other information.
-func Logging(c *gin.Context) {
-	// record the start time
-	start := time.Now()
+func Logging() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// record the start time
+		start := time.Now()
 
-	// run the route
-	c.Next()
+		// run the route
+		c.Next()
 
-	// record the end time
-	duration := time.Since(start)
+		// record the end time
+		duration := time.Since(start)
 
-	// log it!
-	log.Debug(
-		"request",
-		"duration", duration,
-		"pretty_duration", prettyDuration(duration),
-		"method", c.Request.Method,
-		"status", c.Writer.Status(),
-		"agent", c.Request.UserAgent(),
-		"client", c.ClientIP(),
-		"path", c.Request.URL.Path,
-	)
+		// log it!
+		log.Debug(
+			"request",
+			"duration", duration,
+			"pretty_duration", prettyDuration(duration),
+			"method", c.Request.Method,
+			"status", c.Writer.Status(),
+			"agent", c.Request.UserAgent(),
+			"client", c.ClientIP(),
+			"path", c.Request.URL.Path,
+		)
+	}
 }

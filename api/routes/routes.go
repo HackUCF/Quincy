@@ -13,7 +13,6 @@ import (
 	"github.com/HackUCF/Quincy/api/routes/scoring"
 	"github.com/HackUCF/Quincy/api/routes/users"
 	"github.com/HackUCF/Quincy/common/middleware"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,9 +21,9 @@ func initRoutes() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 
-	router.Use(middleware.Recovery)
-	router.Use(middleware.Logging)
-	router.Use(cors.Default()) // insecure, allows all cross-origin requests
+	router.Use(middleware.Recovery())
+	router.Use(middleware.Logging())
+	router.Use(middleware.InsecureCORS())
 
 	v1 := router.Group("/api/v1")
 	{
