@@ -8,6 +8,7 @@ import (
 	_ "embed"
 	"fmt"
 
+	"github.com/HackUCF/Quincy/api/config"
 	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/db/scoring"
 	"github.com/HackUCF/Quincy/api/db/users"
@@ -19,8 +20,9 @@ var schema string
 
 // InitDB runs all db initialization steps.
 // It creates the datbase connections, sets driver settings, executes the schema, and seeds users.
-func InitDB() error {
-	db, err := conn.InitDBConnection()
+func InitDB(cfg *config.APIConfigSpec) error {
+
+	db, err := conn.InitDBConnection(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to connect to db: %w", err)
 	}
@@ -32,13 +34,13 @@ func InitDB() error {
 	}
 
 	// make sure all users are present in db
-	err = users.InitUsers()
+	err = users.InitUsers(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to initialize users: %w", err)
 	}
 
 	// make sure final scores table is populated
-	err = scoring.InitScoring()
+	err = scoring.InitScoring(cfg)
 	if err != nil {
 		return fmt.Errorf("failed to initialize users: %w", err)
 	}

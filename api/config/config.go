@@ -10,9 +10,9 @@ import (
 	"os"
 	"sync/atomic"
 
-	"github.com/goccy/go-yaml"
 	"github.com/HackUCF/Quincy/common/log"
 	"github.com/HackUCF/Quincy/common/types"
+	"github.com/goccy/go-yaml"
 )
 
 const (
@@ -26,9 +26,9 @@ var (
 	TeamRange []types.TeamNum
 )
 
-// InitConfig reads the environment variables and loads the YAML file.
+// LoadConfig reads the environment variables and loads the YAML file.
 // It validates the file then stores it in a global variable.
-func InitConfig() error {
+func LoadConfig() (*APIConfigSpec, error) {
 	cfg = new(APIConfigSpec)
 
 	config_file := os.Getenv(envConfigFile)
@@ -38,17 +38,17 @@ func InitConfig() error {
 
 	bytes, err := os.ReadFile(config_file)
 	if err != nil {
-		return fmt.Errorf("could not read config file %q: %w", config_file, err)
+		return nil, fmt.Errorf("could not read config file %q: %w", config_file, err)
 	}
 
 	err = yaml.Unmarshal(bytes, cfg)
 	if err != nil {
-		return fmt.Errorf("could not unmarshall yaml from config file: %w", err)
+		return nil, fmt.Errorf("could not unmarshall yaml from config file: %w", err)
 	}
 
 	err = cfg.validate()
 	if err != nil {
-		return fmt.Errorf("config failed to validate: %w", err)
+		return nil, fmt.Errorf("config failed to validate: %w", err)
 	}
 
 	// a little slice helpful for iterating over every team
@@ -57,23 +57,18 @@ func InitConfig() error {
 	}
 
 	cfgLoaded.Store(true)
-	return nil
+	return cfg, nil
 }
 
 // Get returns a pointer to the global configuration object.
 // This should never be written to. This will cause one morbillion race conditions and wont really do anything.
-// Only has one error condition, and it's stupid.
-func Get() (*APIConfigSpec, error) {
+// Will panic if the config was never generated with LoadConfig().
+func Get() *APIConfigSpec {
 	if !cfgLoaded.Load() {
-		err := fmt.Errorf("tried to get config object before it was initialized")
-		log.Error(
-			"failed to get config",
-			"error", err,
-		)
-		return nil, err
+		log.Panic("config not loaded")
 	}
 
-	return cfg, nil
+	return cfg
 }
 
 // UserListExists determines if a UserListID exists in the config.

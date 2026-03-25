@@ -18,6 +18,8 @@ type similarRoute struct {
 }
 
 // NoRoute responds with a 404 when no other route is matched.
+// Provides the user a list of "similar" endpoints available.
+// This is helpful while manually testing.
 func NoRoute(router *gin.Engine) func(c *gin.Context) {
 	routes := router.Routes()
 

@@ -16,12 +16,8 @@ import (
 // Users that have had passwords changed in a previous run of the API will be ignored.
 // This keeps consistent state between restarts.
 // This requires the config to be loaded.
-func InitUsers() error {
+func InitUsers(cfg *config.APIConfigSpec) error {
 	db := conn.Get()
-	cfg, err := config.Get()
-	if err != nil {
-		return fmt.Errorf("failed to load config: %w", err)
-	}
 
 	query := `
 	  INSERT OR IGNORE INTO scoring_users (team_num, user_list, username, password, domain, netbios)

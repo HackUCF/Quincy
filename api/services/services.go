@@ -7,7 +7,6 @@ Users are randomly pulled from the database when needed.
 package services
 
 import (
-	"fmt"
 	"math/rand/v2"
 	"sync/atomic"
 
@@ -22,11 +21,7 @@ var (
 )
 
 // InitServices reads the config and generates a list containing every service for every team.
-func InitServices() error {
-	cfg, err := config.Get()
-	if err != nil {
-		return fmt.Errorf("could not get config: %w", err)
-	}
+func InitServices(cfg *config.APIConfigSpec) error {
 
 	// loop through every box, its checks, for every team
 	for _, box := range cfg.Boxes {
@@ -58,7 +53,6 @@ func specToTemplate(serviceSpec config.ServiceSpec, boxSpec config.BoxSpec, t ty
 	st.ID = serviceSpec.ID
 	st.CheckID = serviceSpec.CheckID
 	st.UserList = serviceSpec.UserList
-	// st.Arguments = qutils.DeepCloneMap(serviceSpec.Arguments)
 
 	st.BoxID = boxSpec.ID
 	st.Host = boxSpec.Host

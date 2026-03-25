@@ -11,12 +11,9 @@ import (
 // GetCurrentServiceStatus returns the entire recent scores table.
 // It is sorted by team number, then box ID, then service ID.
 func GetCurrentServiceStatus() ([]types.Score, error) {
-	c, err := config.Get()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get config: %w", err)
-	}
+	cfg := config.Get()
 
-	cap := int(c.NumTeams) * len(c.Boxes)
+	cap := int(cfg.NumTeams) * len(cfg.Boxes)
 	status := make([]types.Score, 0, cap)
 	db := conn.Get()
 

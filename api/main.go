@@ -19,7 +19,7 @@ import (
 // serves http using the gin router
 func main() {
 	// load yaml config and validate
-	err := config.InitConfig()
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Panic(
 			"failed to load config file",
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	// connect to db, execute schema, and set up user table
-	err = db.InitDB()
+	err = db.InitDB(cfg)
 	if err != nil {
 		log.Panic(
 			"failed to set up database",
@@ -37,7 +37,7 @@ func main() {
 	}
 
 	// generate all services and prepare to serve to agents
-	err = services.InitServices()
+	err = services.InitServices(cfg)
 	if err != nil {
 		log.Panic(
 			"failed to set up services",
@@ -46,7 +46,7 @@ func main() {
 	}
 
 	// serves the routes over http as specified by the config file
-	err = routes.ServeRoutes()
+	err = routes.ServeRoutes(cfg)
 	if err != nil {
 		log.Panic(
 			"error while serving routes",

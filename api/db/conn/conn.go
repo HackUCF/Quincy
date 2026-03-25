@@ -20,16 +20,13 @@ var db *sql.DB
 
 // InitDBConnection connects to the database and changes some of the driver settings.
 // It requires that the config be loaded before running.
-func InitDBConnection() (*sql.DB, error) {
-	cfg, err := config.Get()
-	if err != nil {
-		return nil, fmt.Errorf("db initialization could not get config: %w", err)
-	}
+func InitDBConnection(cfg *config.APIConfigSpec) (*sql.DB, error) {
 
 	// add configs to filename to create connection string
 	conn_string := cfg.DBFile + "?_journal_mode=WAL&cache=shared&mode=rwc&_timeout=5000"
 
 	// create connection
+	var err error
 	db, err = sql.Open("sqlite3", conn_string)
 	if err != nil {
 		return nil, fmt.Errorf("could not create database connection %q: %w", conn_string, err)

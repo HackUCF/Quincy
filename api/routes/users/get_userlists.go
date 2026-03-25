@@ -3,9 +3,9 @@ package users
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/HackUCF/Quincy/api/config"
 	"github.com/HackUCF/Quincy/common/types"
+	"github.com/gin-gonic/gin"
 )
 
 // UserListInfo represents a description of a userlist.
@@ -21,15 +21,7 @@ type UserListInfo struct {
 // Notably it does not actually return any usernames or passwords.
 // This is intended for use to generate an obfuscated PCR form (like CCDC).
 func GetUserLists(c *gin.Context) {
-	cfg, err := config.Get()
-	if err != nil {
-		resp := gin.H{
-			"message": "failed to get config",
-			"error":   err,
-		}
-		c.JSON(http.StatusBadRequest, resp)
-		return
-	}
+	cfg := config.Get()
 
 	allInfo := make([]UserListInfo, 0, len(cfg.UserLists))
 

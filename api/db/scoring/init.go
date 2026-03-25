@@ -10,12 +10,8 @@ import (
 )
 
 // InitScoring creates rows in the final scores table for each team/box/service combo.
-func InitScoring() error {
+func InitScoring(cfg *config.APIConfigSpec) error {
 	db := conn.Get()
-	cfg, err := config.Get()
-	if err != nil {
-		return fmt.Errorf("failed to load config: %w", err)
-	}
 
 	query := `
 	  INSERT OR IGNORE INTO final_scores (service, box, team_num, total, passed)
