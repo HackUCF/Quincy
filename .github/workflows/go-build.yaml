@@ -1,0 +1,55 @@
+name: build and release
+
+# run on pushes to main and when manually triggered
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# write permissions needed to create tag and release
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # checkout repo
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # needed for auto versioning
+
+      # install golang dependencies
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      # build agent and api for:
+      #   linux-amd64
+      #   darwin-amd64
+      #   darwin-arm64
+      #   windows-amd-64
+      - name: build binaries
+        run: |
+          for proj in agent api; do
+            GOOS=linux   GOARCH=amd64 go build -o dist/${proj}-linux-amd64 ./${proj}
+            GOOS=darwin  GOARCH=amd64 go build -o dist/${proj}-darwin-amd64 ./${proj}
+            GOOS=darwin  GOARCH=arm64 go build -o dist/${proj}-darwin-arm64 ./${proj}
+            GOOS=windows GOARCH=amd64 go build -o dist/${proj}-windows-amd64.exe ./${proj}
+          done
+
+      # create the tag from recent branch
+      - name: generate tag
+        id: tag
+        run: |
+          TAG="v0.0.$(git rev-list --count HEAD)-$(git rev-parse --short HEAD)"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      # release the binaries under the tag
+      - name: create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          generate_release_notes: true
+          files: dist/*
