@@ -11,9 +11,15 @@ import (
 	"github.com/HackUCF/Quincy/common/types"
 )
 
+// global http client object
+var client http.Client
+
+// run a single check.
+// uses info from the config to determin behavior.
 func (cfg *agentConfig) run(id string) {
+
 	// get next check from api server
-	resp, err := http.Get(cfg.checkURL)
+	resp, err := client.Get(cfg.checkURL)
 	if err != nil {
 		log.Error(
 			"failed to get a new request from api server",
@@ -68,10 +74,6 @@ func (cfg *agentConfig) run(id string) {
 		return
 	}
 
-	// rc.messages <- fmt.Sprintf("err: %s", out.stderr.String())
-	// rc.messages <- fmt.Sprintf("out: %s", out.stdout.String())
-	// rc.messages <- fmt.Sprintf("%s", scriptPath)
-
 	score := types.Score{
 		TeamNum:   check.TeamNum,
 		Status:    out.status,
@@ -90,7 +92,7 @@ func (cfg *agentConfig) run(id string) {
 		return
 	}
 
-	resp, err = http.Post(cfg.scoreURL, "application/json", bytes.NewReader(data))
+	resp, err = client.Post(cfg.scoreURL, "application/json", bytes.NewReader(data))
 	if err != nil {
 		log.Error(
 			"failed to post completed scorecheck to api server",
@@ -111,9 +113,10 @@ func (cfg *agentConfig) run(id string) {
 	}
 }
 
+// infinite loop of checks
 func (cfg *agentConfig) loop(id string) {
 	for {
-		time.Sleep(cfg.loopTime)
 		cfg.run(id)
+		time.Sleep(cfg.loopTime)
 	}
 }
