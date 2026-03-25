@@ -21,7 +21,7 @@ func initRoutes() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 
-	router.Use(middleware.Recovery())
+	router.Use(middleware.Recovery(false))
 	router.Use(middleware.Logging())
 	router.Use(middleware.InsecureCORS())
 
