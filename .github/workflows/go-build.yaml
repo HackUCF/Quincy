@@ -27,16 +27,16 @@ jobs:
 
       # build agent and api for:
       #   linux-amd64
-      #   darwin-amd64
-      #   darwin-arm64
-      #   windows-amd-64
+      #   darwin-amd64   (disabled)
+      #   darwin-arm64   (disabled)
+      #   windows-amd-64 (disabled)
       - name: build binaries
         run: |
           for proj in agent api; do
             GOOS=linux   GOARCH=amd64 go build -o dist/${proj}-linux-amd64 ./${proj}
-            GOOS=darwin  GOARCH=amd64 go build -o dist/${proj}-darwin-amd64 ./${proj}
-            GOOS=darwin  GOARCH=arm64 go build -o dist/${proj}-darwin-arm64 ./${proj}
-            GOOS=windows GOARCH=amd64 go build -o dist/${proj}-windows-amd64.exe ./${proj}
+            # GOOS=darwin  GOARCH=amd64 go build -o dist/${proj}-darwin-amd64 ./${proj}
+            # GOOS=darwin  GOARCH=arm64 go build -o dist/${proj}-darwin-arm64 ./${proj}
+            # GOOS=windows GOARCH=amd64 go build -o dist/${proj}-windows-amd64.exe ./${proj}
           done
 
       # create the tag from recent branch
