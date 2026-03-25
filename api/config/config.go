@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	envConfigFile     = "QU_CONFIG_FILE"
-	defaultConfigFile = "config.yaml"
+	EnvConfigFile     = "QU_CONFIG_FILE"
+	DefaultConfigFile = "config.yaml"
 )
 
 var (
@@ -31,9 +31,9 @@ var (
 func LoadConfig() (*APIConfigSpec, error) {
 	cfg = new(APIConfigSpec)
 
-	config_file := os.Getenv(envConfigFile)
+	config_file := os.Getenv(EnvConfigFile)
 	if config_file == "" {
-		config_file = defaultConfigFile
+		config_file = DefaultConfigFile
 	}
 
 	bytes, err := os.ReadFile(config_file)

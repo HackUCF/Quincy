@@ -18,6 +18,11 @@ import (
 // steps through all of the initialization steps in the correct order
 // serves http using the gin router
 func main() {
+
+	// handle cli args
+	// may exit the program early
+	doCLI()
+
 	// load yaml config and validate
 	cfg, err := config.LoadConfig()
 	if err != nil {
