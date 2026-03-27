@@ -50,7 +50,7 @@ func doCLI() {
 		if err != nil {
 			log.Panic(
 				"failed to write default config file",
-				"config_file", config.DefaultConfigFile,
+				"config_file", config.DefaultConfigFile, 
 				"error", err,
 			)
 		}

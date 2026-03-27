@@ -10,7 +10,7 @@ import (
 // UpdateUser performs a password change request.
 // This performs no validation. Will cause an error if invalid input is given.
 // This query can only update the password in an existing row.
-func UpdateUser(userListID types.UserListID, teamNum types.TeamNum, user types.User) error {
+func UpdateUser(userListID types.UserListName, teamNum types.TeamNum, user types.User) error {
 	db := conn.Get()
 
 	query := `

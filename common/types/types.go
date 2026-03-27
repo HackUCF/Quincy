@@ -13,17 +13,17 @@ package types
 // [1, num_teams].
 type TeamNum uint32
 
-// UserListID is the unique identifier of a userlist.
-type UserListID string
+// UserListName is the unique identifier of a userlist.
+type UserListName string
 
-// ServiceID is the identifier of a service.
+// ServiceName is the identifier of a service.
 // This is unique under a single box, but different boxes can have services with the same ID.
-type ServiceID string
+type ServiceName string
 
-// BoxID is the unique identifier of a box.
-type BoxID string
+// BoxName is the unique identifier of a box.
+type BoxName string
 
-// CheckID is the identifier of a check.
+// CheckName is the identifier of a check.
 // This has no uniqueness constraint.
 // It has no meaning to the API; is only used by the agent.
-type CheckID string
+type CheckName string

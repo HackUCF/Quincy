@@ -4,11 +4,10 @@ package types
 // It adds the host variable from the box, and a specific teams number.
 // It is only missing a user, as this needs to be pulled from the db on demand.
 type ServiceTemplate struct {
-	DisplayName string     `json:"name"`
-	ID          ServiceID  `json:"id"`
-	CheckID     CheckID    `json:"check"`
-	UserList    UserListID `json:"user_list,omitempty,omitzero"`
-	BoxID       BoxID      `json:"box"`
+	Name      ServiceName  `json:"name"`
+	CheckName CheckName    `json:"check"`
+	UserList  UserListName `json:"user_list,omitempty,omitzero"`
+	BoxName   BoxName      `json:"box"`
 	// Arguments   map[string]any `json:"args,omitempty,omitzero"`
 
 	Host    string  `json:"host"`

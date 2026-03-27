@@ -34,8 +34,8 @@ func AddScore(score types.Score) error {
 		defer stmt.Close()
 
 		_, err = stmt.Exec(
-			score.ServiceID,
-			score.BoxID,
+			score.ServiceName,
+			score.BoxName,
 			score.TeamNum,
 			score.Status,
 			score.Message,
@@ -60,8 +60,8 @@ func AddScore(score types.Score) error {
 		defer stmt.Close()
 
 		_, err = stmt.Exec(
-			score.ServiceID,
-			score.BoxID,
+			score.ServiceName,
+			score.BoxName,
 			score.TeamNum,
 			score.Status,
 			score.Message,
@@ -95,8 +95,8 @@ func AddScore(score types.Score) error {
 
 		res, err := stmt.Exec(
 			passed,
-			score.ServiceID,
-			score.BoxID,
+			score.ServiceName,
+			score.BoxName,
 			score.TeamNum,
 		)
 		if err != nil {
@@ -111,7 +111,7 @@ func AddScore(score types.Score) error {
 		}
 		if rowsAffected == 0 {
 			err = fmt.Errorf("no matching row found in final_scores for service=%s, box=%s, team_num=%d",
-				score.ServiceID, score.BoxID, score.TeamNum)
+				score.ServiceName, score.BoxName, score.TeamNum)
 			return err
 		}
 	}

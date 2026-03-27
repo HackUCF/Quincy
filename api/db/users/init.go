@@ -36,7 +36,7 @@ func InitUsers(cfg *config.APIConfigSpec) error {
 				_, err := tx.Exec(
 					query,
 					t,
-					ul.ID,
+					ul.Name,
 					u.Username,
 					u.Password,
 					ul.DomainName,

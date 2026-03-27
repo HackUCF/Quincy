@@ -19,11 +19,11 @@ import (
 type scriptPath string
 
 var (
-	scriptCache      = make(map[types.CheckID]scriptPath)
+	scriptCache      = make(map[types.CheckName]scriptPath)
 	scriptCacheMutex sync.RWMutex
 )
 
-func (cfg *agentConfig) getScript(id types.CheckID) (scriptPath, error) {
+func (cfg *agentConfig) getScript(id types.CheckName) (scriptPath, error) {
 	scriptCacheMutex.RLock()
 	cachedPath, ok := scriptCache[id]
 	scriptCacheMutex.RUnlock()
@@ -87,7 +87,7 @@ func (cfg *agentConfig) runScript(script scriptPath, c types.Service) (scriptOut
 	// convert service to json
 	bytes, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
-		err = fmt.Errorf("failed to marshal json for check '%s': %w", c.CheckID, err)
+		err = fmt.Errorf("failed to marshal json for check '%s': %w", c.CheckName, err)
 		return output, err
 	}
 

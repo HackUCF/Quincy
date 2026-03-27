@@ -66,11 +66,11 @@ func GetScoreboardData() (*ScoreboardData, error) {
 	for rows.Next() {
 		// scan the necessary scores out
 		var s types.Score
-		rows.Scan(&s.ServiceID, &s.BoxID, &s.TeamNum, &s.Status, &s.Timestamp, &s.Message)
+		rows.Scan(&s.ServiceName, &s.BoxName, &s.TeamNum, &s.Status, &s.Timestamp, &s.Message)
 
 		// get x, y, and v
 		var point scoreboardPoint
-		point.X = string(s.BoxID) + "-" + string(s.ServiceID)
+		point.X = string(s.BoxName) + "-" + string(s.ServiceName)
 		point.Y = "team " + fmt.Sprintf("%d", s.TeamNum)
 		if s.Status {
 			point.V = 1

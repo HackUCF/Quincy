@@ -62,11 +62,11 @@ func GetHeatmapData() (*HeatmapData, error) {
 		// scan the aggregated scores out
 		var s types.Score
 		var passed, total uint64
-		rows.Scan(&s.ServiceID, &s.BoxID, &s.TeamNum, &passed, &total)
+		rows.Scan(&s.ServiceName, &s.BoxName, &s.TeamNum, &passed, &total)
 
 		// get x, y, and v
 		var point heatmapPoint
-		point.X = string(s.BoxID) + "-" + string(s.ServiceID)
+		point.X = string(s.BoxName) + "-" + string(s.ServiceName)
 		point.Y = fmt.Sprintf(labelFmt, s.TeamNum)
 		if total > 0 {
 			point.V = float64(passed) / float64(total)

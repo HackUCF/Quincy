@@ -52,13 +52,13 @@ func (cfg *agentConfig) run(id string) {
 	}
 
 	// identify script from check id
-	scriptPath, err := cfg.getScript(check.CheckID)
+	scriptPath, err := cfg.getScript(check.CheckName)
 	if err != nil {
 		log.Error(
 			"failed to get script path from check",
 			"runner_id", id,
 			"error", err,
-			"check", check.CheckID,
+			"check", check.CheckName,
 		)
 		return
 	}
@@ -69,17 +69,17 @@ func (cfg *agentConfig) run(id string) {
 			"failed to run check",
 			"runner_id", id,
 			"error", err,
-			"check", check.CheckID,
+			"check", check.CheckName,
 		)
 		return
 	}
 
 	score := types.Score{
-		TeamNum:   check.TeamNum,
-		Status:    out.status,
-		BoxID:     check.BoxID,
-		ServiceID: check.ID,
-		Message:   fmt.Sprintf("err %s\nout %s", out.stderr.String(), out.stdout.String()),
+		TeamNum:     check.TeamNum,
+		Status:      out.status,
+		BoxName:     check.BoxName,
+		ServiceName: check.Name,
+		Message:     fmt.Sprintf("err %s\nout %s", out.stderr.String(), out.stdout.String()),
 	}
 
 	data, err := json.Marshal(score)

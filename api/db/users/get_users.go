@@ -7,7 +7,7 @@ import (
 	"github.com/HackUCF/Quincy/common/types"
 )
 
-type AllUsers map[types.TeamNum]map[types.UserListID][]types.User
+type AllUsers map[types.TeamNum]map[types.UserListName][]types.User
 
 func GetAllUsers() (AllUsers, error) {
 	allUsers := make(AllUsers)
@@ -23,7 +23,7 @@ func GetAllUsers() (AllUsers, error) {
 
 	// loop vars
 	var t types.TeamNum
-	var ul types.UserListID
+	var ul types.UserListName
 	var user types.User
 
 	for rows.Next() {
@@ -33,7 +33,7 @@ func GetAllUsers() (AllUsers, error) {
 		}
 
 		if _, ok := allUsers[t]; !ok {
-			allUsers[t] = make(map[types.UserListID][]types.User)
+			allUsers[t] = make(map[types.UserListName][]types.User)
 		}
 
 		if _, ok := allUsers[t][ul]; !ok {

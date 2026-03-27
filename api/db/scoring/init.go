@@ -29,8 +29,8 @@ func InitScoring(cfg *config.APIConfigSpec) error {
 				// for every team, box, and service
 				_, err := tx.Exec(
 					query,
-					svc.ID,
-					box.ID,
+					svc.Name,
+					box.Name,
 					t,
 				)
 				if err != nil {

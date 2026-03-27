@@ -11,10 +11,9 @@ import (
 // UserListInfo represents a description of a userlist.
 // This can be used by a frontend to create a PCR form that does not exposes usernames/passwords.
 type UserListInfo struct {
-	ID      types.UserListID `json:"id"`
-	Name    string           `json:"name"`
-	Domain  string           `json:"domain"`
-	NetBIOS string           `json:"netbios"`
+	Name    types.UserListName `json:"name"`
+	Domain  string             `json:"domain"`
+	NetBIOS string             `json:"netbios"`
 }
 
 // GetUserLists is a route that returns descriptions of all userlists.
@@ -27,8 +26,7 @@ func GetUserLists(c *gin.Context) {
 
 	for _, ul := range cfg.UserLists {
 		info := UserListInfo{
-			ID:      ul.ID,
-			Name:    ul.DisplayName,
+			Name:    ul.Name,
 			Domain:  ul.DomainName,
 			NetBIOS: ul.NetBIOSName,
 		}

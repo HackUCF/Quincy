@@ -37,8 +37,8 @@ func GetDetailedScores() (DetailedScores, error) {
 
 	// holding variables, shit gets scanned into them
 	var teamNum types.TeamNum
-	var boxID types.BoxID
-	var serviceID types.ServiceID
+	var boxID types.BoxName
+	var serviceID types.ServiceName
 	var total, passed uint64
 
 	// loop through all of the teams
@@ -59,7 +59,7 @@ func GetDetailedScores() (DetailedScores, error) {
 
 		// create map for this box if it doesn't exist yet
 		if _, ok := scores[teamNum][boxID]; !ok {
-			scores[teamNum][boxID] = make(map[types.ServiceID]types.ScoreResult)
+			scores[teamNum][boxID] = make(map[types.ServiceName]types.ScoreResult)
 		}
 
 		// insert the result 😭

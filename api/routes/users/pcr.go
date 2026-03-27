@@ -8,17 +8,17 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/HackUCF/Quincy/api/config"
 	"github.com/HackUCF/Quincy/api/db/users"
 	"github.com/HackUCF/Quincy/common/types"
+	"github.com/gin-gonic/gin"
 )
 
 // PCR is the JSON object that must be posted to the server to complete a PCR.
 type PCR struct {
 	types.User
-	UserListID types.UserListID `json:"user_list"`
-	TeamNum    types.TeamNum    `json:"team_num"`
+	UserListName types.UserListName `json:"user_list"`
+	TeamNum      types.TeamNum      `json:"team_num"`
 }
 
 // SubmitPCR is a POST route for changing a scoring users password.
@@ -36,17 +36,17 @@ func SubmitPCR(c *gin.Context) {
 		return
 	}
 
-	if !config.UserListExists(pcr.UserListID) {
+	if !config.UserListExists(pcr.UserListName) {
 		resp := gin.H{
 			"message":   "user list does not exist",
-			"user_list": pcr.UserListID,
+			"user_list": pcr.UserListName,
 			"pcr":       pcr,
 		}
 		c.JSON(http.StatusBadRequest, resp)
 		return
 	}
 
-	err = users.UpdateUser(pcr.UserListID, pcr.TeamNum, pcr.User)
+	err = users.UpdateUser(pcr.UserListName, pcr.TeamNum, pcr.User)
 	if err != nil {
 		resp := gin.H{
 			"message": "could not update userlist",

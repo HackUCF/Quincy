@@ -71,11 +71,11 @@ func Get() *APIConfigSpec {
 	return cfg
 }
 
-// UserListExists determines if a UserListID exists in the config.
+// UserListExists determines if a UserListName exists in the config.
 // This can be used to validate user input.
-func UserListExists(userListID types.UserListID) bool {
+func UserListExists(userListID types.UserListName) bool {
 	for _, ul := range cfg.UserLists {
-		if userListID == ul.ID {
+		if userListID == ul.Name {
 			return true
 		}
 	}

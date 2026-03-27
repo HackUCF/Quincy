@@ -49,12 +49,11 @@ func InitServices(cfg *config.APIConfigSpec) error {
 func specToTemplate(serviceSpec config.ServiceSpec, boxSpec config.BoxSpec, t types.TeamNum) types.ServiceTemplate {
 	var st types.ServiceTemplate
 
-	st.DisplayName = serviceSpec.DisplayName
-	st.ID = serviceSpec.ID
-	st.CheckID = serviceSpec.CheckID
+	st.Name = serviceSpec.Name
+	st.CheckName = serviceSpec.CheckName
 	st.UserList = serviceSpec.UserList
 
-	st.BoxID = boxSpec.ID
+	st.BoxName = boxSpec.Name
 	st.Host = boxSpec.Host
 	st.TeamNum = t
 
