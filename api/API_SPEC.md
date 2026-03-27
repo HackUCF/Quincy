@@ -15,10 +15,10 @@ The API reads its configuration from a YAML file (default `config.yaml`, overrid
 | Type | Go Type | Description |
 |------|---------|-------------|
 | `TeamNum` | `uint32` | Team identifier, range `[1, num_teams]` |
-| `BoxID` | `string` | Unique box identifier (max 16 chars) |
-| `ServiceID` | `string` | Service identifier, unique per box (max 16 chars) |
-| `UserListID` | `string` | Unique userlist identifier (max 16 chars) |
-| `CheckID` | `string` | Check identifier used by agents to match scripts |
+| `BoxName` | `string` | Unique box name (serves as both identifier and display name) |
+| `ServiceName` | `string` | Service name, unique per box (serves as both identifier and display name) |
+| `UserListName` | `string` | Unique userlist name (serves as both identifier and display name) |
+| `CheckName` | `string` | Check name used by agents to match scripts |
 
 ### Score
 
@@ -39,8 +39,8 @@ Result of a completed score check.
 |-------|------|----------|-------------|
 | TeamNum | uint32 | `team_num` | Team that was checked |
 | Status | bool | `status` | `true` = pass, `false` = fail |
-| BoxID | string | `box` | Box identifier |
-| ServiceID | string | `service` | Service identifier |
+| BoxName | string | `box` | Box name |
+| ServiceName | string | `service` | Service name |
 | Message | string | `message` | Output message from the check |
 | Timestamp | int64 | `timestamp` | Unix microseconds (set server-side on insert) |
 
@@ -70,8 +70,7 @@ Fully rendered service check for an agent to execute.
 
 ```json
 {
-  "name":      "HTTP",
-  "id":        "http",
+  "name":      "http",
   "check":     "http",
   "user_list": "web_users",
   "box":       "web",
@@ -109,7 +108,7 @@ The `user` field is `null`/absent when the service has no `user_list`. The `user
 
 #### `GET /api/v1/scores/current` -- Current Status
 
-Get the most recent check result for every team/box/service combination. Sorted by team number, then box ID, then service ID.
+Get the most recent check result for every team/box/service combination. Sorted by team number, then box name, then service name.
 
 **Response (200):**
 
@@ -175,7 +174,7 @@ Get aggregated scores per box across all teams and services.
 }
 ```
 
-Map of `BoxID` to `ScoreResult`.
+Map of `BoxName` to `ScoreResult`.
 
 **Error (400):** `{"message": "failed to get final scores per box", "error": "..."}`
 
@@ -204,7 +203,7 @@ Get aggregated scores per box per service across all teams.
 }
 ```
 
-Nested map: `BoxID` -> `ServiceID` -> `ScoreResult`.
+Nested map: `BoxName` -> `ServiceName` -> `ScoreResult`.
 
 **Error (400):** `{"message": "failed to get final scores per box per service", "error": "..."}`
 
@@ -234,7 +233,7 @@ Get the most granular score breakdown: per team, per box, per service.
 }
 ```
 
-Triple-nested map: `TeamNum` -> `BoxID` -> `ServiceID` -> `ScoreResult`.
+Triple-nested map: `TeamNum` -> `BoxName` -> `ServiceName` -> `ScoreResult`.
 
 **Error (400):** `{"message": "failed to get final scores", "error": "..."}`
 
@@ -301,7 +300,7 @@ Returns all scoring users from all userlists for all teams, including their curr
 }
 ```
 
-Nested map: `TeamNum` (as string key) -> `UserListID` -> Array of `User`.
+Nested map: `TeamNum` (as string key) -> `UserListName` -> Array of `User`.
 
 **Error (400):** `{"message": "failed to get all users", "error": "..."}`
 
@@ -330,10 +329,10 @@ Update a scoring user's password.
 | Password | string | `password` | New password |
 | DomainName | string | `domain` | Domain (unused in update, but part of the User struct) |
 | NetBIOSName | string | `netbios` | NetBIOS name (unused in update) |
-| UserListID | string | `user_list` | Must match an existing userlist ID from config |
+| UserListName | string | `user_list` | Must match an existing userlist name from config |
 | TeamNum | uint32 | `team_num` | Must be in range `[1, num_teams]` |
 
-The server validates that the `user_list` exists in the config. The actual UPDATE query matches on `team_num`, `user_list`, and `username`, and only modifies the `password` column. If no row matches (wrong username, invalid team), a 500 error is returned.
+The server validates that the `user_list` name exists in the config. The actual UPDATE query matches on `team_num`, `user_list`, and `username`, and only modifies the `password` column. If no row matches (wrong username, invalid team), a 500 error is returned.
 
 **Responses:**
 
@@ -360,13 +359,11 @@ Returns the full API configuration including boxes, services, userlists with cre
   "db_file": "quincy.db",
   "boxes": [
     {
-      "name": "Web Server",
-      "id": "web",
+      "name": "web",
       "host": "10.0.1.5",
       "services": [
         {
-          "name": "HTTP",
-          "id": "http",
+          "name": "http",
           "check": "http",
           "user_list": "web_users"
         }
@@ -375,8 +372,7 @@ Returns the full API configuration including boxes, services, userlists with cre
   ],
   "user_lists": [
     {
-      "name": "Web Users",
-      "id": "web_users",
+      "name": "web_users",
       "domain": "CORP",
       "netbios": "DOMAIN",
       "users": [
@@ -412,8 +408,7 @@ If the service specifies a `user_list`, a random user is pulled from the databas
 
 ```json
 {
-  "name": "HTTP",
-  "id": "http",
+  "name": "http",
   "check": "http",
   "user_list": "web_users",
   "box": "web",

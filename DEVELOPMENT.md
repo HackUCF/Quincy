@@ -71,7 +71,7 @@ The scoring agent. Spawns a pool of goroutines that each loop independently: fet
 
 Shared packages used by both the API server and agent:
 
-- **types** -- Shared type aliases and structs (scores, services, team numbers, IDs).
+- **types** -- Shared type aliases and structs (scores, services, team numbers, names).
 - **log** -- Thin structured logging wrapper around Zap.
 - **middleware** -- Gin middleware for panic recovery and request logging.
 
@@ -80,7 +80,7 @@ Shared packages used by both the API server and agent:
 See the [check scripts section of USAGE.md](USAGE.md#check-scripts) for the full script interface. In short:
 
 1. Write a script in any language that reads a JSON file (passed as its first argument) and exits 0 on success.
-2. Name it so the prefix before the first `.` matches the check ID (case-insensitive).
+2. Name it so the prefix before the first `.` matches the check name (case-insensitive).
 3. Place it in the agent's scripts directory and make it executable.
 4. Add the corresponding service entry to the config.
 
@@ -115,5 +115,5 @@ go mod tidy
 - **Package comments** -- every package has a doc comment explaining its purpose.
 - **Structured logging** -- use `common/log` with key-value pairs, not `fmt.Println`.
 - **Error handling** -- errors are returned up the call stack. Fatal initialization errors use `log.Panic`.
-- **ID constraints** -- all IDs (box, service, check, user list) must be 16 characters or fewer and unique within their scope.
+- **Name constraints** -- box, service, and userlist names serve as identifiers. Box names and userlist names must be globally unique; service names must be unique within their box. The max string length is 16 characters (enforced by the database schema).
 - **Templates** -- host, domain, and NetBIOS fields use `{}` as a placeholder for the team number.

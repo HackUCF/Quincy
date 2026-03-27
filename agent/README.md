@@ -16,8 +16,8 @@ All configuration is via environment variables (with defaults for local developm
 
 - **main.go** - Entry point. Creates the agent config and launches goroutines, each with a unique UUID.
 - **config.go** - `getConfig()` reads environment variables and constructs the `agentConfig` struct with API endpoint URLs, directory paths, loop timing, and thread count.
-- **runner.go** - Core loop. `run()` fetches a check from the API, identifies and executes the matching script, then POSTs the score result back. `loop()` calls `run()` repeatedly with a sleep interval.
-- **scripts.go** - Script discovery and execution. `getScript()` finds a script file matching the check ID (with caching). `runScript()` writes service data to a temp JSON file and executes the script with a timeout.
+- **runner.go** - Core loop. `run()` fetches a check from the API, identifies and executes the matching script by `CheckName`, then POSTs the score result back. `loop()` calls `run()` repeatedly with a sleep interval.
+- **scripts.go** - Script discovery and execution. `getScript()` finds a script file matching the check name (with caching). `runScript()` writes service data to a temp JSON file and executes the script with a timeout.
 - **.air.toml** - Hot-reload configuration for development.
 
 ## Subdirectories

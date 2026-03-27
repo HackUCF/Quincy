@@ -21,19 +21,16 @@ num_teams: 5
 db_file: "./quincy.sqlite3"
 
 user_lists:
-  - name: Local Users
-    id: local
+  - name: local
     users:
       - username: admin
         password: P@ssw0rd!
 
 boxes:
-  - name: Web Server
-    id: webserver
+  - name: webserver
     host: 10.0.{}.1
     services:
-      - name: HTTP
-        id: http
+      - name: http
         check: http
 
 http:
@@ -57,12 +54,10 @@ A "box" is a server that each team operates. Define them under `boxes`:
 
 ```yaml
 boxes:
-  - name: Mail Server            # Display name
-    id: mailserver               # Short unique ID (16 chars max)
+  - name: mailserver             # Unique name (used as both ID and display name)
     host: 10.0.{}.2              # Address template ({} = team number)
     services:                    # What to check on this server
-      - name: SSH
-        id: ssh
+      - name: ssh
         check: ssh
         user_list: domain1       # Optional -- see User Lists below
 ```
@@ -75,8 +70,7 @@ Some checks need credentials to log in (like SSH). User lists let you define set
 
 ```yaml
 user_lists:
-  - name: Domain Users
-    id: domain1
+  - name: domain1
     domain: team{}.quin.cy       # Optional, {} = team number
     netbios: QUIN{}              # Optional, {} = team number
     users:
@@ -86,7 +80,7 @@ user_lists:
         password: GetV4p0rized!
 ```
 
-The `domain` and `netbios` fields are optional -- include them if your checks need them. To attach a user list to a service, set `user_list` on the service to the list's `id`.
+The `domain` and `netbios` fields are optional -- include them if your checks need them. To attach a user list to a service, set `user_list` on the service to the list's `name`.
 
 When a check runs, Quincy picks a random user from the list and sends their credentials to the script.
 
@@ -104,7 +98,8 @@ Use `0.0.0.0` as the host to accept connections from other machines.
 
 ### Config Rules
 
-- All IDs must be unique and 16 characters or fewer.
+- Box names must be unique. Service names must be unique within their box. Userlist names must be unique.
+- Names act as both the identifier and display name — there is no separate `id` field.
 - There must be at least one box, and each box needs at least one service.
 - If a service references a `user_list`, that list must be defined in `user_lists`.
 
@@ -198,8 +193,7 @@ The JSON file looks like this:
 
 ```json
 {
-  "name": "SSH",
-  "id": "ssh",
+  "name": "ssh",
   "check": "ssh",
   "box": "mailserver",
   "host": "10.0.3.2",
