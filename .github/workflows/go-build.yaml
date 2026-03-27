@@ -25,6 +25,15 @@ jobs:
         with:
           go-version-file: go.mod
 
+      # create the tag from recent branch
+      - name: generate tag
+        id: tag
+        run: |
+          VERSION="v0.0.$(git rev-list --count HEAD)"
+          TAG="${VERSION}-$(git rev-parse --short HEAD)"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       # build agent and api for:
       #   linux-amd64
       #   linux-arm64    (disabled)
@@ -33,20 +42,14 @@ jobs:
       #   windows-amd64  (disabled)
       - name: build binaries
         run: |
+          VERSION="${{ steps.tag.outputs.version }}"
           for proj in agent api; do
-            GOOS=linux   GOARCH=amd64 go build -o dist/${proj}-linux-amd64 ./${proj}
-            # GOOS=linux   GOARCH=arm64 go build -o dist/${proj}-linux-amd64 ./${proj}
-            # GOOS=darwin  GOARCH=amd64 go build -o dist/${proj}-darwin-amd64 ./${proj}
-            # GOOS=darwin  GOARCH=arm64 go build -o dist/${proj}-darwin-arm64 ./${proj}
-            # GOOS=windows GOARCH=amd64 go build -o dist/${proj}-windows-amd64.exe ./${proj}
+            GOOS=linux   GOARCH=amd64 go build -o dist/${proj}-linux-amd64-${VERSION} ./${proj}
+            # GOOS=linux   GOARCH=arm64 go build -o dist/${proj}-linux-arm64-${VERSION} ./${proj}
+            # GOOS=darwin  GOARCH=amd64 go build -o dist/${proj}-darwin-amd64-${VERSION} ./${proj}
+            # GOOS=darwin  GOARCH=arm64 go build -o dist/${proj}-darwin-arm64-${VERSION} ./${proj}
+            # GOOS=windows GOARCH=amd64 go build -o dist/${proj}-windows-amd64-${VERSION}.exe ./${proj}
           done
-
-      # create the tag from recent branch
-      - name: generate tag
-        id: tag
-        run: |
-          TAG="v0.0.$(git rev-list --count HEAD)-$(git rev-parse --short HEAD)"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       # release the binaries under the tag
       - name: create release
