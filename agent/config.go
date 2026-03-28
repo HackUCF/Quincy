@@ -17,12 +17,6 @@ const (
 	// QU_API_URL='https://proxy.quin.cy:8443/'
 	envAPIURL = "QU_API_URL"
 
-	// directory to store temporary files
-	// these temp files are used to communicate with scripts
-	// can be absolute or relative
-	// defaults to 'tmp'
-	envTempDir = "QU_TEMP_DIR"
-
 	// directory to search for scripts
 	// can be absolute or relative
 	// defaults to 'scripts'
@@ -40,10 +34,6 @@ const (
 	// default url for local api
 	// should only be used for development
 	defaultAPIURL = "http://127.0.0.1:8888"
-
-	// directory used to generate temporary files for communication with scripts
-	// platform independent ./tmp or .\tmp
-	defaultTempDir = "tmp"
 
 	// directory used to search for scripts
 	// platform independent ./scripts or .\scripts
@@ -63,9 +53,6 @@ type agentConfig struct {
 
 	// url to post a completed scorecheck to
 	scoreURL string
-
-	// directory to store temp files used to communcate with check scripts
-	tempDir string
 
 	// directory to find check scripts
 	checksDir string
@@ -128,26 +115,12 @@ func getConfig() agentConfig {
 		}
 	}
 
-	relTempDir := os.Getenv(envTempDir)
-	if relTempDir == "" {
-		relTempDir = defaultTempDir
-	}
-
-	var err error
-	cfg.tempDir, err = filepath.Abs(relTempDir)
-	if err != nil {
-		log.Panic(
-			"failed to create absolute path from relative temporary directory",
-			"temp_dir", relTempDir,
-			"error", err,
-		)
-	}
-
 	relChecksDir := os.Getenv(envScriptsDir)
 	if relChecksDir == "" {
 		relChecksDir = defaultScriptsDir
 	}
 
+	var err error
 	cfg.checksDir, err = filepath.Abs(relChecksDir)
 	if err != nil {
 		log.Panic(

@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/HackUCF/Quincy/common/types"
-	"github.com/google/uuid"
 )
 
 type scriptPath string
@@ -72,48 +71,49 @@ type scriptOutput struct {
 	stderr bytes.Buffer
 }
 
-func (cfg *agentConfig) runScript(script scriptPath, c types.Service) (scriptOutput, error) {
-	var output scriptOutput
-
-	// create a temporary file called {{uuid}}.json
-	uid, err := uuid.NewRandom()
-	if err != nil {
-		err = fmt.Errorf("failed to generate a random uuid. this should never happen: %w", err)
-		return output, err
-	}
-	tempFileName := uid.String() + ".json"
-	tempFilePath := filepath.Join(cfg.tempDir, tempFileName)
-
-	// convert service to json
+func (cfg *agentConfig) runScript(script scriptPath, c types.Service) (*scriptOutput, error) {
+	// convert service to json byte string
 	bytes, err := json.MarshalIndent(c, "", "  ")
 	if err != nil {
 		err = fmt.Errorf("failed to marshal json for check '%s': %w", c.CheckName, err)
-		return output, err
+		return nil, err
 	}
 
-	// write json to randomly named file
-	err = os.WriteFile(tempFilePath, bytes, 0666)
+	// create a temporary file
+	tmpFile, err := os.CreateTemp("", "quincy-*.json")
 	if err != nil {
-		err = fmt.Errorf("failed to write temp file '%s': %w", tempFilePath, err)
-		return output, err
+		err = fmt.Errorf("failed to create temporary file: %w", err)
+		return nil, err
+	}
+	tmpFilePath := tmpFile.Name()
+
+	// always close and remove
+	defer tmpFile.Close()
+	defer os.Remove(tmpFilePath)
+
+	// write json to temporary file
+	_, err = tmpFile.Write(bytes)
+	if err != nil {
+		err = fmt.Errorf("failed to write temp file '%s': %w", tmpFilePath, err)
+		return nil, err
 	}
 
-	// nuke that shit from orbit!!
-	defer os.Remove(tempFilePath)
+	output := new(scriptOutput)
 
 	// create timeout context to kill commands that run too long
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	// create command
-	cmd := exec.CommandContext(ctx, string(script), tempFilePath)
+	// capture output into buffers
+	cmd := exec.CommandContext(ctx, string(script), tmpFilePath)
 	cmd.Stdout = &output.stdout
 	cmd.Stderr = &output.stderr
 
 	// start it and block until completion
 	err = cmd.Run()
 
+	// exit 0 is success, anything else is failure
 	output.status = (err == nil)
-
 	return output, nil
 }

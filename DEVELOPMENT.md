@@ -23,34 +23,35 @@ cd Quincy
 go mod download
 ```
 
-Build both components:
+Build the single binary:
 
 ```bash
-cd api && go build . && cd ..
-cd agent && go build . && cd ..
+go build -o quincy .
 ```
 
 ## Development with Hot-Reload
 
-Both the API server and agent include Air configs for automatic rebuilds on file changes.
+Both the API server and agent have Air configs at the project root for automatic rebuilds on file changes.
 
 In one terminal:
 
 ```bash
-cd api
-air
+air -c api.air.toml
 ```
 
 In another terminal:
 
 ```bash
-cd agent
-air
+air -c agent.air.toml
 ```
 
 ## Project Layout
 
-The project is a Go module (`github.com/HackUCF/Quincy`) split into three top-level packages:
+The project is a Go module (`github.com/HackUCF/Quincy`) with a single entry point and four top-level packages:
+
+### `cmd/`
+
+The CLI layer. Builds the `quincy` binary using Cobra and wires up the subcommands: `api start`, `api config`, and `agent start`. This is the only `package main` in the module; the `api` and `agent` packages export their entry points as regular functions invoked by the CLI.
 
 ### `api/`
 

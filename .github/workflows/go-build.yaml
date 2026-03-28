@@ -35,11 +35,11 @@ jobs:
       #   windows-amd64  (disabled)
       - name: build binaries
         run: |
-          GOOS=linux   GOARCH=amd64 go build . -o dist/quincy-linux-amd64
-          # GOOS=linux   GOARCH=arm64 go build . -o dist/quincy-linux-arm64
-          # GOOS=darwin  GOARCH=amd64 go build . -o dist/quincy-darwin-amd64
-          # GOOS=darwin  GOARCH=arm64 go build . -o dist/quincy-darwin-arm64
-          # GOOS=windows GOARCH=amd64 go build . -o dist/quincy-windows-amd64.exe
+          GOOS=linux   GOARCH=amd64 go build -o dist/quincy-linux-amd64 .
+          # GOOS=linux   GOARCH=arm64 go build -o dist/quincy-linux-arm64 .
+          # GOOS=darwin  GOARCH=amd64 go build -o dist/quincy-darwin-amd64 .
+          # GOOS=darwin  GOARCH=arm64 go build -o dist/quincy-darwin-arm64 .
+          # GOOS=windows GOARCH=amd64 go build -o dist/quincy-windows-amd64.exe .
 
       # create the tag from recent branch
       - name: generate tag

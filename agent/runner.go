@@ -58,7 +58,7 @@ func (cfg *agentConfig) run(id string) {
 			"failed to get script path from check",
 			"runner_id", id,
 			"error", err,
-			"check", check.CheckName,
+			"check", check,
 		)
 		return
 	}

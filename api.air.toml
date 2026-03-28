@@ -1,0 +1,7 @@
+# run with:
+#   air -c agent.air.toml
+[build]
+  cmd = "go build -o quincy ."
+  entrypoint = ["./quincy", "api", "start"]
+  exclude_dir = ["agent"]
+  include_ext = ["go", "sql", "html", "yaml"]

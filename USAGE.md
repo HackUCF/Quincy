@@ -105,21 +105,26 @@ Use `0.0.0.0` as the host to accept connections from other machines.
 
 ## Starting the API Server
 
-Build and run:
+Build the binary and run the API server:
 
 ```bash
-cd api
-go build .
-./api
+go build -o quincy .
+./quincy api start
 ```
 
 The binary can be run from any directory -- it reads `config.yaml` from the current working directory. To use a config file at a different path:
 
 ```bash
-QU_CONFIG_FILE=/path/to/my-config.yaml ./api
+QU_CONFIG_FILE=/path/to/my-config.yaml ./quincy api start
 ```
 
 The database file (set by `db_file` in the config) is also resolved relative to the working directory, and is created automatically on the first run.
+
+To generate a default config file:
+
+```bash
+./quincy api config
+```
 
 ### API Server Settings
 
@@ -129,18 +134,17 @@ The database file (set by `db_file` in the config) is also resolved relative to 
 
 ## Starting the Agent
 
-Build and run:
+Build the binary (if not already built) and run the agent:
 
 ```bash
-cd agent
-go build .
-./agent
+go build -o quincy .
+./quincy agent start
 ```
 
 Like the API server, the agent binary can be run from anywhere. By default it connects to `http://127.0.0.1:8888`. If your API server is running somewhere else, set the `QU_API_URL` environment variable:
 
 ```bash
-QU_API_URL=http://api.quin.cy:8888 ./agent
+QU_API_URL=http://api.quin.cy:8888 ./quincy agent start
 ```
 
 You can also put settings in a `.env` file in the working directory:
@@ -154,7 +158,6 @@ QU_API_URL=http://api.quin.cy:8888
 | Variable | Default | What it does |
 |----------|---------|--------------|
 | `QU_API_URL` | `http://127.0.0.1:8888` | Where to find the API server |
-| `QU_TEMP_DIR` | `tmp` | Scratch directory for passing data to scripts |
 | `QU_CHECKS_DIR` | `scripts` | Where to find check scripts |
 
 You can run multiple agents on different machines, all pointed at the same API server, to distribute the checking workload.
