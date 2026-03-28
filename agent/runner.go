@@ -22,9 +22,18 @@ func (cfg *agentConfig) run(id string) {
 	resp, err := client.Get(cfg.checkURL)
 	if err != nil {
 		log.Error(
-			"failed to get a new request from api server",
+			"error requesting check from api server",
 			"runner_id", id,
 			"error", err,
+		)
+		return
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		log.Error(
+			"bad status code requesting check from api server",
+			"runner_id", id,
+			"code", resp.StatusCode,
 		)
 		return
 	}

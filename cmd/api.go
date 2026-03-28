@@ -23,6 +23,9 @@ var apiConfigCmd = &cobra.Command{
 }
 
 func initApiCmd() {
+	apiConfigCmd.Flags().BoolP("force", "f", false, "overwrite the config file if it already exists")
+	apiConfigCmd.Flags().BoolP("print", "p", false, "print the config to stdout instead")
+
 	apiCmd.AddCommand(apiStartCmd)
 	apiCmd.AddCommand(apiConfigCmd)
 }

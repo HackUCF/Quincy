@@ -6,6 +6,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/HackUCF/Quincy/api/config"
@@ -60,25 +61,45 @@ func Start(cmd *cobra.Command, args []string) {
 
 // DumpConfig generates the default config file in the default location.
 func DumpConfig(cmd *cobra.Command, args []string) {
-	// panic if file exists
-	_, err := os.Stat(config.DefaultConfigFile)
-	if !errors.Is(err, os.ErrNotExist) {
-		log.Panic(
-			"cannot dump config, file already exists",
-			"config_file", config.DefaultConfigFile,
-		)
+	var force bool
+	var print bool
+	var err error
+
+	// print and exit if requested
+	{
+		print, err = cmd.Flags().GetBool("print")
+		if err != nil {
+			panic(err)
+		}
+
+		if print {
+			fmt.Println(string(config.DefaultConfigBytes))
+			return
+		}
 	}
 
-	// write to file
-	err = os.WriteFile(config.DefaultConfigFile, config.DefaultConfigBytes, 0644)
-	if err != nil {
-		log.Panic(
-			"failed to write default config file",
-			"config_file", config.DefaultConfigFile,
-			"error", err,
-		)
-	}
+	// otherwise write to file
+	{
+		force, err = cmd.Flags().GetBool("force")
+		if err != nil {
+			panic(err)
+		}
 
-	// exit program
-	log.Info("successfully wrote config file, exiting...")
+		// check if file exists
+		_, err = os.Stat(config.DefaultConfigFile)
+		fileExists := !errors.Is(err, os.ErrNotExist)
+
+		// panic if not force overwrite
+		if fileExists && !force {
+			fmt.Println("The config file already exists. Use --force / -f to overwrite.")
+			os.Exit(1)
+		}
+
+		// write to file
+		err = os.WriteFile(config.DefaultConfigFile, config.DefaultConfigBytes, 0644)
+		if err != nil {
+			fmt.Printf("Failed to write the config file: %v\n", err)
+			os.Exit(1)
+		}
+	}
 }

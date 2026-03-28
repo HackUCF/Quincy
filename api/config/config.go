@@ -6,6 +6,7 @@ It has specification types that are meant to only represent the config as it is 
 package config
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"sync/atomic"
@@ -41,12 +42,14 @@ func LoadConfig() (*APIConfigSpec, error) {
 		config_file = DefaultConfigFile
 	}
 
-	bytes, err := os.ReadFile(config_file)
+	fileBytes, err := os.ReadFile(config_file)
 	if err != nil {
 		return nil, fmt.Errorf("could not read config file %q: %w", config_file, err)
 	}
 
-	err = yaml.Unmarshal(bytes, cfg)
+	// decode the config, failing if 
+	dec := yaml.NewDecoder(bytes.NewReader(fileBytes), yaml.DisallowUnknownField())
+	err = dec.Decode(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("could not unmarshall yaml from config file: %w", err)
 	}
