@@ -90,6 +90,22 @@ See the [check scripts section of USAGE.md](USAGE.md#check-scripts) for the full
 2. Register the route in the router setup within the routes package.
 3. If you need new database queries, add them in the relevant db subpackage.
 
+## Updating Documentation
+
+Documentation is kept in sync manually after code changes. Three Claude Code skills in `.claude/skills/` encode the conventions and process:
+
+| Skill | Invocation | Updates |
+|-------|------------|---------|
+| `update-docs` | `/update-docs` | Everything — module READMEs and the API spec |
+| `docs` | `/docs [area]` | Module READMEs only |
+| `api-spec` | `/api-spec` | `api/API_SPEC.md` only |
+
+Run a full documentation update after any non-trivial code change:
+
+```
+/update-docs
+```
+
 ## Dependencies
 
 Key direct dependencies:

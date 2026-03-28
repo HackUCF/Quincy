@@ -1,18 +1,17 @@
 ---
 name: docs
-description: Update Quincy documentation to reflect code changes. Use when source code has changed and docs need to catch up, or when asked to update/review/fix documentation.
+description: Update Quincy module READMEs to reflect code changes. Use when source code has changed and module docs need to catch up, or when asked to update/review/fix module documentation.
 argument-hint: "optional: specific area, e.g. api or agent or config"
 ---
 
-You are updating documentation for the Quincy scoring engine. The repo has two categories of documentation with different conventions.
+You are updating module documentation for the Quincy scoring engine. The repo has two categories of documentation with different conventions.
 
 ## Documentation Map
 
-**User-facing docs** (root level and `api/`):
+**User-facing docs** (root level):
 - `README.md` — project overview, do not change without good reason
 - `USAGE.md` — configuration guide and examples for running Quincy
 - `DEVELOPMENT.md` — developer guide: setup, layout, conventions
-- `api/API_SPEC.md` — full REST API reference with request/response shapes
 
 **Module READMEs** (one per package directory, throughout the repo):
 - Every subdirectory under `api/`, `agent/`, and `common/` has a `README.md`
@@ -39,14 +38,13 @@ Module READMEs must follow this format, in this order:
 
 When source code changes, identify which docs are affected:
 
-**Type/struct changes** → update `common/types/README.md` and `api/API_SPEC.md` (Data Types section)
+**Type/struct changes** → update `common/types/README.md`
 
 **Config shape changes** (adding/removing fields, renaming) → update:
 - `api/config/README.md`
-- `api/API_SPEC.md` (GET /api/v1/config response example)
 - `USAGE.md` (YAML examples and Config Rules section)
 
-**New or removed endpoints** → update `api/API_SPEC.md` and the relevant `api/routes/*/README.md`
+**New or removed endpoints** → update the relevant `api/routes/*/README.md`
 
 **Agent behavior changes** → update `agent/README.md` and/or `agent/scripts/README.md` and `USAGE.md` (Check Scripts section)
 
