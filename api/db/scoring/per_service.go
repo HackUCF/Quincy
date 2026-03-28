@@ -11,7 +11,7 @@ import (
 
 // ServiceScores is a nested map that can be used to quickly reference stats for a specific boxes' specific service.
 // very ugly but i cant think of a better way to do this.
-type ServiceScores map[types.BoxID]map[types.ServiceID]types.ScoreResult
+type ServiceScores map[types.BoxName]map[types.ServiceName]types.ScoreResult
 
 // GetServiceScores collates and calculates competion scores for each service on each box.
 func GetServiceScores() (ServiceScores, error) {
@@ -35,8 +35,8 @@ func GetServiceScores() (ServiceScores, error) {
 	defer rows.Close()
 
 	// holding variables, shit gets scanned into them
-	var boxID types.BoxID
-	var serviceID types.ServiceID
+	var boxID types.BoxName
+	var serviceID types.ServiceName
 	var total, passed uint64
 	// loop through all of the teams
 	for rows.Next() {
@@ -50,7 +50,7 @@ func GetServiceScores() (ServiceScores, error) {
 		// store in results (complicated)
 		// create map if it doesn't exist yet
 		if _, ok := scores[boxID]; !ok {
-			scores[boxID] = make(map[types.ServiceID]types.ScoreResult)
+			scores[boxID] = make(map[types.ServiceName]types.ScoreResult)
 		}
 		scores[boxID][serviceID] = getResult(total, passed)
 	}

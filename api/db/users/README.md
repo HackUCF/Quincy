@@ -1,10 +1,5 @@
 # db/users
 
-Contains all SQL queries for the `scoring_users` table. This table persistently stores per-team credentials so that password changes survive API restarts.
+Database queries for the scoring user credential table. This table is the source of truth for credentials during a competition — it is seeded from the config on startup but persists changes made via password change requests across restarts.
 
-## Files
-
-- **init.go** - `InitUsers()` seeds the `scoring_users` table with default usernames and passwords from the config. Uses `INSERT OR IGNORE` to preserve previously changed passwords.
-- **get_users.go** - `GetAllUsers()` returns every user across all teams and userlists as a nested map: team -> userlist -> users.
-- **random_user.go** - `GetRandomUser()` selects a random user from a specific userlist for a specific team. Used by the services package to attach credentials to checks.
-- **password_change.go** - `UpdateUser()` updates a single user's password in the database.
+Seeding uses insert-or-ignore so that credentials already updated in a previous run are not overwritten. Other queries cover fetching all users across every team and userlist (returned as a nested structure for easy serialization), selecting a random user for a given team and userlist (used when attaching credentials to a check before serving it to an agent), and updating a single user's password by matching on team, userlist, and username.

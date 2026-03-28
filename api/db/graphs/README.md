@@ -1,10 +1,5 @@
 # db/graphs
 
-Database queries for generating graph data.
+Database queries that produce data pre-formatted for chart rendering. Rather than returning raw rows, each query shapes its output into structures with pre-serialized label and data arrays ready to be dropped into Chart.js templates.
 
-## Files
-
-- **scoreboard.go** - `GetScoreboardData()` queries `recent_scores` and returns the latest check result per team/box/service as `ScoreboardData` (JSON-safe x-labels, y-labels, and data points for a matrix chart).
-- **scores.go** - `GetScoresData()` queries the `scores` table and returns time-bucketed cumulative point totals per team, formatted as `ScoresData` (JSON-safe label and dataset strings for a line chart).
-- **standings.go** - `GetStandingsData()` queries `final_scores` and returns total checks passed per team as `StandingsData` (JSON-safe label and data strings for a bar chart).
-- **heatmap.go** - `GetHeatmapData()` queries `final_scores` and returns the historical uptime percentage per team/box/service as `HeatmapData` (JSON-safe x-labels, y-labels, and data points for a matrix chart).
+Currently provides four queries: current service pass/fail status per team and service as a matrix (used for the scoreboard), cumulative points per team bucketed by timestamp over the full competition history (used for a line chart), total checks passed per team (used for a bar chart standings view), and historical uptime percentage per team per box/service combination (used for a heatmap).

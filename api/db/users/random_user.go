@@ -9,7 +9,7 @@ import (
 
 // GetRandomUser pulls a random user from a specific userlist for a specific team.
 // This performs no validation. Will fail with an error if invalid input is given.
-func GetRandomUser(userListID types.UserListID, teamNum types.TeamNum) (types.User, error) {
+func GetRandomUser(userListID types.UserListName, teamNum types.TeamNum) (types.User, error) {
 	db := conn.Get()
 	var u types.User
 

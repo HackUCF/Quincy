@@ -29,7 +29,7 @@ func GetCurrentServiceStatus() ([]types.Score, error) {
 
 	for rows.Next() {
 		var s types.Score
-		rows.Scan(&s.ServiceID, &s.BoxID, &s.TeamNum, &s.Status, &s.Message, &s.Timestamp)
+		rows.Scan(&s.ServiceName, &s.BoxName, &s.TeamNum, &s.Status, &s.Message, &s.Timestamp)
 		status = append(status, s)
 	}
 

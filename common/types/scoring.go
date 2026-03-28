@@ -3,12 +3,12 @@ package types
 // Score is the results of a completed score check.
 // It has a boolean pass/fail, and a string containing an output message.
 type Score struct {
-	TeamNum   TeamNum   `json:"team_num"`
-	Status    bool      `json:"status"`
-	BoxID     BoxID     `json:"box"`
-	ServiceID ServiceID `json:"service"`
-	Message   string    `json:"message"`
-	Timestamp int64     `json:"timestamp"`
+	TeamNum     TeamNum     `json:"team_num"`
+	Status      bool        `json:"status"`
+	BoxName     BoxName     `json:"box"`
+	ServiceName ServiceName `json:"service"`
+	Message     string      `json:"message"`
+	Timestamp   int64       `json:"timestamp"`
 }
 
 // ScoreResult is a flexible object used to store information about scoring results.

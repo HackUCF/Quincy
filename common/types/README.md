@@ -1,9 +1,5 @@
 # types
 
-Shared type definitions used by both the agent and API. Has no dependencies and is safe to import from any Go package in the project.
+Shared type definitions used by both the agent and the API server. Having these in a shared package with no internal dependencies allows both components to speak the same data language without either importing from the other.
 
-## Files
-
-- **types.go** - Core type aliases: `TeamNum`, `UserListID`, `ServiceID`, `BoxID`, and `CheckID`. These make function signatures self-documenting.
-- **scoring.go** - `Score` represents a completed check result (team, status, box, service, message, timestamp). `ScoreResult` holds aggregated stats (passed, failed, total, uptime percent).
-- **services.go** - `ServiceTemplate` contains everything an agent needs to run a check except credentials. `User` holds username, password, and optional domain info. `Service` combines a `ServiceTemplate` with an optional `User`.
+Provides string-typed name aliases for the five core domain entities — teams, boxes, services, userlists, and checks — so function signatures are self-documenting and the compiler catches mismatched identifiers. Also defines the structs that flow between components: a completed score result carrying team, box, service, pass/fail status, an output message, and a Unix microsecond timestamp; aggregated scoring statistics with pass/fail counts and a rounded uptime percentage; a service check template containing everything an agent needs to run a check except credentials (name, check name, box name, host address template, team number, and optional userlist reference); a user credential with username, password, and optional domain and NetBIOS name for Active Directory environments; and a fully rendered service check combining a template with an optional attached user.

@@ -1,21 +1,5 @@
 # db
 
-Contains all SQLite database logic and queries. Organized into subpackages by domain.
+The SQLite database layer for the API server. Coordinates connection setup, schema execution, and initial data seeding through a single initializer called at startup. Uses WAL journal mode and a single shared connection to balance concurrency with SQLite's write limitations.
 
-## Files
-
-- **init.go** - `InitDB()` orchestrates all database setup: connects via `conn.InitDBConnection()`, executes the schema, seeds users via `users.InitUsers()`, and seeds scoring rows via `scoring.InitScoring()`.
-- **schema.sql** - The SQLite schema. Defines four tables:
-  - `scores` - Full history of every check result.
-  - `recent_scores` - Only the most recent result per team/box/service (keyed by composite primary key).
-  - `final_scores` - Running pass/total counters per team/box/service for fast aggregate queries.
-  - `scoring_users` - Persistent credential storage for password change requests (PCRs).
-
-## Subpackages
-
-- **conn/** - Database connection management.
-- **scoring/** - Score insertion and aggregation queries.
-- **users/** - User/credential queries and initialization.
-- **graphs/** - Graph template data generation
-- **misc/** - Random functions that don't fit in elsewhere
-
+The schema defines four tables. The scores table is a full append-only archive of every check result, with indexes optimized for queries filtered by team and status or by team, timestamp, and status. The recent_scores table stores only the most recent result per team/box/service combination using a composite primary key, enabling fast current-status lookups without scanning the full archive. The final_scores table holds running pass and total counters per team/box/service for instant aggregate queries without aggregating over the archive. The scoring_users table is the persistent credential store, keyed on team, userlist, and username, so password changes survive API restarts. Subpackages handle scoring queries, user queries, graph data queries, and miscellaneous utilities independently.

@@ -10,7 +10,7 @@ import (
 )
 
 // BoxScores is a map that can be used to quickly reference stats for a specific box.
-type BoxScores map[types.BoxID]types.ScoreResult
+type BoxScores map[types.BoxName]types.ScoreResult
 
 // GetBoxScores collates and calculates competion scores for all teams.
 func GetBoxScores() (BoxScores, error) {
@@ -34,7 +34,7 @@ func GetBoxScores() (BoxScores, error) {
 	defer rows.Close()
 
 	// holding variables, shit gets scanned into them
-	var boxID types.BoxID
+	var boxID types.BoxName
 	var total, passed uint64
 
 	// loop through all of the teams

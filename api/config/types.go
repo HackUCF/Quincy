@@ -13,37 +13,34 @@ type APIConfigSpec struct {
 
 // BoxSpec contains the config specification of one box.
 // It is the parent to a list of services.
-// The ID is enforced to be unique, but multiple boxes can have identical services or hosts.
+// The Name is enforced to be unique, but multiple boxes can have identical services or hosts.
 type BoxSpec struct {
-	DisplayName string        `yaml:"name"           json:"name"`
-	ID          types.BoxID   `yaml:"id"             json:"id"`
-	Host        string        `yaml:"host,omitempty" json:"host,omitempty"`
-	Services    []ServiceSpec `yaml:"services"       json:"services"`
+	Name     types.BoxName `yaml:"name"             json:"name"`
+	Host     string        `yaml:"host,omitempty" json:"host,omitempty"`
+	Services []ServiceSpec `yaml:"services"       json:"services"`
 }
 
 // ServiceSpec contains the config specification of one service.
-// This always belongs to a box, but it is not linked directly.
-// Service IDs are only unique per individual boxes.
+// This always belongs to a box, but the object is not linked directly.
+// Service Names are only unique per individual boxes.
 // Multiple boxes can have SSH, but one box can't have two SSH-es
 // (SSH2 would be f
 type ServiceSpec struct {
-	DisplayName string           `yaml:"name"                json:"name"`
-	ID          types.ServiceID  `yaml:"id"                  json:"id"`
-	CheckID     types.CheckID    `yaml:"check"               json:"check"`
-	UserList    types.UserListID `yaml:"user_list,omitempty" json:"user_list,omitempty"`
+	Name      types.ServiceName  `yaml:"name"                json:"name"`
+	CheckName types.CheckName    `yaml:"check"               json:"check"`
+	UserList  types.UserListName `yaml:"user_list,omitempty" json:"user_list,omitempty"`
 	// Arguments   map[string]any    `yaml,json:"args"`
 }
 
 // UserListSpec contains the definition of a userlist.
-// Userlists have a unique ID, and a display name.
+// Userlists have a unique name.
 // Optionally, they can have a Domain or NetBIOS name.
 // These apply to every user in the list.
 type UserListSpec struct {
-	DisplayName string           `yaml:"name"              json:"name"`
-	ID          types.UserListID `yaml:"id"                json:"id"`
-	DomainName  string           `yaml:"domain,omitempty"  json:"domain,omitempty"`
-	NetBIOSName string           `yaml:"netbios,omitempty" json:"netbios,omitempty"`
-	Users       []UserSpec       `yaml:"users"             json:"users"`
+	Name        types.UserListName `yaml:"name"                json:"name"`
+	DomainName  string             `yaml:"domain,omitempty"  json:"domain,omitempty"`
+	NetBIOSName string             `yaml:"netbios,omitempty" json:"netbios,omitempty"`
+	Users       []UserSpec         `yaml:"users"             json:"users"`
 }
 
 // UserSpec is the config specification of a single user.

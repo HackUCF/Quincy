@@ -1,8 +1,3 @@
 # services
 
-Generates and serves the queue of service checks that agents consume. On startup, builds a list of every service for every box for every team, shuffles it, then serves entries in round-robin fashion using a lock-free atomic counter for safe concurrent access.
-
-## Files
-
-- **services.go** - `InitServices()` reads the config and generates a shuffled list of `ServiceTemplate` objects covering all team/box/service combinations. Contains the `specToTemplate()` helper for converting config specs into templates.
-- **get_next.go** - `GetNext()` atomically increments the index and returns the next service in the queue, attaching a random user from the database if the service has a userlist.
+Generates and serves the queue of service checks consumed by agents. On startup, expands the config into a flat list of every combination of team, box, and service, then shuffles it randomly. Agents call a single endpoint to receive the next check; the queue is served round-robin using a lock-free atomic counter so any number of concurrent agent goroutines can call the same endpoint safely without contention. When the end of the queue is reached it wraps back to the beginning. If the service has a userlist, a random user is pulled from the database for that team and attached to the check before it is returned.
