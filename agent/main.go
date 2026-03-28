@@ -1,5 +1,5 @@
 /*
-Command agent runs concurrent scoring threads that fetch checks from the API server, execute
+Package agent runs concurrent scoring threads that fetch checks from the API server, execute
 the corresponding scripts, and report results back.
 
 Configuration is driven by environment variables:
@@ -9,15 +9,16 @@ Configuration is driven by environment variables:
   - QU_LOOP_TIME: seconds to wait between check cycles (default 1)
   - QU_NUM_THREADS: number of concurrent scoring goroutines (default 15)
 */
-package main
+package agent
 
 import (
 	"github.com/HackUCF/Quincy/common/log"
 	"github.com/google/uuid"
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/spf13/cobra"
 )
 
-func main() {
+// Start is the CLI entry point for running the agent.
+func Start(cmd *cobra.Command, args []string) {
 	cfg := getConfig()
 
 	for range cfg.numThreads {

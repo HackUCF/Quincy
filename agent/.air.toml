@@ -1,4 +1,0 @@
-[build]
-  cmd = "go build ."
-  entrypoint = "./agent"
-  include_ext = ["go"]

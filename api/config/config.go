@@ -13,7 +13,12 @@ import (
 	"github.com/HackUCF/Quincy/common/log"
 	"github.com/HackUCF/Quincy/common/types"
 	"github.com/goccy/go-yaml"
+
+	_ "embed"
 )
+
+//go:embed default-config.yaml
+var DefaultConfigBytes []byte
 
 const (
 	EnvConfigFile     = "QU_CONFIG_FILE"

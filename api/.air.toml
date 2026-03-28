@@ -1,4 +1,0 @@
-[build]
-  cmd = "go build ."
-  entrypoint = "./api"
-  include_ext = ["go", "sql", "yaml", "html"]
