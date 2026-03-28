@@ -1,12 +1,5 @@
 # routes/graphs
 
-Gin route handlers for generating graphs.
+HTTP route handlers that render live scoring visualizations as HTML pages. Each handler queries the database, injects the results into a Go template, and returns a fully rendered Chart.js chart. Templates are stored in an embedded filesystem and parsed at startup.
 
-## Files
-
-- **scoreboard.go** - `GetScoreboard()` renders a Chart.js scoreboard with up to date statuses from the database.
-- **scores.go** - `GetScores()` renders a Chart.js line graph of cumulative points per team over time, served as HTML.
-- **standings.go** - `GetStandings()` renders a Chart.js bar chart of total checks passed per team, served as HTML.
-- **heatmap.go** - `GetHeatmap()` renders a Chart.js heatmap of historical uptime percentage per team per box/service, served as HTML.
-- **templates/\*** - Contains Golang template files used to generate the correct graphs.
-- **templates.go** - Stores and parses the templates from an embedded filesystem.
+Currently provides four chart endpoints: a service status scoreboard rendered as a color matrix (pass/fail per team per service), cumulative team scores over time as a line chart, team standings by total checks passed as a bar chart, and historical uptime per team per box/service as a heatmap.

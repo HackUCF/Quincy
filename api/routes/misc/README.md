@@ -1,8 +1,3 @@
 # routes/misc
 
-Gin route handlers that don't belong in other categories.
-
-## Files
-
-- **no_route.go** - `NoRoute()` is the 404 handler. Returns a JSON response with the unmatched path and method.
-- **get_config.go** - `GetConfig()` serves the full API configuration as JSON at `GET /api/v1/config`. Useful for frontends to discover boxes, services, and userlists.
+HTTP route handlers that don't fit in other categories. Currently provides two handlers: a catch-all 404 handler that returns the unmatched path and HTTP method as JSON, and a config endpoint that serializes and returns the full parsed API configuration including boxes, services, userlists with credentials, and HTTP settings.

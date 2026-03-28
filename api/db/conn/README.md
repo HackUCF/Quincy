@@ -1,7 +1,3 @@
 # db/conn
 
-Manages the SQLite database connection. Initializes the connection using the database file path from the API config, configures driver settings (WAL journal mode, shared cache, single connection), and exposes the global `*sql.DB` via `Get()`.
-
-## Files
-
-- **conn.go** - `InitDBConnection()` opens the SQLite database and configures connection pooling. `Get()` returns the shared `*sql.DB` instance.
+Manages the SQLite database connection for the rest of the database layer. Opens the database file specified in the config and builds a connection string that enables WAL journal mode, shared cache, and a 5-second busy timeout to handle concurrent access gracefully. The connection pool is constrained to a single open and idle connection, which is appropriate for SQLite's single-writer model. Exposes the initialized connection via a global getter used by all other database subpackages.

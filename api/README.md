@@ -1,18 +1,5 @@
 # api
 
-The central API server. Loads a YAML config, initializes a SQLite database, generates the service check queue, and serves a JSON REST API over HTTP using Gin.
+The central API server. It loads competition configuration from a YAML file, initializes a SQLite database, builds a shuffled service check queue, and serves a JSON REST API over HTTP using Gin. Startup order is fixed — config must load before the database can initialize, and the database must be ready before services can be queued — so any failure in an earlier step halts startup entirely.
 
-Startup order: config -> database -> services -> HTTP server.
-
-## Files
-
-- **main.go** - Entry point. Calls init functions for config, database, services, then starts the HTTP server.
-- **config.yaml** - Example/default configuration file defining teams, boxes, services, userlists, and HTTP settings.
-- **.air.toml** - Hot-reload configuration for the Air live-reloader during development.
-
-## Subpackages
-
-- **config/** - YAML config loading, types, and validation.
-- **db/** - SQLite connection, schema, and all database queries.
-- **routes/** - Gin HTTP router and all route handlers.
-- **services/** - Service check queue generation and serving.
+The binary also supports a CLI flag to generate a default config file on disk. The default config is embedded in the binary at build time, so the binary is self-contained and can bootstrap a new setup without any external files.

@@ -1,9 +1,5 @@
 # config
 
-Loads, validates, and serves the API configuration from a YAML file (default `config.yaml`, overridable via `QU_CONFIG_FILE` env var). The config defines teams, boxes, services, userlists, and HTTP listener settings.
+Loads, stores, and provides access to the API configuration from a YAML file. The config file path defaults to `config.yaml` in the working directory and can be overridden with an environment variable. The parsed config is stored as a package-level global, so the rest of the server can access it without passing it around explicitly.
 
-## Files
-
-- **types.go** - Defines the configuration struct hierarchy: `APIConfigSpec`, `BoxSpec`, `ServiceSpec`, `UserListSpec`, `UserSpec`, and `HTTPSpec`. `BoxSpec`, `ServiceSpec`, and `UserListSpec` each have a single `Name` field (type `BoxName`, `ServiceName`, `UserListName` respectively) that acts as both the unique identifier and display name — there is no separate `id` field.
-- **config.go** - `InitConfig()` reads and unmarshals the YAML file, validates it, and stores it globally. `Get()` returns the loaded config. `UserListExists()` checks if a `UserListName` is valid.
-- **validation.go** - Validation stubs (all currently TODO). The `MaxStringLength` constant (16) is defined here for use by the database schema.
+Provides an initializer that reads and unmarshals the YAML file on startup, a global accessor for the rest of the server, and a helper that checks whether a given userlist name exists — used to validate PCR requests. The config describes the full competition setup: number of teams, boxes with host address templates, services on each box with their check assignments and optional userlist references, credential userlists with optional domain and NetBIOS settings, and the HTTP listener address and port. Validation logic is currently stubbed out. The max entity name length (16 characters) is defined as a constant here since it is shared with the database schema.

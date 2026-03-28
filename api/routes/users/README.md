@@ -1,9 +1,3 @@
 # routes/users
 
-Gin route handlers for user and credential management endpoints.
-
-## Files
-
-- **get_users.go** - `GetAllUsers()` handles `GET /api/v1/users`. Returns all users with their current passwords for every team and userlist.
-- **get_userlists.go** - `GetUserLists()` returns userlist metadata (name, domain, NetBIOS) without exposing usernames or passwords. Intended for building obfuscated PCR forms.
-- **pcr.go** - `SubmitPCR()` handles `POST /api/v1/users`. Accepts a password change request (PCR) containing a team number, userlist name, username, and new password. Validates that the userlist exists before updating.
+HTTP route handlers for user and credential management. Provides three endpoints: one that returns all current credentials for every user, team, and userlist (intended for admin/internal use); one that returns userlist metadata — name, domain, and NetBIOS — without exposing usernames or passwords, intended for frontends building password change forms; and one that accepts a password change request containing a team number, userlist name, username, and new password, validates that the userlist exists, and updates the credential in the database.
