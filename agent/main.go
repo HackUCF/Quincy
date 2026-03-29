@@ -14,11 +14,10 @@ package agent
 import (
 	"github.com/HackUCF/Quincy/common/log"
 	"github.com/google/uuid"
-	"github.com/spf13/cobra"
 )
 
 // Start is the CLI entry point for running the agent.
-func Start(cmd *cobra.Command, args []string) {
+func Start() {
 	cfg := getConfig()
 
 	for range cfg.numThreads {

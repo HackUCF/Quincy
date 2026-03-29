@@ -5,27 +5,46 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var apiCmd = &cobra.Command{
-	Use:   "api",
-	Short: "Scoring API server",
+func apiCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "api",
+		Short: "Scoring API server",
+		// no "Run" means print help command
+	}
+
+	cmd.AddCommand(
+		apiStartCmd(),
+		apiConfigCmd(),
+	)
+
+	return cmd
 }
 
-var apiStartCmd = &cobra.Command{
-	Run:   api.Start,
-	Use:   "start",
-	Short: "Start the API server",
+func apiStartCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "start",
+		Short: "Start the API server",
+		Run: func(cmd *cobra.Command, args []string) {
+			api.Start()
+		},
+	}
+
+	return cmd
 }
 
-var apiConfigCmd = &cobra.Command{
-	Run:   api.DumpConfig,
-	Use:   "config",
-	Short: "Dump the default YAML config file",
-}
+func apiConfigCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "dump-config",
+		Short: "Dump the default YAML config file",
+		Run: func(cmd *cobra.Command, args []string) {
+			force, _ := cmd.Flags().GetBool("force")
+			print, _ := cmd.Flags().GetBool("print")
+			api.DumpConfig(force, print)
+		},
+	}
 
-func initApiCmd() {
-	apiConfigCmd.Flags().BoolP("force", "f", false, "overwrite the config file if it already exists")
-	apiConfigCmd.Flags().BoolP("print", "p", false, "print the config to stdout instead")
+	cmd.Flags().BoolP("force", "f", false, "overwrite the config file if it already exists")
+	cmd.Flags().BoolP("print", "p", false, "print the config to stdout instead")
 
-	apiCmd.AddCommand(apiStartCmd)
-	apiCmd.AddCommand(apiConfigCmd)
+	return cmd
 }

@@ -5,17 +5,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var agentCmd = &cobra.Command{
-	Use:   "agent",
-	Short: "Scoring agent",
+func agentCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "agent",
+		Short: "Scoring agent",
+		// no "Run" means print help command
+	}
+
+	cmd.AddCommand(agentStartCmd())
+
+	return cmd
 }
 
-var agentStartCmd = &cobra.Command{
-	Run:   agent.Start,
-	Use:   "start",
-	Short: "Start the scoring agent",
-}
+func agentStartCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "start",
+		Short: "Start the scoring agent",
+		Run: func(cmd *cobra.Command, args []string) {
+			agent.Start()
+		},
+	}
 
-func initAgentCmd() {
-	agentCmd.AddCommand(agentStartCmd)
+	return cmd
 }
