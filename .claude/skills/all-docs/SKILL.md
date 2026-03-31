@@ -1,5 +1,5 @@
 ---
-name: update-docs
+name: all-docs
 description: Update all Quincy documentation — module READMEs and the API spec — to reflect the current state of the code. Use after any non-trivial code change, or when asked to bring docs up to date.
 ---
 

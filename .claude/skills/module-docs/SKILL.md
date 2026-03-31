@@ -1,5 +1,5 @@
 ---
-name: docs
+name: module-docs
 description: Update Quincy module READMEs to reflect code changes. Use when source code has changed and module docs need to catch up, or when asked to update/review/fix module documentation.
 argument-hint: "optional: specific area, e.g. api or agent or config"
 ---

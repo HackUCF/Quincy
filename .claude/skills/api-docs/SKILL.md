@@ -1,5 +1,5 @@
 ---
-name: api-spec
+name: api-docs
 description: Update api/API_SPEC.md to reflect the current state of the codebase. Use when routes, request/response shapes, data types, or database behavior have changed.
 ---
 
