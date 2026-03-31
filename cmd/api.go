@@ -1,16 +1,21 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/HackUCF/Quincy/api"
+	"github.com/HackUCF/Quincy/api/config"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func apiCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "api",
 		Short: "Scoring API server",
-		// no "Run" means print help command
 	}
+
+	cmd.PersistentFlags().StringP("config", "c", "config.yaml", "config file path")
 
 	cmd.AddCommand(
 		apiStartCmd(),
@@ -21,15 +26,23 @@ func apiCmd() *cobra.Command {
 }
 
 func apiStartCmd() *cobra.Command {
-	cmd := &cobra.Command{
+	return &cobra.Command{
 		Use:   "start",
 		Short: "Start the API server",
-		Run: func(cmd *cobra.Command, args []string) {
-			api.Start()
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfgFile, _ := cmd.Flags().GetString("config")
+			viper.SetConfigFile(cfgFile)
+			if err := viper.ReadInConfig(); err != nil {
+				return fmt.Errorf("failed to read config file %q: %w", cfgFile, err)
+			}
+
+			var cfg config.APIConfigSpec
+			if err := viper.Unmarshal(&cfg); err != nil {
+				return fmt.Errorf("failed to unmarshal config: %w", err)
+			}
+			return api.Start(&cfg)
 		},
 	}
-
-	return cmd
 }
 
 func apiConfigCmd() *cobra.Command {

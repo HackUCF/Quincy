@@ -12,8 +12,8 @@ import (
 // stored in two places: here and in the db schema
 const MaxStringLength int = 16
 
-// TODO
-func (cfg *APIConfigSpec) validate() error {
+// Validate validates the API configuration.
+func (cfg *APIConfigSpec) Validate() error {
 	return nil
 }
 

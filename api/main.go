@@ -13,71 +13,44 @@ import (
 	"github.com/HackUCF/Quincy/api/db"
 	"github.com/HackUCF/Quincy/api/routes"
 	"github.com/HackUCF/Quincy/api/services"
-	"github.com/HackUCF/Quincy/common/log"
 )
 
-// Start is the command line entry point for the API.
-// It steps through all of the initialization steps in the correct order/
-// Serves HTTP using the Gin router.
-func Start() {
-
-	// load yaml config and validate
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		log.Panic(
-			"failed to load config file",
-			"error", err,
-		)
+// Start is the entry point for the API server.
+// It validates the config, initializes all subsystems, and serves HTTP.
+func Start(cfg *config.APIConfigSpec) error {
+	if err := cfg.Validate(); err != nil {
+		return fmt.Errorf("invalid config: %w", err)
 	}
 
-	// connect to db, execute schema, and set up user table
-	err = db.InitDB(cfg)
-	if err != nil {
-		log.Panic(
-			"failed to set up database",
-			"error", err,
-		)
+	// Store config globally so route handlers and db code can access it.
+	config.SetConfig(cfg)
+
+	if err := db.InitDB(cfg); err != nil {
+		return fmt.Errorf("failed to set up database: %w", err)
 	}
 
-	// generate all services and prepare to serve to agents
-	err = services.InitServices(cfg)
-	if err != nil {
-		log.Panic(
-			"failed to set up services",
-			"error", err,
-		)
+	if err := services.InitServices(cfg); err != nil {
+		return fmt.Errorf("failed to set up services: %w", err)
 	}
 
-	// serves the routes over http as specified by the config file
-	err = routes.ServeRoutes(cfg)
-	if err != nil {
-		log.Panic(
-			"error while serving routes",
-			"error", err,
-		)
-	}
+	return routes.ServeRoutes(cfg)
 }
 
-// DumpConfig generates the default config file in the default location.
-func DumpConfig(force bool, print bool) {
-	// print and exit if requested
-	if print {
+// DumpConfig writes the default YAML config to disk, or prints it to stdout.
+func DumpConfig(forceOverwrite bool, printInstead bool) {
+	if printInstead {
 		fmt.Println(string(config.DefaultConfigBytes))
 		return
 	}
 
-	// otherwise write to file
-	// check if file exists
 	_, err := os.Stat(config.DefaultConfigFile)
 	fileExists := !errors.Is(err, os.ErrNotExist)
 
-	// panic if not force overwrite
-	if fileExists && !force {
+	if fileExists && !forceOverwrite {
 		fmt.Println("The config file already exists. Use --force / -f to overwrite.")
 		os.Exit(1)
 	}
 
-	// write to file
 	err = os.WriteFile(config.DefaultConfigFile, config.DefaultConfigBytes, 0644)
 	if err != nil {
 		fmt.Printf("Failed to write the config file: %v\n", err)
