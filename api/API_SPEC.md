@@ -6,7 +6,7 @@ All endpoints are prefixed with `/api/v1`. The server listens on the host and po
 
 ## Configuration
 
-The API reads its configuration from a YAML file (default `config.yaml`, override with `QU_CONFIG_FILE` environment variable). A `.env` file is automatically loaded if present.
+The API reads its configuration from a YAML file. The path defaults to `config.yaml` in the working directory and can be overridden with the `--config` (or `-c`) flag on `quincy api start`. A `.env` file is automatically loaded if present.
 
 ## CORS
 
@@ -348,7 +348,7 @@ Returns the full parsed API configuration. Useful for frontends to discover boxe
 }
 ```
 
-`host` on a box is omitted when empty. `user_list` on a service, and `domain`/`netbios` on a userlist, are omitted when empty.
+`user_list` on a service, and `domain`/`netbios` on a userlist, are omitted when empty. `host` on a box is always present.
 
 **Error (500):** `{"message": "failed to get config", "error": "..."}`
 

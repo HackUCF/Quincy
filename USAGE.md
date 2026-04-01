@@ -112,10 +112,10 @@ go build -o quincy .
 ./quincy api start
 ```
 
-The binary can be run from any directory -- it reads `config.yaml` from the current working directory. To use a config file at a different path:
+The binary can be run from any directory -- it reads `config.yaml` from the current working directory. To use a config file at a different path, pass the `--config` (or `-c`) flag:
 
 ```bash
-QU_CONFIG_FILE=/path/to/my-config.yaml ./quincy api start
+./quincy api start --config /path/to/my-config.yaml
 ```
 
 The database file (set by `db_file` in the config) is also resolved relative to the working directory, and is created automatically on the first run.
@@ -123,14 +123,14 @@ The database file (set by `db_file` in the config) is also resolved relative to 
 To generate a default config file:
 
 ```bash
-./quincy api config
+./quincy api dump-config
 ```
 
 ### API Server Settings
 
-| Variable | Default | What it does |
-|----------|---------|--------------|
-| `QU_CONFIG_FILE` | `config.yaml` | Path to the YAML config file |
+| Flag | Default | What it does |
+|------|---------|--------------|
+| `--config` / `-c` | `config.yaml` | Path to the YAML config file |
 
 ## Starting the Agent
 
@@ -147,7 +147,7 @@ Like the API server, the agent binary can be run from anywhere. By default it co
 QU_API_URL=http://api.quin.cy:8888 ./quincy agent start
 ```
 
-You can also put settings in a `.env` file in the working directory:
+You can also put settings in a `.env` file in the working directory, or pass them directly as flags:
 
 ```
 QU_API_URL=http://api.quin.cy:8888
@@ -155,10 +155,14 @@ QU_API_URL=http://api.quin.cy:8888
 
 ### Agent Settings
 
-| Variable | Default | What it does |
-|----------|---------|--------------|
-| `QU_API_URL` | `http://127.0.0.1:8888` | Where to find the API server |
-| `QU_CHECKS_DIR` | `scripts` | Where to find check scripts |
+Each flag can also be set as an environment variable with the `QU_` prefix.
+
+| Flag | Env var | Default | What it does |
+|------|---------|---------|--------------|
+| `--api-url` | `QU_API_URL` | `http://127.0.0.1:8888` | Where to find the API server |
+| `--checks-dir` | `QU_CHECKS_DIR` | `scripts` | Where to find check scripts |
+| `--loop-time` | `QU_LOOP_TIME` | `1` | Seconds between scoring loops |
+| `--num-threads` | `QU_NUM_THREADS` | `15` | Number of concurrent scoring goroutines |
 
 You can run multiple agents on different machines, all pointed at the same API server, to distribute the checking workload.
 

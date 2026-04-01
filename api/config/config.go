@@ -25,7 +25,7 @@ var (
 )
 
 // SetConfig stores the config globally and computes derived state.
-// Must be called before Get(), UserListExists(), or TeamRange.
+// Must be called before Get() or TeamRange.
 func SetConfig(c *APIConfigSpec) {
 	cfg = c
 
@@ -46,13 +46,3 @@ func Get() *APIConfigSpec {
 	return cfg
 }
 
-// UserListExists determines if a UserListName exists in the config.
-func UserListExists(userListID types.UserListName) bool {
-	for _, ul := range cfg.UserLists {
-		if userListID == ul.Name {
-			return true
-		}
-	}
-
-	return false
-}

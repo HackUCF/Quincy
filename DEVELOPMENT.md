@@ -97,9 +97,9 @@ Documentation is kept in sync manually after code changes. Three Claude Code ski
 
 | Skill | Invocation | Updates |
 |-------|------------|---------|
-| `update-docs` | `/update-docs` | Everything — module READMEs and the API spec |
-| `docs` | `/docs [area]` | Module READMEs only |
-| `api-spec` | `/api-spec` | `api/API_SPEC.md` only |
+| `all-docs` | `/all-docs` | Everything — module READMEs and the API spec |
+| `module-docs` | `/module-docs` | Module READMEs only |
+| `api-docs` | `/api-docs` | `api/API_SPEC.md` only |
 
 Run a full documentation update after any non-trivial code change:
 
@@ -113,11 +113,12 @@ Key direct dependencies:
 
 | Package | Purpose |
 |---------|---------|
+| `spf13/cobra` | CLI command tree and flag parsing |
+| `spf13/viper` | Config loading from files, env vars, and flags |
 | `gin-gonic/gin` | HTTP framework and routing |
 | `mattn/go-sqlite3` | SQLite database driver (CGo) |
 | `go.uber.org/zap` | Structured logging |
-| `goccy/go-yaml` | YAML config parsing |
-| `google/uuid` | UUID generation for agent IDs and temp files |
+| `google/uuid` | UUID generation for agent goroutine IDs |
 | `joho/godotenv` | `.env` file loading |
 
 Update dependencies:
