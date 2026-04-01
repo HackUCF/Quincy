@@ -1,12 +1,12 @@
-package scoring
+package agent
 
 import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/HackUCF/Quincy/api/db/scoring"
 	"github.com/HackUCF/Quincy/common/types"
+	"github.com/gin-gonic/gin"
 )
 
 func validateScore(types.Score) error {

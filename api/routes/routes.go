@@ -8,6 +8,7 @@ Most Gin handler functions are located in subpackages.
 package routes
 
 import (
+	"github.com/HackUCF/Quincy/api/routes/agent"
 	"github.com/HackUCF/Quincy/api/routes/graphs"
 	"github.com/HackUCF/Quincy/api/routes/misc"
 	"github.com/HackUCF/Quincy/api/routes/scoring"
@@ -29,7 +30,6 @@ func initRoutes() *gin.Engine {
 	{
 		scoringGroup := v1.Group("/scores")
 		{
-			scoringGroup.POST("/", scoring.AddScore)                 // /api/v1/scores
 			scoringGroup.GET("/team", scoring.GetTeamScores)         // /api/v1/scores/team
 			scoringGroup.GET("/box", scoring.GetBoxScores)           // /api/v1/scores/box
 			scoringGroup.GET("/service", scoring.GetServiceScores)   // /api/v1/scores/service
@@ -37,15 +37,16 @@ func initRoutes() *gin.Engine {
 			scoringGroup.GET("/detailed", scoring.GetDetailedScores) // /api/v1/scores/detailed
 		}
 
+		agentGroup := v1.Group("/agent")
+		{
+			agentGroup.GET("/new-check", agent.GetCheck)        // /api/v1/agent/new-check
+			agentGroup.POST("/completed-score", agent.AddScore) // /api/v1/agent/completed-score
+		}
+
 		userGroup := v1.Group("/users")
 		{
 			userGroup.GET("", users.GetAllUsers) // /api/v1/users
 			userGroup.POST("", users.SubmitPCR)  // /api/v1/users
-		}
-
-		checkGroup := v1.Group("/checks")
-		{
-			checkGroup.GET("", scoring.GetCheck) // /api/v1/checks
 		}
 
 		graphsGroup := v1.Group("/graphs")

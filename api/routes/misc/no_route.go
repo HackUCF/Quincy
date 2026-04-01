@@ -6,7 +6,6 @@ package misc
 
 import (
 	"net/http"
-	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -20,48 +19,41 @@ type similarRoute struct {
 // NoRoute responds with a 404 when no other route is matched.
 // Provides the user a list of "similar" endpoints available.
 // This is helpful while manually testing.
+// To be fully accurate, this needs to be the last route registered on the server.
 func NoRoute(router *gin.Engine) func(c *gin.Context) {
+
+	// pull the routes from the router (at route definition time)
 	routes := router.Routes()
 
 	return func(c *gin.Context) {
-		// get the path and parent for the request
-		reqPath := c.Request.URL.Path
-		reqParent := filepath.Dir(reqPath)
 
-		// accumulate similar routes
-		similar := make([]similarRoute, 0)
+		// construct a list of similar routes
+		var similar []similarRoute
 
+		// remove trailing slash if present
+		reqPath := strings.TrimRight(c.Request.URL.Path, "/")
+
+		// loop through all routes in the api
 		for _, route := range routes {
+
+			// do the same thing
 			routePath := strings.TrimRight(route.Path, "/")
 
-			// check if the requested route has the same parent as an existing one
-			if strings.HasPrefix(routePath, reqParent) {
-				// add it to a list
-				newRoute := similarRoute{
+			// identify similar routes
+			if strings.HasPrefix(routePath, reqPath) || strings.HasPrefix(reqPath, routePath) {
+				similar = append(similar, similarRoute{
 					Path:   routePath,
 					Method: route.Method,
-				}
-				similar = append(similar, newRoute)
+				})
 			}
 		}
 
-		// add all routes if nothing available
-		if len(similar) == 0 {
-			for _, route := range routes {
-				newRoute := similarRoute{
-					Path:   route.Path,
-					Method: route.Method,
-				}
-				similar = append(similar, newRoute)
-			}
-		}
-
-		resp := gin.H{
+		// return 404 with similar routes
+		c.JSON(http.StatusNotFound, gin.H{
 			"message":        "route not found or method not allowed",
 			"path":           c.Request.URL.Path,
 			"method":         c.Request.Method,
-			"similar_routes": similar, // send to user
-		}
-		c.JSON(http.StatusNotFound, resp)
+			"similar_routes": similar,
+		})
 	}
 }

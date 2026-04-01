@@ -9,7 +9,13 @@ You are performing a full documentation update for the Quincy scoring engine. Th
 
 ## Step 1: Identify What Changed
 
-Before touching any docs, understand the scope of changes. Run `git diff origin/main...HEAD` (or against the relevant base) to see what source files changed. Use this to focus your work — not everything needs updating for every change.
+Before touching any docs, understand the scope of changes. Use the following approach to identify what changed:
+
+1. **Active branch vs origin**: Run `git rev-parse --abbrev-ref HEAD` to get the current branch. Then run `git diff origin/<current-branch>...HEAD` to see what changed relative to the remote tracking branch. This is the **primary** diff to focus on — it captures work that hasn't been pushed yet or has diverged from the upstream branch.
+
+2. **Branch vs main**: Also run `git diff origin/main...HEAD` to catch any changes from the base branch that may not yet be reflected in remote tracking. Use this as a secondary check to ensure nothing is missed.
+
+Combine both diffs to build a complete picture of what source files changed. If the active branch *is* main (or has no remote tracking branch), fall back to `git diff origin/main...HEAD` only. Use this combined scope to focus your work — not everything needs updating for every change.
 
 If the change touched:
 - Any file under `cmd/` → `cmd/README.md`, `USAGE.md`, and `DEVELOPMENT.md` may be affected

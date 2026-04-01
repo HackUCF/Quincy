@@ -1,10 +1,10 @@
-package scoring
+package agent
 
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/HackUCF/Quincy/api/services"
+	"github.com/gin-gonic/gin"
 )
 
 // GetCheck is a route that returns the next check to run.

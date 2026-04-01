@@ -204,9 +204,27 @@ Returns the full scoring breakdown: every combination of team, box, and service.
 
 ---
 
-#### `POST /api/v1/scores/`
+---
 
-Submit a completed check result. **Intended for agent use.** Note the trailing slash.
+### Agent
+
+These endpoints are the interface between the API server and scoring agents. They are not intended for operator or frontend use.
+
+#### `GET /api/v1/agent/new-check`
+
+Returns the next service check for an agent to run.
+
+The queue contains every combination of team × box × service, shuffled at startup. The queue is served round-robin with a lock-free counter and wraps when exhausted. If the service has a `user_list`, a random user is pulled from the database for that team and attached.
+
+**Response (200):** A `Service` object (see Data Types).
+
+**Error (400):** `{"message": "failed to get check", "error": "..."}`
+
+---
+
+#### `POST /api/v1/agent/completed-score`
+
+Submit a completed check result.
 
 The `timestamp` field in the request body is ignored — the server generates its own timestamp (Unix microseconds) at insert time. The insert runs as a single transaction across all three scoring tables.
 
@@ -230,18 +248,6 @@ The `timestamp` field in the request body is ignored — the server generates it
 | 400 | Invalid JSON | `{"message": "couldn't marshall json from request body", "error": "..."}` |
 | 400 | Validation failure | `{"message": "score failed to verify", "error": "...", "score": <Score>}` |
 | 400 | Database error | `{"message": "failed to add score to database", "error": "...", "score": <Score>}` |
-
----
-
-#### `GET /api/v1/checks`
-
-Returns the next service check for an agent to run. **Intended for agent use.**
-
-The queue contains every combination of team × box × service, shuffled at startup. The queue is served round-robin with a lock-free counter and wraps when exhausted. If the service has a `user_list`, a random user is pulled from the database for that team and attached.
-
-**Response (200):** A `Service` object (see Data Types).
-
-**Error (400):** `{"message": "failed to get check", "error": "..."}`
 
 ---
 
