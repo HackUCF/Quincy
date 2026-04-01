@@ -7,8 +7,7 @@ db_file: "./quincy.sqlite3"
 
 # credential lists used by one or more service
 user_lists:
-  - name: local users # display name for the user list
-    id: userlist1 # unique id of the user list
+  - name: local users
     users:
       - username: geraldo # usernames and passwords
         password: BuyMyNFT1!
@@ -16,7 +15,6 @@ user_lists:
         password: GetV4p0rized!
 
   - name: simple domain
-    id: domain1
     # you can specify one, both, or neither of the domain options
     # just depends on what you need for your checks
     domain: quin.cy
@@ -27,8 +25,7 @@ user_lists:
       - username: adora
         password: GetV4p0rized!
 
-  - name: complex  domain
-    id: domain2
+  - name: complex domain
     # these can be templates if you want
     # this is handled by your check logic, the api dgaf
     domain: team{}.quin.cy
@@ -42,36 +39,28 @@ user_lists:
 # list of servers
 boxes:
   - name: cubism
-    id: localhost
     host: 127.0.{}.0
     services:
       - name: fileshare
-        id: smb
         check: 75percent
-        userlist: userlist1
+        user_list: local users
 
       - name: remoting
-        id: ssh
         check: 25percent
-        userlist: domain2
+        user_list: complex domain
 
-  - name: scrapyard # display name of this box
-    id: localhost2 # display name of this box
+  - name: scrapyard
     host: 127.0.0.{} # ip or dns name template
-    # list of checks this box has
     services:
-      - name: blog # display name of this service
-        id: http # unique id of this service
+      - name: blog
         check: 100percent # what check do the agents run?
 
       - name: shop
-        id: http2
         check: 50percent
 
       - name: ssh-ad
-        id: ssh
         check: 0percent
-        user_list: domain2 # optional userlist id
+        user_list: complex domain # optional userlist name
 
 # http server settings
 http:

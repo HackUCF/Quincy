@@ -1,0 +1,12 @@
+# database files
+/*.sqlite3*
+
+# development config file
+/config.yaml
+
+# compiled binaries
+/Quincy
+/quincy
+
+# air temporary directory
+/tmp/

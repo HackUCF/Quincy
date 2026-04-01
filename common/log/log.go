@@ -52,7 +52,6 @@ func init() {
 	// add a uuid to identify logs between restarts
 	instanceID := uuid.New().String()
 	logger = baseLogger.Sugar().With("restart", instanceID)
-	Info("logger initialized")
 }
 
 /*

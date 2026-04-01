@@ -21,6 +21,15 @@ type PCR struct {
 	TeamNum      types.TeamNum      `json:"team_num"`
 }
 
+func userListExists(name types.UserListName) bool {
+	for _, ul := range config.Get().UserLists {
+		if name == ul.Name {
+			return true
+		}
+	}
+	return false
+}
+
 // SubmitPCR is a POST route for changing a scoring users password.
 // Takes the following input:
 func SubmitPCR(c *gin.Context) {
@@ -36,7 +45,7 @@ func SubmitPCR(c *gin.Context) {
 		return
 	}
 
-	if !config.UserListExists(pcr.UserListName) {
+	if !userListExists(pcr.UserListName) {
 		resp := gin.H{
 			"message":   "user list does not exist",
 			"user_list": pcr.UserListName,

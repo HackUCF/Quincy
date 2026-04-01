@@ -1,0 +1,10 @@
+#!/usr/bin/env -S air -c
+# run with:
+#   air -c agent.air.toml
+# or 
+#   ./agent.air.toml
+[build]
+  cmd = "go build -o quincy ."
+  entrypoint = ["./quincy", "agent", "start"]
+  exclude_dir = ["api"]
+  include_ext = ["go"]

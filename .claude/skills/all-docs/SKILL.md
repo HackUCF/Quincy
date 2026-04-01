@@ -1,5 +1,5 @@
 ---
-name: update-docs
+name: all-docs
 description: Update all Quincy documentation — module READMEs and the API spec — to reflect the current state of the code. Use after any non-trivial code change, or when asked to bring docs up to date.
 ---
 
@@ -12,6 +12,7 @@ You are performing a full documentation update for the Quincy scoring engine. Th
 Before touching any docs, understand the scope of changes. Run `git diff origin/main...HEAD` (or against the relevant base) to see what source files changed. Use this to focus your work — not everything needs updating for every change.
 
 If the change touched:
+- Any file under `cmd/` → `cmd/README.md`, `USAGE.md`, and `DEVELOPMENT.md` may be affected
 - Any file under `common/` → module READMEs in `common/` are likely affected
 - Any file under `api/config/` → `api/config/README.md` and `USAGE.md` may be affected
 - Any file under `api/db/` → the relevant `api/db/*/README.md` may be affected
@@ -19,11 +20,13 @@ If the change touched:
 - Any file under `agent/` → `agent/README.md` and/or `agent/scripts/README.md` may be affected
 - Any type definition → `common/types/README.md` and `api/API_SPEC.md` are likely affected
 
+Also check whether the project structure itself changed — new packages added, packages removed or moved. If the set of Go packages has changed, update `DEVELOPMENT.md`'s project layout section to match.
+
 ---
 
 ## Step 2: Update Module READMEs
 
-Every package directory under `api/`, `agent/`, and `common/` has a `README.md`. Update any that are affected by the changes identified in Step 1.
+Every package directory under `api/`, `agent/`, `cmd/`, and `common/` has a `README.md`. Before updating, check whether any package directories are **missing** a `README.md`. If a directory contains `.go` files but no `README.md`, create one following the convention below. Update any READMEs that are affected by the changes identified in Step 1.
 
 ### Convention
 

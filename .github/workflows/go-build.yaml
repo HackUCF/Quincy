@@ -18,18 +18,14 @@ jobs:
       # checkout repo
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # needed for auto versioning
+          # clone the entire repo, not just the most recent commit
+          # needed for auto versioning
+          fetch-depth: 0 
 
       # install golang dependencies
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-
-      # create the tag from recent branch
-      - name: generate tag
-        id: tag
-        run: |
-          echo "tag=v0.0.$(git rev-list --count HEAD)-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       # build agent and api for:
       #   linux-amd64
@@ -39,13 +35,17 @@ jobs:
       #   windows-amd64  (disabled)
       - name: build binaries
         run: |
-          for proj in agent api; do
-            GOOS=linux   GOARCH=amd64 go build -o dist/${proj}-linux-amd64 ./${proj}
-            # GOOS=linux   GOARCH=arm64 go build -o dist/${proj}-linux-arm64 ./${proj}
-            # GOOS=darwin  GOARCH=amd64 go build -o dist/${proj}-darwin-amd64 ./${proj}
-            # GOOS=darwin  GOARCH=arm64 go build -o dist/${proj}-darwin-arm64 ./${proj}
-            # GOOS=windows GOARCH=amd64 go build -o dist/${proj}-windows-amd64.exe ./${proj}
-          done
+          GOOS=linux   GOARCH=amd64 go build -o dist/quincy-linux-amd64 .
+          # GOOS=linux   GOARCH=arm64 go build -o dist/quincy-linux-arm64 .
+          # GOOS=darwin  GOARCH=amd64 go build -o dist/quincy-darwin-amd64 .
+          # GOOS=darwin  GOARCH=arm64 go build -o dist/quincy-darwin-arm64 .
+          # GOOS=windows GOARCH=amd64 go build -o dist/quincy-windows-amd64.exe .
+
+      # create the tag from recent branch
+      - name: generate tag
+        id: tag
+        run: |
+          echo "tag=v0.0.$(git rev-list --count HEAD)-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
 
       # release the binaries under the tag
       - name: create release

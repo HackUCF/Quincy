@@ -23,34 +23,35 @@ cd Quincy
 go mod download
 ```
 
-Build both components:
+Build the single binary:
 
 ```bash
-cd api && go build . && cd ..
-cd agent && go build . && cd ..
+go build -o quincy .
 ```
 
 ## Development with Hot-Reload
 
-Both the API server and agent include Air configs for automatic rebuilds on file changes.
+Both the API server and agent have Air configs at the project root for automatic rebuilds on file changes.
 
 In one terminal:
 
 ```bash
-cd api
-air
+air -c api.air.toml
 ```
 
 In another terminal:
 
 ```bash
-cd agent
-air
+air -c agent.air.toml
 ```
 
 ## Project Layout
 
-The project is a Go module (`github.com/HackUCF/Quincy`) split into three top-level packages:
+The project is a Go module (`github.com/HackUCF/Quincy`) with a single entry point and four top-level packages:
+
+### `cmd/`
+
+The CLI layer. Builds the `quincy` binary using Cobra and wires up the subcommands: `api start`, `api config`, and `agent start`. This is the only `package main` in the module; the `api` and `agent` packages export their entry points as regular functions invoked by the CLI.
 
 ### `api/`
 
@@ -96,9 +97,9 @@ Documentation is kept in sync manually after code changes. Three Claude Code ski
 
 | Skill | Invocation | Updates |
 |-------|------------|---------|
-| `update-docs` | `/update-docs` | Everything — module READMEs and the API spec |
-| `docs` | `/docs [area]` | Module READMEs only |
-| `api-spec` | `/api-spec` | `api/API_SPEC.md` only |
+| `all-docs` | `/all-docs` | Everything — module READMEs and the API spec |
+| `module-docs` | `/module-docs` | Module READMEs only |
+| `api-docs` | `/api-docs` | `api/API_SPEC.md` only |
 
 Run a full documentation update after any non-trivial code change:
 
@@ -112,11 +113,12 @@ Key direct dependencies:
 
 | Package | Purpose |
 |---------|---------|
+| `spf13/cobra` | CLI command tree and flag parsing |
+| `spf13/viper` | Config loading from files, env vars, and flags |
 | `gin-gonic/gin` | HTTP framework and routing |
 | `mattn/go-sqlite3` | SQLite database driver (CGo) |
 | `go.uber.org/zap` | Structured logging |
-| `goccy/go-yaml` | YAML config parsing |
-| `google/uuid` | UUID generation for agent IDs and temp files |
+| `google/uuid` | UUID generation for agent goroutine IDs |
 | `joho/godotenv` | `.env` file loading |
 
 Update dependencies:
