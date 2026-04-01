@@ -14,7 +14,7 @@ import (
 type Config struct {
 	APIURL     string `mapstructure:"api_url"`
 	ChecksDir  string `mapstructure:"checks_dir"`
-	LoopTime   int    `mapstructure:"loop_time"`   // seconds
+	LoopTime   int    `mapstructure:"loop_time"` // seconds
 	NumThreads int    `mapstructure:"num_threads"`
 }
 
@@ -40,12 +40,12 @@ func (cfg *Config) resolve() *agentConfig {
 		log.Panic("failed to resolve checks directory", "checks_dir", cfg.ChecksDir, "error", err)
 	}
 
-	ac.checkURL, err = url.JoinPath(cfg.APIURL, "/api/v1/checks")
+	ac.checkURL, err = url.JoinPath(cfg.APIURL, "/api/v1/agent/new-check")
 	if err != nil {
 		log.Panic("failed to construct check URL", "api_url", cfg.APIURL, "error", err)
 	}
 
-	ac.scoreURL, err = url.JoinPath(cfg.APIURL, "/api/v1/scores")
+	ac.scoreURL, err = url.JoinPath(cfg.APIURL, "/api/v1/agent/completed-score")
 	if err != nil {
 		log.Panic("failed to construct score URL", "api_url", cfg.APIURL, "error", err)
 	}
