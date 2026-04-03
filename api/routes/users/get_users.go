@@ -3,13 +3,16 @@ package users
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/db/users"
+	"github.com/gin-gonic/gin"
 )
 
 // GetAllUsers returns all users from all userlists and their up to date passwords for all teams.
 func GetAllUsers(c *gin.Context) {
-	users, err := users.GetAllUsers()
+	db := conn.Get(c)
+
+	users, err := users.GetAllUsers(db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get all users",

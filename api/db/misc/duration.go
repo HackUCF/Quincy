@@ -1,14 +1,12 @@
 package misc
 
 import (
+	"database/sql"
 	"time"
-
-	"github.com/HackUCF/Quincy/api/db/conn"
 )
 
 // GetCompDuration returns how long the competition has been running
-func GetCompDuration() (time.Duration, error) {
-	db := conn.Get()
+func GetCompDuration(db *sql.DB) (time.Duration, error) {
 
 	var start uint64
 	var end uint64

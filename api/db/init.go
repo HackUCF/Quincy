@@ -34,13 +34,13 @@ func InitDB(cfg *config.APIConfigSpec) error {
 	}
 
 	// make sure all users are present in db
-	err = users.InitUsers(cfg)
+	err = users.InitUsers(db, cfg)
 	if err != nil {
 		return fmt.Errorf("failed to initialize users: %w", err)
 	}
 
 	// make sure final scores table is populated
-	err = scoring.InitScoring(cfg)
+	err = scoring.InitScoring(db, cfg)
 	if err != nil {
 		return fmt.Errorf("failed to initialize users: %w", err)
 	}

@@ -1,16 +1,16 @@
 package users
 
 import (
+	"database/sql"
 	"fmt"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/common/types"
 )
 
 // GetRandomUser pulls a random user from a specific userlist for a specific team.
 // This performs no validation. Will fail with an error if invalid input is given.
-func GetRandomUser(userListID types.UserListName, teamNum types.TeamNum) (types.User, error) {
-	db := conn.Get()
+func GetRandomUser(db *sql.DB, userListID types.UserListName, teamNum types.TeamNum) (types.User, error) {
+
 	var u types.User
 
 	query := `

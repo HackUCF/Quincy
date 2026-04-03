@@ -8,15 +8,17 @@ package scoring
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/db/scoring"
+	"github.com/gin-gonic/gin"
 )
 
 // GetRecentChecks gets a list of the the most recent checks for every service.
 // It is sorted by team number, then box ID, then service ID
 func GetRecentChecks(c *gin.Context) {
+	db := conn.Get(c)
 
-	status, err := scoring.GetCurrentServiceStatus()
+	status, err := scoring.GetCurrentServiceStatus(db)
 	if err != nil {
 		resp := gin.H{
 			"message": "could not get current service status",

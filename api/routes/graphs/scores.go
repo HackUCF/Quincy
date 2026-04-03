@@ -3,13 +3,16 @@ package graphs
 import (
 	"net/http"
 
+	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/db/graphs"
 	"github.com/HackUCF/Quincy/common/log"
 	"github.com/gin-gonic/gin"
 )
 
 func GetScores(c *gin.Context) {
-	data, err := graphs.GetScoresData()
+	db := conn.Get(c)
+
+	data, err := graphs.GetScoresData(db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get scores data",

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/HackUCF/Quincy/api/db/users"
@@ -11,7 +12,7 @@ var roundEndTime = time.Now()
 
 // GetNext returns the next service in the queue.
 // This is a fully templated service, with check info, team number, and a username/password.
-func GetNext() (types.Service, error) {
+func GetNext(db *sql.DB) (types.Service, error) {
 	// atomically read the next service
 	// this is so incredibly safe i love it
 	idx := (servicesIdx.Add(1) - 1) % servicesLen
@@ -27,7 +28,7 @@ func GetNext() (types.Service, error) {
 	}
 
 	// otherwise get a username/password
-	u, err := users.GetRandomUser(st.UserList, st.TeamNum)
+	u, err := users.GetRandomUser(db, st.UserList, st.TeamNum)
 	if err != nil {
 		return types.Service{}, err
 	}

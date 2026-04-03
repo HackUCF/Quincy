@@ -1,9 +1,9 @@
 package scoring
 
 import (
+	"database/sql"
 	"fmt"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/common/types"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -14,12 +14,13 @@ import (
 type ServiceScores map[types.BoxName]map[types.ServiceName]types.ScoreResult
 
 // GetServiceScores collates and calculates competion scores for each service on each box.
-func GetServiceScores() (ServiceScores, error) {
+func GetServiceScores(db *sql.DB) (ServiceScores, error) {
+
 	// ugly nested dictionary
 	var scores = make(ServiceScores)
 
 	// get totals for each box+service combo
-	rows, err := conn.Get().Query(`
+	rows, err := db.Query(`
     SELECT
     	box,
      	service,

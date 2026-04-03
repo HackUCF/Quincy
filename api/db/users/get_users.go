@@ -1,22 +1,22 @@
 package users
 
 import (
+	"database/sql"
 	"fmt"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/common/types"
 )
 
 type AllUsers map[types.TeamNum]map[types.UserListName][]types.User
 
-func GetAllUsers() (AllUsers, error) {
+func GetAllUsers(db *sql.DB) (AllUsers, error) {
 	allUsers := make(AllUsers)
 
 	query := `
 	  SELECT team_num, user_list, username, password, domain, netbios
 		FROM scoring_users
 	`
-	rows, err := conn.Get().Query(query)
+	rows, err := db.Query(query)
 	if err != nil {
 		return allUsers, fmt.Errorf("failed to list users in db: %w", err)
 	}

@@ -1,11 +1,11 @@
 package graphs
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/common/types"
 )
 
@@ -19,8 +19,7 @@ type StandingsData struct {
 
 // GetStandingsData returns the template data needed to render a current standings bar chart.
 // data contains rendered json strings.
-func GetStandingsData() (*StandingsData, error) {
-	db := conn.Get()
+func GetStandingsData(db *sql.DB) (*StandingsData, error) {
 
 	// query each teams scores
 	rows, err := db.Query(`

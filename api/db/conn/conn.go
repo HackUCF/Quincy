@@ -44,8 +44,3 @@ func InitDBConnection(cfg *config.APIConfigSpec) (*sql.DB, error) {
 
 	return db, nil
 }
-
-// Get returns the global database object.
-func Get() *sql.DB {
-	return db
-}

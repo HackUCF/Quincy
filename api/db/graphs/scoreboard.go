@@ -5,12 +5,12 @@ These are relatively slow functions that do a lot of construction and transforma
 package graphs
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"slices"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/common/log"
 	"github.com/HackUCF/Quincy/common/types"
 )
@@ -45,8 +45,7 @@ type ScoreboardData struct {
 
 // GetScoreboardData returns the template data needed to render a scoreboard chart.
 // data contains rendered json strings.
-func GetScoreboardData() (*ScoreboardData, error) {
-	db := conn.Get()
+func GetScoreboardData(db *sql.DB) (*ScoreboardData, error) {
 
 	rows, err := db.Query(`
 		SELECT service, box, team_num, status, timestamp, message

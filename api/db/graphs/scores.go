@@ -1,13 +1,13 @@
 package graphs
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"slices"
 	"time"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/db/misc"
 	"github.com/HackUCF/Quincy/common/types"
 )
@@ -37,12 +37,11 @@ const labelFmt = "team %d"
 const numIntervals = 100
 
 // GetScoresData contains the data required to render a line chart with all team scores.
-func GetScoresData() (*ScoresData, error) {
-	db := conn.Get()
+func GetScoresData(db *sql.DB) (*ScoresData, error) {
 
 	// get microsecond intervals for this competition
 	// compeition duration divided, in microseconds
-	duration, err := misc.GetCompDuration()
+	duration, err := misc.GetCompDuration(db)
 	if err != nil {
 		return nil, err
 	}

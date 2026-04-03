@@ -1,9 +1,9 @@
 package scoring
 
 import (
+	"database/sql"
 	"fmt"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/common/types"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -13,13 +13,14 @@ import (
 type TeamScores map[types.TeamNum]types.ScoreResult
 
 // GetTeamScores collates and calculates competion scores for all teams.
-func GetTeamScores() (TeamScores, error) {
+func GetTeamScores(db *sql.DB) (TeamScores, error) {
+
 	// dict of team number to scoring results
 	var scores = make(TeamScores)
 
 	// get totals for each team
 	// outputs n rows, where n is the number of teams
-	rows, err := conn.Get().Query(`
+	rows, err := db.Query(`
     SELECT
     	team_num,
       SUM(total) as total,

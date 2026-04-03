@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/HackUCF/Quincy/api/config"
+	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/db/users"
 	"github.com/HackUCF/Quincy/common/types"
 	"github.com/gin-gonic/gin"
@@ -33,6 +34,8 @@ func userListExists(name types.UserListName) bool {
 // SubmitPCR is a POST route for changing a scoring users password.
 // Takes the following input:
 func SubmitPCR(c *gin.Context) {
+	db := conn.Get(c)
+
 	var pcr PCR
 	err := json.NewDecoder(c.Request.Body).Decode(&pcr)
 	if err != nil {
@@ -55,7 +58,7 @@ func SubmitPCR(c *gin.Context) {
 		return
 	}
 
-	err = users.UpdateUser(pcr.UserListName, pcr.TeamNum, pcr.User)
+	err = users.UpdateUser(db, pcr.UserListName, pcr.TeamNum, pcr.User)
 	if err != nil {
 		resp := gin.H{
 			"message": "could not update userlist",

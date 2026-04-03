@@ -1,17 +1,16 @@
 package scoring
 
 import (
+	"database/sql"
 	"fmt"
 	"math"
 
 	"github.com/HackUCF/Quincy/api/config"
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/common/types"
 )
 
 // InitScoring creates rows in the final scores table for each team/box/service combo.
-func InitScoring(cfg *config.APIConfigSpec) error {
-	db := conn.Get()
+func InitScoring(db *sql.DB, cfg *config.APIConfigSpec) error {
 
 	query := `
 	  INSERT OR IGNORE INTO final_scores (service, box, team_num, total, passed)

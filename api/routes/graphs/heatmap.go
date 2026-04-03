@@ -3,13 +3,16 @@ package graphs
 import (
 	"net/http"
 
+	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/db/graphs"
 	"github.com/gin-gonic/gin"
 )
 
 // GetHeatmap returns html and js containing a heatmap of historical uptime percentage per team per box/service.
 func GetHeatmap(c *gin.Context) {
-	data, err := graphs.GetHeatmapData()
+	db := conn.Get(c)
+
+	data, err := graphs.GetHeatmapData(db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get heatmap data",

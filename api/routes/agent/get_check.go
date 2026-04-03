@@ -3,6 +3,7 @@ package agent
 import (
 	"net/http"
 
+	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/services"
 	"github.com/gin-gonic/gin"
 )
@@ -10,7 +11,9 @@ import (
 // GetCheck is a route that returns the next check to run.
 // This is meant for interaction from the agents.
 func GetCheck(c *gin.Context) {
-	check, err := services.GetNext()
+	db := conn.Get(c)
+
+	check, err := services.GetNext(db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get check",

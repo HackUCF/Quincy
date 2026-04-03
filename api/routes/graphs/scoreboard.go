@@ -3,13 +3,16 @@ package graphs
 import (
 	"net/http"
 
+	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/db/graphs"
 	"github.com/gin-gonic/gin"
 )
 
 // GetScoreboard returns html and js containing a simple scoreaboard.
 func GetScoreboard(c *gin.Context) {
-	data, err := graphs.GetScoreboardData()
+	db := conn.Get(c)
+
+	data, err := graphs.GetScoreboardData(db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get scoreboard data",

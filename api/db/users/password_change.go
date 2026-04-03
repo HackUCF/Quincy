@@ -1,17 +1,16 @@
 package users
 
 import (
+	"database/sql"
 	"fmt"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/common/types"
 )
 
 // UpdateUser performs a password change request.
 // This performs no validation. Will cause an error if invalid input is given.
 // This query can only update the password in an existing row.
-func UpdateUser(userListID types.UserListName, teamNum types.TeamNum, user types.User) error {
-	db := conn.Get()
+func UpdateUser(db *sql.DB, userListID types.UserListName, teamNum types.TeamNum, user types.User) error {
 
 	query := `
 	  UPDATE scoring_users

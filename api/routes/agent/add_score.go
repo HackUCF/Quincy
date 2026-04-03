@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/db/scoring"
 	"github.com/HackUCF/Quincy/common/types"
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,8 @@ AddScore is a POST route for submitting a completed scorecheck,
 only meant for interaction from an agent.
 */
 func AddScore(c *gin.Context) {
+	db := conn.Get(c)
+
 	// load score from request body
 	var score types.Score
 	err := json.NewDecoder(c.Request.Body).Decode(&score)
@@ -41,7 +44,7 @@ func AddScore(c *gin.Context) {
 		return
 	}
 
-	err = scoring.AddScore(score)
+	err = scoring.AddScore(db, score)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to add score to database",

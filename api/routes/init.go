@@ -8,6 +8,7 @@ Most Gin handler functions are located in subpackages.
 package routes
 
 import (
+	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/routes/agent"
 	"github.com/HackUCF/Quincy/api/routes/graphs"
 	"github.com/HackUCF/Quincy/api/routes/misc"
@@ -22,9 +23,12 @@ func initRoutes() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 
-	router.Use(middleware.Recovery(false))
-	router.Use(middleware.Logging())
-	router.Use(middleware.InsecureCORS())
+	router.Use(
+		middleware.Recovery(false),
+		middleware.Logging(),
+		middleware.InsecureCORS(),
+		conn.DBMiddleware(),
+	)
 
 	v1 := router.Group("/api/v1")
 	{

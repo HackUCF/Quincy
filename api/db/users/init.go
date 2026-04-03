@@ -6,18 +6,17 @@ It requires the DB conneciton to have already been initialized.
 package users
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/HackUCF/Quincy/api/config"
-	"github.com/HackUCF/Quincy/api/db/conn"
 )
 
 // InitUsers fills the users table in the database with default usernames and passwords.
 // Users that have had passwords changed in a previous run of the API will be ignored.
 // This keeps consistent state between restarts.
 // This requires the config to be loaded.
-func InitUsers(cfg *config.APIConfigSpec) error {
-	db := conn.Get()
+func InitUsers(db *sql.DB, cfg *config.APIConfigSpec) error {
 
 	query := `
 	  INSERT OR IGNORE INTO scoring_users (team_num, user_list, username, password, domain, netbios)

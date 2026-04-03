@@ -1,17 +1,16 @@
 package scoring
 
 import (
+	"database/sql"
 	"fmt"
 	"time"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/common/types"
 )
 
 // AddScore inserts a score into the main score database.
 // It also updates the entry for this specific box/service/team combo in the recent scores table.
-func AddScore(score types.Score) error {
-	db := conn.Get()
+func AddScore(db *sql.DB, score types.Score) error {
 	ts := time.Now().UnixMicro()
 
 	tx, err := db.Begin()

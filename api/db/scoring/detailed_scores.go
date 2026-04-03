@@ -1,9 +1,9 @@
 package scoring
 
 import (
+	"database/sql"
 	"fmt"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/common/types"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -15,12 +15,12 @@ import (
 type DetailedScores map[types.TeamNum]ServiceScores
 
 // GetDetailedScores pulls the full final scoring data as it is stored in the db.
-func GetDetailedScores() (DetailedScores, error) {
+func GetDetailedScores(db *sql.DB) (DetailedScores, error) {
 	// ugly nested dictionary
 	var scores = make(DetailedScores)
 
 	// get every row from db
-	rows, err := conn.Get().Query(`
+	rows, err := db.Query(`
     SELECT
       team_num,
     	box,

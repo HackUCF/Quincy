@@ -1,12 +1,12 @@
 package graphs
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"slices"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/common/log"
 	"github.com/HackUCF/Quincy/common/types"
 )
@@ -40,8 +40,7 @@ type HeatmapData struct {
 // GetHeatmapData returns the template data needed to render a heatmap chart.
 // data contains rendered json strings.
 // each cell value is the historical uptime percentage for that team/box/service combination.
-func GetHeatmapData() (*HeatmapData, error) {
-	db := conn.Get()
+func GetHeatmapData(db *sql.DB) (*HeatmapData, error) {
 
 	rows, err := db.Query(`
 		SELECT service, box, team_num, passed, total
