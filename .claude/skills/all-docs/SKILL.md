@@ -18,21 +18,21 @@ Before touching any docs, understand the scope of changes. Use the following app
 Combine both diffs to build a complete picture of what source files changed. If the active branch *is* main (or has no remote tracking branch), fall back to `git diff origin/main...HEAD` only. Use this combined scope to focus your work — not everything needs updating for every change.
 
 If the change touched:
-- Any file under `cmd/` → `cmd/README.md`, `USAGE.md`, and `DEVELOPMENT.md` may be affected
-- Any file under `common/` → module READMEs in `common/` are likely affected
-- Any file under `api/config/` → `api/config/README.md` and `USAGE.md` may be affected
-- Any file under `api/db/` → the relevant `api/db/*/README.md` may be affected
-- Any file under `api/routes/` → the relevant `api/routes/*/README.md` **and** `api/API_SPEC.md` are likely affected
-- Any file under `agent/` → `agent/README.md` and/or `agent/scripts/README.md` may be affected
-- Any type definition → `common/types/README.md` and `api/API_SPEC.md` are likely affected
+- Any file under `src/cmd/` → `src/cmd/README.md`, `docs/USAGE.md`, and `docs/DEVELOPMENT.md` may be affected
+- Any file under `src/common/` → module READMEs in `src/common/` are likely affected
+- Any file under `src/api/config/` → `src/api/config/README.md` and `docs/USAGE.md` may be affected
+- Any file under `src/api/db/` → the relevant `src/api/db/*/README.md` may be affected
+- Any file under `src/api/routes/` → the relevant `src/api/routes/*/README.md` **and** `docs/API_SPEC.md` are likely affected
+- Any file under `src/agent/` → `src/agent/README.md` and/or `src/scripts/README.md` may be affected
+- Any type definition → `src/common/types/README.md` and `docs/API_SPEC.md` are likely affected
 
-Also check whether the project structure itself changed — new packages added, packages removed or moved. If the set of Go packages has changed, update `DEVELOPMENT.md`'s project layout section to match.
+Also check whether the project structure itself changed — new packages added, packages removed or moved. If the set of Go packages has changed, update `docs/DEVELOPMENT.md`'s project layout section to match.
 
 ---
 
 ## Step 2: Update Module READMEs
 
-Every package directory under `api/`, `agent/`, `cmd/`, and `common/` has a `README.md`. Before updating, check whether any package directories are **missing** a `README.md`. If a directory contains `.go` files but no `README.md`, create one following the convention below. Update any READMEs that are affected by the changes identified in Step 1.
+Every package directory under `src/api/`, `src/agent/`, `src/cmd/`, and `src/common/` has a `README.md`. Before updating, check whether any package directories are **missing** a `README.md`. If a directory contains `.go` files but no `README.md`, create one following the convention below. Update any READMEs that are affected by the changes identified in Step 1.
 
 ### Convention
 
@@ -54,11 +54,11 @@ Module READMEs are technical documentation. The goal is not to avoid detail — 
 
 ## Step 3: Update the API Spec
 
-`api/API_SPEC.md` must reflect every currently registered route. The three sources of truth are:
+`docs/API_SPEC.md` must reflect every currently registered route. The three sources of truth are:
 
-1. **Route registrations** (`api/routes/routes.go`) — the canonical list of what paths and methods exist
-2. **Route handlers** (`api/routes/**/*.go`) — what input they parse, what responses they construct, what error conditions they return
-3. **Shared types** (`common/types/*.go`) — exact JSON field names and shapes via struct tags
+1. **Route registrations** (`src/api/routes/init.go`) — the canonical list of what paths and methods exist
+2. **Route handlers** (`src/api/routes/**/*.go`) — what input they parse, what responses they construct, what error conditions they return
+3. **Shared types** (`src/common/types/*.go`) — exact JSON field names and shapes via struct tags
 
 Read all three for any endpoint you are updating. Do not rely on memory.
 

@@ -1,0 +1,78 @@
+/*
+Package users contains all the API routes involving scoring users.
+This includes PCRs, as well as enumeration routes that can be used by frontends to create PCR pages.
+*/
+package users
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"github.com/HackUCF/Quincy/api/config"
+	"github.com/HackUCF/Quincy/api/db/conn"
+	"github.com/HackUCF/Quincy/api/db/users"
+	"github.com/HackUCF/Quincy/common/types"
+	"github.com/gin-gonic/gin"
+)
+
+// PCR is the JSON object that must be posted to the server to complete a PCR.
+type PCR struct {
+	types.User
+	UserListName types.UserListName `json:"user_list"`
+	TeamNum      types.TeamNum      `json:"team_num"`
+}
+
+func userListExists(cfg *config.APIConfigSpec, name types.UserListName) bool {
+	for _, ul := range cfg.UserLists {
+		if name == ul.Name {
+			return true
+		}
+	}
+	return false
+}
+
+// SubmitPCR is a POST route for changing a scoring users password.
+// Takes the following input:
+func SubmitPCR(c *gin.Context) {
+	db := conn.Get(c)
+	cfg := config.Get(c)
+
+	var pcr PCR
+	err := json.NewDecoder(c.Request.Body).Decode(&pcr)
+	if err != nil {
+		resp := gin.H{
+			"message": "failed to unmarshall json from request body",
+			"error":   err,
+			"pcr":     pcr,
+		}
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	if !userListExists(cfg, pcr.UserListName) {
+		resp := gin.H{
+			"message":   "user list does not exist",
+			"user_list": pcr.UserListName,
+			"pcr":       pcr,
+		}
+		c.JSON(http.StatusBadRequest, resp)
+		return
+	}
+
+	err = users.UpdateUser(db, pcr.UserListName, pcr.TeamNum, pcr.User)
+	if err != nil {
+		resp := gin.H{
+			"message": "could not update userlist",
+			"err":     err,
+			"pcr":     pcr,
+		}
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	resp := gin.H{
+		"message": "user updated",
+		"pcr":     pcr,
+	}
+	c.JSON(http.StatusOK, resp)
+}

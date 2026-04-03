@@ -1,0 +1,5 @@
+# config
+
+Stores and provides access to the API configuration for the rest of the server. Configuration is loaded by the CLI layer (via viper) and passed in through a setter; this package does not read files directly. The config describes the full competition setup: number of teams, boxes with host address templates, services on each box with their check assignments and optional userlist references, credential userlists with optional domain and NetBIOS settings, and the HTTP listener address and port.
+
+The package follows the same middleware pattern used by the database connection layer. A Gin middleware stores the config object in each request's context at startup, and a pair of context-based accessors allow handlers to retrieve it — one that panics on error and one that returns an error explicitly. The setter that stores the config guards against being called more than once by panicking on a second invocation. The default config YAML is embedded in the binary at build time and exposed so the CLI layer can write it to disk. Validation logic is currently stubbed out.

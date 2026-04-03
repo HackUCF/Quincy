@@ -1,5 +1,0 @@
-# config
-
-Stores and provides access to the API configuration for the rest of the server. Configuration is loaded by the CLI layer (via viper) and passed in through a setter; this package does not read files directly. The parsed config is kept as a package-level global, so route handlers and other subpackages can access it without threading it through every call.
-
-Provides a setter that stores the config and computes derived state (the pre-built team number slice) and a global accessor. The config describes the full competition setup: number of teams, boxes with host address templates, services on each box with their check assignments and optional userlist references, credential userlists with optional domain and NetBIOS settings, and the HTTP listener address and port. Validation logic is currently stubbed out. The max entity name length (16 characters) is defined as a constant here since it is shared with the database schema. The default config YAML is embedded in the binary at build time and exposed so the CLI layer can write it to disk.
