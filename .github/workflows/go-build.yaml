@@ -25,7 +25,7 @@ jobs:
       # install golang dependencies
       - uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
+          go-version-file: src/go.mod
 
       # create the version tag from recent branch
       - name: generate tag
