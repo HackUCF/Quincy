@@ -76,6 +76,12 @@ Shared packages used by both the API server and agent:
 - **log** -- Thin structured logging wrapper around Zap.
 - **middleware** -- Gin middleware for panic recovery and request logging.
 
+## Initialization Flow
+
+The entire project compiles into one binary with entry point in `main.go`. The CLI (handled by the `cmd/` package) parses user input and calls functions other in subpackages. Commands for the agent are handled by the `agent/` subpackage, and commands for the API are handled by the `api/` subpackage. The agent is relatively simple, but the API requires a few initialization steps. The database connection is created, tables are created, and pre-population is done where necessary. Services are loaded from the config and  prepared to be served to agents. The HTTP router is created and served from the `routes/` package.
+
+![Application CLI and initialization flow diagram](/assets/init-flow.excalidraw.svg)
+
 ## Adding a New Check Script
 
 See the [check scripts section of USAGE.md](USAGE.md#check-scripts) for the full script interface. In short:
