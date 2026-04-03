@@ -36,15 +36,24 @@ var (
 // SetConfig stores the config in the global state.
 // Must be called before Get() or TeamRange.
 // Panics if called more than once.
-func SetConfig(c *APIConfigSpec) {
+func SetConfig(newCfg *APIConfigSpec) {
 	if cfgIsValid.Load() {
 		log.Panic(
 			"cannot store the config more than once",
 			"old_config", cfg,
-			"new_config", c,
+			"new_config", newCfg,
 		)
 	}
 
+	// store in global
+	cfg = newCfg
+
+	// create helper slice
+	TeamRange = make([]types.TeamNum, 0, cfg.NumTeams)
+	for i := types.TeamNum(1); i <= cfg.NumTeams; i++ {
+		TeamRange = append(TeamRange, i)
+	}
+
+	// mark config as loaded!
 	cfgIsValid.Store(true)
-	cfg = c
 }

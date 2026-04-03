@@ -356,7 +356,7 @@ Returns the full parsed API configuration. Useful for frontends to discover boxe
 
 `user_list` on a service, and `domain`/`netbios` on a userlist, are omitted when empty. `host` on a box is always present.
 
-**Error (500):** `{"message": "failed to get config", "error": "..."}`
+This endpoint has no error response path; a missing config in the request context causes a panic handled by the recovery middleware.
 
 ---
 
@@ -416,7 +416,7 @@ Heatmap of historical uptime percentage per team per box/service.
 
 #### Unmatched routes — 404
 
-When no route matches, the response includes the requested path and method, plus a list of routes that share the same URL parent. If no routes share the parent, all registered routes are returned.
+When no route matches, the response includes the requested path and method, plus a list of similar routes. A route is considered similar if its path shares a prefix with the requested path (in either direction). If no routes share a prefix, `similar_routes` is an empty array.
 
 ```json
 {
