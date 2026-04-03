@@ -1,8 +1,33 @@
 # Nothing gets past my bow!
 
 - To get started running Quincy see [USAGE.md](/USAGE.md)
-- For information about the source code or development see [DEVELOPMENT.md](/DEVELOPMENT.md)
-- The API specification is available here: [api/API_SPEC.md](/api/API_SPEC.md) (this is nowhere near final, just what has been implemented so far)
+- For information about the source code or development see [DEVELOPMENT.md](/src/DEVELOPMENT.md)
+- The API specification is available here: [api/API_SPEC.md](/src/api/API_SPEC.md) (this is nowhere near final, just what has been implemented so far)
+
+## "Quick" Start
+
+```sh
+#!/bin/bash
+
+# pull quincy
+wget https://github.com/HackUCF/Quincy/releases/latest/download/quincy-linux-amd64 -O ./quincy
+chmod +x ./quincy
+
+# run setup
+./quincy api dump-config
+mkdir scripts
+```
+
+1. Edit `config.yaml` and define your competition ([guide](/USAGE.md#configuration), [default config](/src/api/config/default-config.yaml))
+2. Add corresponding scripts to your new `scripts/` directory ([guide](/USAGE.md#check-scripts))
+
+```sh
+#!/bin/bash
+
+# in two different terminals
+./quincy api start
+./quincy agent start
+```
 
 ## About
 
