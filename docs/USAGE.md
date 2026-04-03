@@ -12,7 +12,7 @@ Running Quincy involves three steps:
 
 ## Configuration
 
-The API server reads a YAML config file on startup. By default it looks for `config.yaml` in the current working directory. You can point it elsewhere with the `QU_CONFIG_FILE` environment variable.
+The API server reads a YAML config file on startup. By default it looks for `config.yaml` in the current working directory. You can point it elsewhere with the `QU_CONFIG_FILE` environment variable. The default API config can be viewed [here.](/src/api/config/default-config.yaml)
 
 ### Minimal Example
 
