@@ -8,13 +8,13 @@ You are updating module documentation for the Quincy scoring engine. The repo ha
 
 ## Documentation Map
 
-**User-facing docs** (root level):
+**User-facing docs** (in `docs/`):
 - `README.md` — project overview, do not change without good reason
-- `USAGE.md` — configuration guide and examples for running Quincy
-- `DEVELOPMENT.md` — developer guide: setup, layout, conventions
+- `docs/USAGE.md` — configuration guide and examples for running Quincy
+- `docs/DEVELOPMENT.md` — developer guide: setup, layout, conventions
 
 **Module READMEs** (one per package directory, throughout the repo):
-- Every subdirectory under `api/`, `agent/`, and `common/` has a `README.md`
+- Every subdirectory under `src/api/`, `src/agent/`, and `src/common/` has a `README.md`
 - These follow a strict convention (see below)
 
 ## Module README Convention
@@ -38,17 +38,17 @@ Module READMEs must follow this format, in this order:
 
 When source code changes, identify which docs are affected:
 
-**Type/struct changes** → update `common/types/README.md`
+**Type/struct changes** → update `src/common/types/README.md`
 
 **Config shape changes** (adding/removing fields, renaming) → update:
-- `api/config/README.md`
-- `USAGE.md` (YAML examples and Config Rules section)
+- `src/api/config/README.md`
+- `docs/USAGE.md` (YAML examples and Config Rules section)
 
-**New or removed endpoints** → update the relevant `api/routes/*/README.md`
+**New or removed endpoints** → update the relevant `src/api/routes/*/README.md`
 
-**Agent behavior changes** → update `agent/README.md` and/or `agent/scripts/README.md` and `USAGE.md` (Check Scripts section)
+**Agent behavior changes** → update `src/agent/README.md` and/or `src/scripts/README.md` and `docs/USAGE.md` (Check Scripts section)
 
-**Database schema changes** → update `api/db/README.md` (table descriptions)
+**Database schema changes** → update `src/api/db/README.md` (table descriptions)
 
 **Any package-level change** → update that package's `README.md`
 

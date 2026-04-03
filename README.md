@@ -14,8 +14,8 @@ chmod +x ./quincy
 mkdir scripts
 ```
 
-1. Edit `config.yaml` and define your competition ([guide](/USAGE.md#configuration), [default config](/src/api/config/default-config.yaml))
-2. Add corresponding scripts to your new `scripts/` directory ([guide](/USAGE.md#check-scripts))
+1. Edit `config.yaml` and define your competition ([guide](/docs/USAGE.md#configuration), [default config](/src/api/config/default-config.yaml))
+2. Add corresponding scripts to your new `scripts/` directory ([guide](/docs/USAGE.md#check-scripts))
 
 ```sh
 # in two different terminals

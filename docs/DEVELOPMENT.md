@@ -16,59 +16,57 @@ go install github.com/air-verse/air@latest
 ## Getting Started
 
 Clone the repository and install Go dependencies:
-
 ```bash
 git clone https://github.com/HackUCF/Quincy.git
-cd Quincy
+cd Quincy/src
 go mod download
 ```
 
-Build the single binary:
+All commands below assume you are in `src/`.
 
+Build the single binary:
 ```bash
 go build -o quincy .
 ```
 
 ## Development with Hot-Reload
 
-Both the API server and agent have Air configs at the project root for automatic rebuilds on file changes.
+Both the API server and agent have Air configs for automatic rebuilds on file changes.
 
 In one terminal:
-
 ```bash
 air -c api.air.toml
 ```
 
 In another terminal:
-
 ```bash
 air -c agent.air.toml
 ```
 
 ## Project Layout
 
-The project is a Go module (`github.com/HackUCF/Quincy`) with a single entry point and four top-level packages:
+The project is a Go module (`github.com/HackUCF/Quincy`) rooted at `src/`, with a single entry point and four top-level packages:
 
-### `cmd/`
+### `src/cmd/`
 
 The CLI layer. Builds the `quincy` binary using Cobra and wires up the subcommands: `api start`, `api config`, and `agent start`. This is the only `package main` in the module; the `api` and `agent` packages export their entry points as regular functions invoked by the CLI.
 
-### `api/`
+### `src/api/`
 
 The API server. On startup it loads the YAML config, initializes the SQLite database, generates the check queue, and starts the HTTP server. Internally it's organized into subpackages by responsibility:
 
 - **config** -- Loads and validates the YAML config file. The parsed config is stored globally and accessed by the rest of the server.
-- **db** -- Database layer. Manages the SQLite connection and provides query functions organized by domain (scoring and users). The schema is executed on startup.
-- **routes** -- HTTP route handlers built on Gin, with recovery and request logging middleware. Handlers are grouped into subpackages by domain (scoring, users, misc).
+- **db** -- Database layer. Manages the SQLite connection and provides query functions organized by domain (scoring and users). The schema is executed on startup. The `db/conn` subpackage also exposes Gin middleware that injects the database connection into each request's context.
+- **routes** -- HTTP route handlers built on Gin, with recovery, request logging, CORS, and database middleware. Handlers are grouped into subpackages by domain (scoring, users, misc).
 - **services** -- Generates the full check queue by combining every team with every box and service, shuffles it, and serves checks round-robin to agents.
 
-### `agent/`
+### `src/agent/`
 
 The scoring agent. Spawns a pool of goroutines that each loop independently: fetch a check from the API, find the matching script, execute it with a timeout, and post the result back. Scripts are discovered by filename and cached after the first lookup.
 
 - **scripts/** -- Default directory for check scripts.
 
-### `common/`
+### `src/common/`
 
 Shared packages used by both the API server and agent:
 
@@ -105,12 +103,12 @@ Documentation is kept in sync manually after code changes. Three Claude Code ski
 |-------|------------|---------|
 | `all-docs` | `/all-docs` | Everything — module READMEs and the API spec |
 | `module-docs` | `/module-docs` | Module READMEs only |
-| `api-docs` | `/api-docs` | `api/API_SPEC.md` only |
+| `api-docs` | `/api-docs` | `docs/API_SPEC.md` only |
 
 Run a full documentation update after any non-trivial code change:
 
 ```
-/update-docs
+/all-docs
 ```
 
 ## Dependencies
