@@ -22,8 +22,8 @@ type PCR struct {
 	TeamNum      types.TeamNum      `json:"team_num"`
 }
 
-func userListExists(name types.UserListName) bool {
-	for _, ul := range config.Get().UserLists {
+func userListExists(cfg *config.APIConfigSpec, name types.UserListName) bool {
+	for _, ul := range cfg.UserLists {
 		if name == ul.Name {
 			return true
 		}
@@ -35,6 +35,7 @@ func userListExists(name types.UserListName) bool {
 // Takes the following input:
 func SubmitPCR(c *gin.Context) {
 	db := conn.Get(c)
+	cfg := config.Get(c)
 
 	var pcr PCR
 	err := json.NewDecoder(c.Request.Body).Decode(&pcr)
@@ -48,7 +49,7 @@ func SubmitPCR(c *gin.Context) {
 		return
 	}
 
-	if !userListExists(pcr.UserListName) {
+	if !userListExists(cfg, pcr.UserListName) {
 		resp := gin.H{
 			"message":   "user list does not exist",
 			"user_list": pcr.UserListName,

@@ -8,6 +8,7 @@ package scoring
 import (
 	"net/http"
 
+	"github.com/HackUCF/Quincy/api/config"
 	"github.com/HackUCF/Quincy/api/db/conn"
 	"github.com/HackUCF/Quincy/api/db/scoring"
 	"github.com/gin-gonic/gin"
@@ -17,8 +18,9 @@ import (
 // It is sorted by team number, then box ID, then service ID
 func GetRecentChecks(c *gin.Context) {
 	db := conn.Get(c)
+	cfg := config.Get(c)
 
-	status, err := scoring.GetCurrentServiceStatus(db)
+	status, err := scoring.GetCurrentServiceStatus(db, cfg)
 	if err != nil {
 		resp := gin.H{
 			"message": "could not get current service status",

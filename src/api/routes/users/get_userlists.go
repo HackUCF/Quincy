@@ -20,7 +20,7 @@ type UserListInfo struct {
 // Notably it does not actually return any usernames or passwords.
 // This is intended for use to generate an obfuscated PCR form (like CCDC).
 func GetUserLists(c *gin.Context) {
-	cfg := config.Get()
+	cfg := config.Get(c)
 
 	allInfo := make([]UserListInfo, 0, len(cfg.UserLists))
 

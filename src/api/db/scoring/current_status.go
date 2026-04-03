@@ -10,8 +10,7 @@ import (
 
 // GetCurrentServiceStatus returns the entire recent scores table.
 // It is sorted by team number, then box ID, then service ID.
-func GetCurrentServiceStatus(db *sql.DB) ([]types.Score, error) {
-	cfg := config.Get()
+func GetCurrentServiceStatus(db *sql.DB, cfg *config.APIConfigSpec) ([]types.Score, error) {
 
 	cap := int(cfg.NumTeams) * len(cfg.Boxes)
 	status := make([]types.Score, 0, cap)

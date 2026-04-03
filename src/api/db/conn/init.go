@@ -7,6 +7,7 @@ package conn
 import (
 	"database/sql"
 	"fmt"
+	"sync/atomic"
 	"time"
 
 	_ "embed"
@@ -16,7 +17,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var db *sql.DB
+var (
+	db        *sql.DB
+	dbIsValid atomic.Bool
+)
 
 // InitDBConnection connects to the database and changes some of the driver settings.
 // It requires that the config be loaded before running.
@@ -42,5 +46,6 @@ func InitDBConnection(cfg *config.APIConfigSpec) (*sql.DB, error) {
 		"conn_string", conn_string,
 	)
 
+	dbIsValid.Store(true)
 	return db, nil
 }
