@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/HackUCF/Quincy/common/log"
+	"github.com/HackUCF/quincy/common/log"
 )
 
 // Config holds the viper-loadable agent configuration.

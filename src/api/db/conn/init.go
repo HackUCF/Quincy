@@ -12,8 +12,8 @@ import (
 
 	_ "embed"
 
-	"github.com/HackUCF/Quincy/api/config"
-	"github.com/HackUCF/Quincy/common/log"
+	"github.com/HackUCF/quincy/api/config"
+	"github.com/HackUCF/quincy/common/log"
 	_ "github.com/mattn/go-sqlite3"
 )
 

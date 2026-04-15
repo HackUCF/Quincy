@@ -12,7 +12,7 @@ It can be set via flags or environment variables with the QU_ prefix:
 package agent
 
 import (
-	"github.com/HackUCF/Quincy/common/log"
+	"github.com/HackUCF/quincy/common/log"
 	"github.com/google/uuid"
 )
 

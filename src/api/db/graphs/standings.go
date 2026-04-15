@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"html/template"
 
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/common/types"
 )
 
 // StandingsData contains the rendered strings required for the standings graph template.

@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/common/types"
 )
 
 type scriptPath string

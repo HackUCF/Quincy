@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/common/types"
 )
 
 // GetRandomUser pulls a random user from a specific userlist for a specific team.

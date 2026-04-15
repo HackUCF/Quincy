@@ -1,6 +1,6 @@
 package config
 
-import "github.com/HackUCF/Quincy/common/types"
+import "github.com/HackUCF/quincy/common/types"
 
 // APIConfigSpec defines the entire API configuration file.
 type APIConfigSpec struct {

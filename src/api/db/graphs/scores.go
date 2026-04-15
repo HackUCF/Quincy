@@ -8,8 +8,8 @@ import (
 	"slices"
 	"time"
 
-	"github.com/HackUCF/Quincy/api/db/misc"
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/api/db/misc"
+	"github.com/HackUCF/quincy/common/types"
 )
 
 type scoresDataset struct {

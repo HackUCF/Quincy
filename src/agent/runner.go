@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/HackUCF/Quincy/common/log"
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/common/log"
+	"github.com/HackUCF/quincy/common/types"
 )
 
 // global http client object

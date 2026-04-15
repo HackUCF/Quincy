@@ -9,7 +9,7 @@ import (
 	"log"
 	"sync/atomic"
 
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/common/types"
 )
 
 // exported

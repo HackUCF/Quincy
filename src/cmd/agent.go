@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/HackUCF/Quincy/agent"
+	"github.com/HackUCF/quincy/agent"
 	"github.com/spf13/cobra"
 )
 

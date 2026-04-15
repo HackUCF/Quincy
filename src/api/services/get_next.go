@@ -3,8 +3,8 @@ package services
 import (
 	"database/sql"
 
-	"github.com/HackUCF/Quincy/api/db/users"
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/api/db/users"
+	"github.com/HackUCF/quincy/common/types"
 )
 
 // GetNext returns the next service in the queue.

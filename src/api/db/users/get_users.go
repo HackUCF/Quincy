@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/common/types"
 )
 
 type AllUsers map[types.TeamNum]map[types.UserListName][]types.User

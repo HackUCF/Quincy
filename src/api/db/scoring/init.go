@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/HackUCF/Quincy/api/config"
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/api/config"
+	"github.com/HackUCF/quincy/common/types"
 )
 
 // InitScoring creates rows in the final scores table for each team/box/service combo.

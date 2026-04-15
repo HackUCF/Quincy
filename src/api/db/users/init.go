@@ -9,7 +9,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/HackUCF/Quincy/api/config"
+	"github.com/HackUCF/quincy/api/config"
 )
 
 // InitUsers fills the users table in the database with default usernames and passwords.
