@@ -1,5 +1,5 @@
 # routes/scoring
 
-HTTP route handlers for all scoring-related endpoints. Serves two distinct audiences: agents consuming work and frontends displaying results.
+HTTP route handlers for the scoring display endpoints, intended for frontends and operators. Provides five endpoints: current service status showing the most recent check result for every team and service combination; scores aggregated per team; scores aggregated per box; scores aggregated per box and service; and a full per-team per-box per-service breakdown.
 
-Agent-facing: an endpoint that returns the next service check to run from the queue (with credentials attached if the service has a userlist), and an endpoint that accepts a completed check result and writes it to the database. Frontend-facing: endpoints for current service status across all teams and services, scores aggregated by team, scores aggregated by box, scores aggregated by box and service, and a full per-team per-box per-service breakdown.
+Agent-facing endpoints (fetching the next check and submitting a completed result) live in the sibling `routes/agent` package, not here.
