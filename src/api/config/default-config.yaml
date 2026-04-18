@@ -39,27 +39,27 @@ user_lists:
 # list of servers
 boxes:
   - name: cubism
-    host: 127.0.{}.0
+    host: 127.0.0.1 # can be a static ip
     services:
       - name: fileshare
-        check: 75percent
+        check: 75percent.py
         user_list: local users
 
       - name: remoting
-        check: 25percent
+        check: 25percent.py
         user_list: complex domain
 
   - name: scrapyard
     host: 127.0.0.{} # ip or dns name template
     services:
       - name: blog
-        check: 100percent # what check do the agents run?
+        check: 100percent.py # what script does the agent run?
 
       - name: shop
-        check: 50percent
+        check: 50percent.py
 
       - name: ssh-ad
-        check: 0percent
+        check: 0percent.py
         user_list: complex domain # optional userlist name
 
 # http server settings

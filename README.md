@@ -1,8 +1,10 @@
 # Nothing gets past my bow!
 
-### Check [the docs!](/docs/README.md)
+### [Read the docs!](/docs/README.md)
 
-## "Quick" Start (are you kidding me?)
+## Quick Start (are you kidding me?)
+
+This scoreboard is not designed for a quick start, so this is about as fast as it gets.
 
 ```sh
 # pull quincy
@@ -20,7 +22,7 @@ mkdir scripts
 ```sh
 # in two different terminals
 ./quincy api start
-./quincy agent start
+PATH=$(pwd)/scripts:$PATH ./quincy agent start
 ```
 
 For a longer explanation, see the [usage guide](/docs/USAGE.md).
