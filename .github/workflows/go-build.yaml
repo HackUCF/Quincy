@@ -26,6 +26,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: src/go.mod
+          cache: false
 
       # create the version tag from recent branch
       - name: generate tag
