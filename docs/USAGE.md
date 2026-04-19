@@ -203,6 +203,7 @@ The JSON file passed as the first argument looks like this:
   "box": "mailserver",
   "host": "10.0.3.2",
   "team_num": 3,
+  "user_list": "admin",
   "user": {
     "username": "geraldo",
     "password": "BuyMyNFT1!",

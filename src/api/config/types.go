@@ -27,6 +27,7 @@ type ServiceSpec struct {
 	Name      types.ServiceName  `yaml:"name"      mapstructure:"name"      json:"name"`
 	CheckName types.CheckName    `yaml:"check"     mapstructure:"check"     json:"check"`
 	UserList  types.UserListName `yaml:"user_list" mapstructure:"user_list" json:"user_list,omitempty"`
+	Timeout   float64            `yaml:"timeout"   mapstructure:"timeout"   json:"timeout,omitempty"`
 }
 
 // UserListSpec contains the definition of a userlist.

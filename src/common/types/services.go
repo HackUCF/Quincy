@@ -8,7 +8,7 @@ type ServiceTemplate struct {
 	CheckName CheckName    `json:"check"`
 	UserList  UserListName `json:"user_list,omitempty,omitzero"`
 	BoxName   BoxName      `json:"box"`
-	// Arguments   map[string]any `json:"args,omitempty,omitzero"`
+	Timeout   float64      `json:"timeout,omitempty,omitzero"`
 
 	Host    string  `json:"host"`
 	TeamNum TeamNum `json:"team_num"`

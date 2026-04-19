@@ -40,7 +40,7 @@ func (cfg *AgentConfig) Loop() {
 		}
 
 		// run it (with the configured timeout)
-		timeout := time.Second * time.Duration(cfg.LoopTime)
+		timeout := getTimeout(cfg, svc)
 		output, err := runCheck(svc, timeout)
 		if err != nil {
 			log.Error(

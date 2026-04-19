@@ -76,6 +76,15 @@ func runCheck(svc *types.Service, timeout time.Duration) (*scriptOutput, error) 
 	// sample error for condition
 	var exitError *exec.ExitError
 
+	// check timing out is an organizer failure
+	// script logic should determine it's own timeouts and fail gracefully
+	select {
+	case <-ctx.Done():
+		err := fmt.Errorf("check timed out (ran past %0.2f seconds)", timeout.Seconds())
+		return nil, err
+	default:
+	}
+
 	if err == nil {
 		// no failure!
 		output.Status = Pass

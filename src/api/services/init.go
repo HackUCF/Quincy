@@ -46,12 +46,14 @@ func InitServices(cfg *config.APIConfigSpec) error {
 // creates a check template from the config specification.
 // this is a helper function for InitServices.
 // this is a deep clone.
+// i do not like this function. this is a bad system.
 func specToTemplate(serviceSpec config.ServiceSpec, boxSpec config.BoxSpec, t types.TeamNum) types.ServiceTemplate {
 	var st types.ServiceTemplate
 
 	st.Name = serviceSpec.Name
 	st.CheckName = serviceSpec.CheckName
 	st.UserList = serviceSpec.UserList
+	st.Timeout = serviceSpec.Timeout
 
 	st.BoxName = boxSpec.Name
 	st.Host = boxSpec.Host

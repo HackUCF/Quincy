@@ -57,10 +57,12 @@ boxes:
 
       - name: shop
         check: 50percent.py
+        timeout: 0.5 # custom timeouts (in seconds) can be provided
 
       - name: ssh-ad
         check: 0percent.py
         user_list: complex domain # optional userlist name
+        timeout: 30 # can be very long or very short
 
 # http server settings
 http:

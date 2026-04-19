@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/HackUCF/quincy/common/types"
 
@@ -41,6 +42,23 @@ func getService(url string) (*types.Service, error) {
 	}
 
 	return &svc, nil
+}
+
+// get the timeout from config or service
+func getTimeout(cfg *AgentConfig, svc *types.Service) time.Duration {
+
+	var timeout time.Duration
+
+	if svc.Timeout == 0 {
+		// if it's not defined in the check, use the loop time
+		timeout = time.Second * time.Duration(cfg.LoopTime)
+	} else {
+		// try and salvage the float
+		svcDuration := time.Duration(svc.Timeout*1000) / 1000
+		timeout = time.Second * svcDuration
+	}
+
+	return timeout
 }
 
 // convert the output into api compatible object

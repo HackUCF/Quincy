@@ -8,7 +8,10 @@ type Score struct {
 	BoxName     BoxName     `json:"box"`
 	ServiceName ServiceName `json:"service"`
 	Message     string      `json:"message"`
-	Timestamp   int64       `json:"timestamp"`
+
+	// Timestamp is inserted by the api on submission.
+	// Does not need to added when building manually.
+	Timestamp int64 `json:"timestamp"`
 }
 
 // ScoreResult is a flexible object used to store information about scoring results.
