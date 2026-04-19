@@ -26,12 +26,13 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: src/go.mod
+          cache: false
 
       # create the version tag from recent branch
       - name: generate tag
         id: tag
         run: |
-          echo "tag=v0.0.$(git rev-list --count HEAD)-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "tag=v0.0.$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
 
       # build agent and api for:
       #   linux-amd64
