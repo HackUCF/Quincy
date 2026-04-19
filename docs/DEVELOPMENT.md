@@ -40,8 +40,6 @@ air -c api.air.toml
 
 In another terminal:
 ```bash
-# setting path doesn't look like this on windows :\
-export PATH=$PWD/example-scripts:$PATH
 air -c agent.air.toml
 ```
 

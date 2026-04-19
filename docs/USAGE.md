@@ -167,7 +167,7 @@ You can run multiple agents on different machines, all pointed at the same API s
 
 ## Check Scripts
 
-Check scripts are small programs that test whether a service is working. The `check` field in a service config is the name of the executable the agent will run for that service — it must be on the agent's `PATH` or be an absolute path.
+Check scripts are small programs that test whether a service is working. The `check` field in a service config is the name of the executable the agent will run for that service. On startup the agent prepends a local `scripts` directory (in the working directory) to its `PATH`, so any executable placed there is available by its exact filename. Scripts can also be on the system `PATH` or referenced by absolute path.
 
 ### How They Work
 
@@ -177,6 +177,14 @@ Check scripts are small programs that test whether a service is working. The `ch
 4. The result gets sent back to the API server.
 
 The time limit per script is equal to `--loop-time` (default 5 seconds). If a script exceeds it, it is killed and the check counts as a failure.
+
+To generate a `scripts` directory populated with example check scripts:
+
+```bash
+./quincy agent dump-scripts
+```
+
+Pass `--force` / `-f` to overwrite existing files.
 
 ### Writing a New Script
 
