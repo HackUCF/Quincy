@@ -27,7 +27,12 @@ func InitServices(cfg *config.APIConfigSpec) error {
 	for _, box := range cfg.Boxes {
 		for _, service := range box.Services {
 			for _, t := range config.TeamRange {
-				ct := specToTemplate(service, box, t)
+				ct := types.ServiceTemplate{
+					ServiceSpec: service,
+					BoxName:     box.Name,
+					Host:        box.Host,
+					TeamNum:     t,
+				}
 				services = append(services, ct)
 			}
 		}
@@ -41,23 +46,4 @@ func InitServices(cfg *config.APIConfigSpec) error {
 	})
 
 	return nil
-}
-
-// creates a check template from the config specification.
-// this is a helper function for InitServices.
-// this is a deep clone.
-// i do not like this function. this is a bad system.
-func specToTemplate(serviceSpec config.ServiceSpec, boxSpec config.BoxSpec, t types.TeamNum) types.ServiceTemplate {
-	var st types.ServiceTemplate
-
-	st.Name = serviceSpec.Name
-	st.CheckName = serviceSpec.CheckName
-	st.UserList = serviceSpec.UserList
-	st.Timeout = serviceSpec.Timeout
-
-	st.BoxName = boxSpec.Name
-	st.Host = boxSpec.Host
-	st.TeamNum = t
-
-	return st
 }

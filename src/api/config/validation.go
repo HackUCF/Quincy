@@ -23,11 +23,6 @@ func (box *BoxSpec) validate() error {
 }
 
 // TODO
-func (svc *ServiceSpec) validate() error {
-	return nil
-}
-
-// TODO
 func (ul *UserListSpec) validate() error {
 	return nil
 }

@@ -1,15 +1,22 @@
 package types
 
+// ServiceSpec contains the config specification of one service.
+// This always belongs to a box, but the object is not linked directly.
+// Service Names are only unique per individual box.
+type ServiceSpec struct {
+	Name      ServiceName  `yaml:"name"      mapstructure:"name"      json:"name"`
+	CheckName CheckName    `yaml:"check"     mapstructure:"check"     json:"check"`
+	UserList  UserListName `yaml:"user_list" mapstructure:"user_list" json:"user_list,omitempty"`
+	Timeout   float64      `yaml:"timeout"   mapstructure:"timeout"   json:"timeout,omitempty"`
+}
+
 // ServiceTemplate contains *almost* everything an agent needs to run a check.
-// It adds the host variable from the box, and a specific teams number.
+// It adds variables from the box, and a specific team number.
 // It is only missing a user, as this needs to be pulled from the db on demand.
 type ServiceTemplate struct {
-	Name      ServiceName  `json:"name"`
-	CheckName CheckName    `json:"check"`
-	UserList  UserListName `json:"user_list,omitempty,omitzero"`
-	BoxName   BoxName      `json:"box"`
-	Timeout   float64      `json:"timeout,omitempty,omitzero"`
+	ServiceSpec
 
+	BoxName BoxName `json:"box"`
 	Host    string  `json:"host"`
 	TeamNum TeamNum `json:"team_num"`
 }

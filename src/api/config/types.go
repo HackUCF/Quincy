@@ -15,19 +15,9 @@ type APIConfigSpec struct {
 // It is the parent to a list of services.
 // The Name is enforced to be unique, but multiple boxes can have identical services or hosts.
 type BoxSpec struct {
-	Name     types.BoxName `yaml:"name"     mapstructure:"name"     json:"name"`
-	Host     string        `yaml:"host"     mapstructure:"host"     json:"host"`
-	Services []ServiceSpec `yaml:"services" mapstructure:"services" json:"services"`
-}
-
-// ServiceSpec contains the config specification of one service.
-// This always belongs to a box, but the object is not linked directly.
-// Service Names are only unique per individual box.
-type ServiceSpec struct {
-	Name      types.ServiceName  `yaml:"name"      mapstructure:"name"      json:"name"`
-	CheckName types.CheckName    `yaml:"check"     mapstructure:"check"     json:"check"`
-	UserList  types.UserListName `yaml:"user_list" mapstructure:"user_list" json:"user_list,omitempty"`
-	Timeout   float64            `yaml:"timeout"   mapstructure:"timeout"   json:"timeout,omitempty"`
+	Name     types.BoxName       `yaml:"name"     mapstructure:"name"     json:"name"`
+	Host     string              `yaml:"host"     mapstructure:"host"     json:"host"`
+	Services []types.ServiceSpec `yaml:"services" mapstructure:"services" json:"services"`
 }
 
 // UserListSpec contains the definition of a userlist.
