@@ -1,8 +1,10 @@
 # Nothing gets past my bow!
 
-### Check [the docs!](/docs/README.md)
+### [Read the docs!](/docs/README.md)
 
-## "Quick" Start (are you kidding me?)
+## Quick Start (are you kidding me?)
+
+This scoreboard is not designed for a quick start, so this is about as fast as it gets.
 
 ```sh
 # pull quincy
@@ -11,11 +13,11 @@ chmod +x ./quincy
 
 # run setup
 ./quincy api dump-config
-mkdir scripts
+./quincy agent dump-scripts
 ```
 
-1. Edit `config.yaml` and define your competition ([guide](/docs/USAGE.md#configuration), [default config](/src/api/config/default-config.yaml))
-2. Add corresponding scripts to your new `scripts/` directory ([guide](/docs/USAGE.md#check-scripts))
+1. Edit `config.yaml` and define your competition ([guide](/docs/USAGE.md#configuration), [default](/src/api/config/default-config.yaml))
+2. Add or edit the scripts in the new `scripts/` directory ([guide](/docs/USAGE.md#check-scripts), [default](/src/agent/default-scripts/))
 
 ```sh
 # in two different terminals

@@ -8,10 +8,10 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/HackUCF/Quincy/api/config"
-	"github.com/HackUCF/Quincy/api/db/conn"
-	"github.com/HackUCF/Quincy/api/db/scoring"
-	"github.com/HackUCF/Quincy/api/db/users"
+	"github.com/HackUCF/quincy/api/config"
+	"github.com/HackUCF/quincy/api/db/conn"
+	"github.com/HackUCF/quincy/api/db/scoring"
+	"github.com/HackUCF/quincy/api/db/users"
 	_ "github.com/mattn/go-sqlite3"
 )
 

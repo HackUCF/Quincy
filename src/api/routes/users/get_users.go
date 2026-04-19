@@ -3,8 +3,8 @@ package users
 import (
 	"net/http"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
-	"github.com/HackUCF/Quincy/api/db/users"
+	"github.com/HackUCF/quincy/api/db/conn"
+	"github.com/HackUCF/quincy/api/db/users"
 	"github.com/gin-gonic/gin"
 )
 

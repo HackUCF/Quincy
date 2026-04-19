@@ -1,4 +1,4 @@
-module github.com/HackUCF/Quincy
+module github.com/HackUCF/quincy
 
 go 1.26.1
 

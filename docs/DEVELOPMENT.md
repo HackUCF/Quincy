@@ -49,7 +49,7 @@ The project is a Go module (`github.com/HackUCF/Quincy`) rooted at `src/`, with 
 
 ### `src/cmd/`
 
-The CLI layer. Builds the `quincy` binary using Cobra and wires up the subcommands: `api start`, `api config`, and `agent start`. This is the only `package main` in the module; the `api` and `agent` packages export their entry points as regular functions invoked by the CLI.
+The CLI layer. Builds the `quincy` binary using Cobra and wires up the subcommands: `api start`, `api dump-config`, and `agent start`. This is the only `package main` in the module; the `api` and `agent` packages export their entry points as regular functions invoked by the CLI.
 
 ### `src/api/`
 
@@ -62,7 +62,7 @@ The API server. On startup it loads the YAML config, initializes the SQLite data
 
 ### `src/agent/`
 
-The scoring agent. Spawns a pool of goroutines that each loop independently: fetch a check from the API, find the matching script, execute it with a timeout, and post the result back. Scripts are discovered by filename and cached after the first lookup.
+The scoring agent. Spawns a pool of goroutines that each loop independently: fetch a check from the API, run the check script by executing the check name directly as a command with a timeout, and post the result back.
 
 - **scripts/** -- Default directory for check scripts.
 

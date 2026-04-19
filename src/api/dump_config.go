@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/HackUCF/Quincy/api/config"
+	"github.com/HackUCF/quincy/api/config"
 )
 
 // DumpConfig writes the default YAML config to disk, or prints it to stdout.

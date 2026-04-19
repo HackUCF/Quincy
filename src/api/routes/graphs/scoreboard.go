@@ -3,8 +3,8 @@ package graphs
 import (
 	"net/http"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
-	"github.com/HackUCF/Quincy/api/db/graphs"
+	"github.com/HackUCF/quincy/api/db/conn"
+	"github.com/HackUCF/quincy/api/db/graphs"
 	"github.com/gin-gonic/gin"
 )
 

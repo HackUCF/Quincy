@@ -3,8 +3,8 @@ package scoring
 import (
 	"net/http"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
-	"github.com/HackUCF/Quincy/api/db/scoring"
+	"github.com/HackUCF/quincy/api/db/conn"
+	"github.com/HackUCF/quincy/api/db/scoring"
 	"github.com/gin-gonic/gin"
 )
 

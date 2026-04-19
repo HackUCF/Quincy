@@ -3,8 +3,8 @@ package agent
 import (
 	"net/http"
 
-	"github.com/HackUCF/Quincy/api/db/conn"
-	"github.com/HackUCF/Quincy/api/services"
+	"github.com/HackUCF/quincy/api/db/conn"
+	"github.com/HackUCF/quincy/api/services"
 	"github.com/gin-gonic/gin"
 )
 

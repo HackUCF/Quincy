@@ -5,8 +5,8 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/HackUCF/Quincy/api/config"
-	"github.com/HackUCF/Quincy/common/log"
+	"github.com/HackUCF/quincy/api/config"
+	"github.com/HackUCF/quincy/common/log"
 )
 
 // ServeRoutes generates an HTTP router and starts listening!

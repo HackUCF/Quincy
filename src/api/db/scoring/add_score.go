@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/common/types"
 )
 
 // AddScore inserts a score into the main score database.

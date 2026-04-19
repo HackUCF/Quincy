@@ -416,7 +416,7 @@ Heatmap of historical uptime percentage per team per box/service.
 
 #### Unmatched routes — 404
 
-When no route matches, the response includes the requested path and method, plus a list of similar routes. A route is considered similar if its path shares a prefix with the requested path (in either direction). If no routes share a prefix, `similar_routes` is an empty array.
+When no route matches, the response includes the requested path and method, plus a list of similar routes. A route is considered similar if its path shares a prefix with the requested path (in either direction). If no routes share a prefix, `similar_routes` is `null`.
 
 ```json
 {
@@ -428,3 +428,5 @@ When no route matches, the response includes the requested path and method, plus
   ]
 }
 ```
+
+`similar_routes` is `null` (not an empty array) when no routes share a prefix with the requested path.

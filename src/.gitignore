@@ -4,6 +4,9 @@
 # development config file
 /config.yaml
 
+# development scripts
+/scripts/
+
 # compiled binaries
 /Quincy
 /quincy

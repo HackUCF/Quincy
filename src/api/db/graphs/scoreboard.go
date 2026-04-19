@@ -11,8 +11,8 @@ import (
 	"html/template"
 	"slices"
 
-	"github.com/HackUCF/Quincy/common/log"
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/common/log"
+	"github.com/HackUCF/quincy/common/types"
 )
 
 // scoreboardPoint is the a specific check on the scoreboard chart.

@@ -3,8 +3,8 @@ package users
 import (
 	"net/http"
 
-	"github.com/HackUCF/Quincy/api/config"
-	"github.com/HackUCF/Quincy/common/types"
+	"github.com/HackUCF/quincy/api/config"
+	"github.com/HackUCF/quincy/common/types"
 	"github.com/gin-gonic/gin"
 )
 

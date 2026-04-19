@@ -7,10 +7,10 @@ package api
 import (
 	"fmt"
 
-	"github.com/HackUCF/Quincy/api/config"
-	"github.com/HackUCF/Quincy/api/db"
-	"github.com/HackUCF/Quincy/api/routes"
-	"github.com/HackUCF/Quincy/api/services"
+	"github.com/HackUCF/quincy/api/config"
+	"github.com/HackUCF/quincy/api/db"
+	"github.com/HackUCF/quincy/api/routes"
+	"github.com/HackUCF/quincy/api/services"
 )
 
 // Start is the entry point for the API server.

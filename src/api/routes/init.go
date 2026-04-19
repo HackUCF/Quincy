@@ -8,14 +8,14 @@ Most Gin handler functions are located in subpackages.
 package routes
 
 import (
-	"github.com/HackUCF/Quincy/api/config"
-	"github.com/HackUCF/Quincy/api/db/conn"
-	"github.com/HackUCF/Quincy/api/routes/agent"
-	"github.com/HackUCF/Quincy/api/routes/graphs"
-	"github.com/HackUCF/Quincy/api/routes/misc"
-	"github.com/HackUCF/Quincy/api/routes/scoring"
-	"github.com/HackUCF/Quincy/api/routes/users"
-	"github.com/HackUCF/Quincy/common/middleware"
+	"github.com/HackUCF/quincy/api/config"
+	"github.com/HackUCF/quincy/api/db/conn"
+	"github.com/HackUCF/quincy/api/routes/agent"
+	"github.com/HackUCF/quincy/api/routes/graphs"
+	"github.com/HackUCF/quincy/api/routes/misc"
+	"github.com/HackUCF/quincy/api/routes/scoring"
+	"github.com/HackUCF/quincy/api/routes/users"
+	"github.com/HackUCF/quincy/common/middleware"
 	"github.com/gin-gonic/gin"
 )
 
