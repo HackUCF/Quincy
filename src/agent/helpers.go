@@ -51,7 +51,11 @@ func makeScore(svc *types.Service, output *scriptOutput) *types.Score {
 	score.ServiceName = svc.Name
 	score.TeamNum = svc.TeamNum
 	score.Status = output.Status
-	score.Message = fmt.Sprintf(messageTpl, output.Stdout.String(), output.Stderr.String())
+	score.Message = fmt.Sprintf(
+		messageTpl,
+		output.Stdout.String(),
+		output.Stderr.String(),
+	)
 
 	return score
 }

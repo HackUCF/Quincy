@@ -1,6 +1,6 @@
 package agent
 
-import "bytes"
+import "strings"
 
 // AgentConfig holds the viper-loadable agent configuration.
 // Fields map to viper keys, which in turn map to QU_<KEY> env vars
@@ -16,6 +16,6 @@ const Fail bool = false
 
 type scriptOutput struct {
 	Status bool
-	Stdout bytes.Buffer
-	Stderr bytes.Buffer
+	Stdout strings.Builder
+	Stderr strings.Builder
 }

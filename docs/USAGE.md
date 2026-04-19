@@ -160,43 +160,33 @@ Each flag can also be set as an environment variable with the `QU_` prefix.
 | Flag | Env var | Default | What it does |
 |------|---------|---------|--------------|
 | `--api-url` | `QU_API_URL` | `http://127.0.0.1:8888` | Where to find the API server |
-| `--checks-dir` | `QU_CHECKS_DIR` | `scripts` | Where to find check scripts |
-| `--loop-time` | `QU_LOOP_TIME` | `1` | Seconds between scoring loops |
-| `--num-threads` | `QU_NUM_THREADS` | `15` | Number of concurrent scoring goroutines |
+| `--loop-time` | `QU_LOOP_TIME` | `5` | Seconds between scoring loops (also used as the per-check timeout) |
+| `--num-threads` | `QU_NUM_THREADS` | `10` | Number of concurrent scoring goroutines |
 
 You can run multiple agents on different machines, all pointed at the same API server, to distribute the checking workload.
 
 ## Check Scripts
 
-Check scripts are small programs that test whether a service is working. They live in the directory specified by `QU_CHECKS_DIR` (defaults to `scripts/` in the agent's working directory).
+Check scripts are small programs that test whether a service is working. The `check` field in a service config is the name of the executable the agent will run for that service — it must be on the agent's `PATH` or be an absolute path.
 
 ### How They Work
 
 1. The agent gets a check assignment from the API server (e.g. "check SSH on team 3's mail server").
-2. It finds the right script by matching the check name to the script's filename.
-3. It writes the service details (host, credentials, etc.) to a temporary file and runs the script with that file as an argument.
-4. If the script exits successfully (exit code 0), the check passes. Any other exit code means it failed.
-5. The result gets sent back to the API server.
+2. It runs the check name as a subprocess. The service details (host, credentials, etc.) are written to a temporary JSON file and passed to the script as its first argument.
+3. If the script exits with code 0, the check passes. Any other exit code is a failure. The script's stdout and stderr are both captured and stored with the result.
+4. The result gets sent back to the API server.
 
-Scripts have a 10-second time limit. If they take longer, they're stopped and counted as a failure.
-
-### Naming Scripts
-
-The agent matches scripts by the part of the filename before the first `.` (case doesn't matter). So a check with `check: ssh` would match any of:
-
-- `ssh.check.py`
-- `SSH.sh`
-- `ssh.x86-64.exe`
+The time limit per script is equal to `--loop-time` (default 5 seconds). If a script exceeds it, it is killed and the check counts as a failure.
 
 ### Writing a New Script
 
-A check script can be written in any language. It just needs to:
+A check script can be written in any language. It needs to:
 
-1. Accept one argument: a path to a JSON file with the check details.
-2. Exit with code 0 if the service is healthy, or any other code if it's not.
-3. Finish within 10 seconds.
+1. Accept one argument: a path to a temporary JSON file containing the service details.
+2. Exit with code 0 if the service is healthy, or any non-zero code if it's not.
+3. Finish within the configured loop time.
 
-The JSON file looks like this:
+The JSON file passed as the first argument looks like this:
 
 ```json
 {
@@ -214,12 +204,12 @@ The JSON file looks like this:
 }
 ```
 
-The `user` block is only present when the service has a user list configured.
+The `user` block is only present when the service has a user list configured. The `domain` and `netbios` fields within `user` are omitted when not set.
 
-Don't forget to make the script executable:
+Make the script executable and ensure it is on the agent's `PATH`:
 
 ```bash
-chmod +x scripts/my-script.sh
+chmod +x my-ssh-check.py
 ```
 
 ## Scores

@@ -7,7 +7,7 @@ import (
 	"github.com/HackUCF/quincy/common/log"
 )
 
-func (cfg *AgentConfig) Loop(id string) {
+func (cfg *AgentConfig) Loop() {
 
 	// precompute some urls to save time later:
 	serviceURL, err := url.JoinPath(cfg.APIURL, "/api/v1/agent/new-check")
@@ -19,11 +19,14 @@ func (cfg *AgentConfig) Loop(id string) {
 		log.Panic("failed to construct score URL", "api_url", cfg.APIURL, "error", err)
 	}
 
+	// convert configured loop time into seconds
+	loopTime := time.Second * time.Duration(cfg.LoopTime)
+
 	// infinite loop
 	for {
 
 		// start with sleep so continues don't skip it
-		time.Sleep(time.Duration(cfg.LoopTime))
+		time.Sleep(loopTime)
 
 		// get service from quincy
 		svc, err := getService(serviceURL)
@@ -64,6 +67,10 @@ func (cfg *AgentConfig) Loop(id string) {
 		}
 
 		// log success then loop again!
-		log.Info("successfully posted score to server")
+		// go here may be stupid, but i figure it is slightly more optimal
+		go log.Info(
+			"successfully posted score to server",
+			"score", score,
+		)
 	}
 }

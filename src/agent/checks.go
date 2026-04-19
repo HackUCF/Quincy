@@ -66,7 +66,7 @@ func runCheck(svc *types.Service, timeout time.Duration) (*scriptOutput, error) 
 
 	// create command to run
 	// call the check name with the temporary filepath as the only argument.
-	cmd := exec.CommandContext(ctx, string(svc.CheckName))
+	cmd := exec.CommandContext(ctx, string(svc.CheckName), tmpFile.Name())
 	cmd.Stdout = &output.Stdout
 	cmd.Stderr = &output.Stderr
 

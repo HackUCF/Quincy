@@ -13,16 +13,16 @@ chmod +x ./quincy
 
 # run setup
 ./quincy api dump-config
-mkdir scripts
+./quincy agent dump-scripts
 ```
 
-1. Edit `config.yaml` and define your competition ([guide](/docs/USAGE.md#configuration), [default config](/src/api/config/default-config.yaml))
-2. Add corresponding scripts to your new `scripts/` directory ([guide](/docs/USAGE.md#check-scripts))
+1. Edit `config.yaml` and define your competition ([guide](/docs/USAGE.md#configuration), [default](/src/api/config/default-config.yaml))
+2. Add or edit the scripts in the new `scripts/` directory ([guide](/docs/USAGE.md#check-scripts), [default](/src/agent/default-scripts/))
 
 ```sh
 # in two different terminals
 ./quincy api start
-PATH=$(pwd)/scripts:$PATH ./quincy agent start
+./quincy agent start
 ```
 
 For a longer explanation, see the [usage guide](/docs/USAGE.md).
