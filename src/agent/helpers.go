@@ -18,7 +18,13 @@ import (
 var messageTpl string
 
 // shared http client for requests to api
-var apiClient http.Client
+var apiTransport = &http.Transport{
+	MaxIdleConns:        1000,
+	MaxIdleConnsPerHost: 1000,
+	MaxConnsPerHost:     0,
+	IdleConnTimeout:     90 * time.Second,
+}
+var apiClient = &http.Client{Transport: apiTransport}
 
 // grab next service to check from api
 func getService(url string) (*types.Service, error) {
@@ -94,6 +100,7 @@ func postScore(url string, score *types.Score) error {
 		err := fmt.Errorf("failed to request check from quincy: %w", err)
 		return err
 	}
+	defer resp.Body.Close()
 
 	// ensure it was recieved
 	if resp.StatusCode != http.StatusOK {
