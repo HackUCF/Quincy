@@ -32,7 +32,7 @@ jobs:
       - name: generate tag
         id: tag
         run: |
-          echo "tag=v0.0.$(git rev-list --count HEAD)-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "tag=v0.0.$(git rev-list --count HEAD)" >> "$GITHUB_OUTPUT"
 
       # build agent and api for:
       #   linux-amd64
