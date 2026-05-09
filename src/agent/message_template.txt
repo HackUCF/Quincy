@@ -1,4 +1,4 @@
-======== stdout ========
+========= check output =========
 %s
-======== stderr ========
+======== error messages ========
 %s

@@ -50,18 +50,23 @@ func getService(url string) (*types.Service, error) {
 	return &svc, nil
 }
 
-// get the timeout from config or service
+// get the timeout from config or service.
+// if the service-specific timeout is specified, use it.
+// if the loop time is reasonable (>5s), use it.
+// otherwise just pick a chill 30s.
 func getTimeout(cfg *AgentConfig, svc *types.Service) time.Duration {
 
 	var timeout time.Duration
 
-	if svc.Timeout == 0 {
-		// if it's not defined in the check, use the loop time
-		timeout = time.Second * time.Duration(cfg.LoopTime)
+	if svc.Timeout != 0 {
+		// use the service-specific timeout if provided
+		timeout = time.Duration(svc.Timeout * float64(time.Second))
+	} else if cfg.LoopTime >= 5 {
+		// use the loop time if long enough
+		timeout = time.Duration(cfg.LoopTime) * time.Second
 	} else {
-		// try and salvage the float
-		svcDuration := time.Duration(svc.Timeout*1000) / 1000
-		timeout = time.Second * svcDuration
+		// default to 30s (unlikely to trigger)
+		timeout = 30 * time.Second
 	}
 
 	return timeout
