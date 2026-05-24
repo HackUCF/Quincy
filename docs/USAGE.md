@@ -18,7 +18,14 @@ The API server reads a YAML config file on startup. By default it looks for `con
 
 ```yaml
 num_teams: 5
-db_file: "./quincy.sqlite3"
+
+db:
+  host: localhost
+  port: 5432
+  username: postgres
+  password: postgres
+  database: quincy
+  ssl_mode: prefer
 
 user_lists:
   - name: local
@@ -118,7 +125,7 @@ The binary can be run from any directory -- it reads `config.yaml` from the curr
 ./quincy api start --config /path/to/my-config.yaml
 ```
 
-The database file (set by `db_file` in the config) is also resolved relative to the working directory, and is created automatically on the first run.
+The API server connects to PostgreSQL using the `db` block in the config. The target database is created automatically on the first run if it does not already exist.
 
 To generate a default config file:
 

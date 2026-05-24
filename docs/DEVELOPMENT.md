@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - **Go 1.25+** -- [install instructions](https://go.dev/doc/install)
-- **GCC** -- required by the SQLite (CGo dependency)
+- **PostgreSQL** -- database backend (must be running and accessible)
 - **Python 3** -- for running the included check scripts
 - **Air** (optional) -- for hot-reload during development
 
@@ -53,10 +53,10 @@ The CLI layer. Builds the `quincy` binary using Cobra and wires up the subcomman
 
 ### `src/api/`
 
-The API server. On startup it loads the YAML config, initializes the SQLite database, generates the check queue, and starts the HTTP server. Internally it's organized into subpackages by responsibility:
+The API server. On startup it loads the YAML config, initializes the PostgreSQL database, generates the check queue, and starts the HTTP server. Internally it's organized into subpackages by responsibility:
 
 - **config** -- Loads and validates the YAML config file. The parsed config is stored globally and accessed by the rest of the server.
-- **db** -- Database layer. Manages the SQLite connection and provides query functions organized by domain (scoring and users). The schema is executed on startup. The `db/conn` subpackage also exposes Gin middleware that injects the database connection into each request's context.
+- **db** -- Database layer. Manages the PostgreSQL connection pool and provides query functions organized by domain (scoring and users). The schema is executed on startup. The `db/conn` subpackage also exposes Gin middleware that injects the database connection into each request's context.
 - **routes** -- HTTP route handlers built on Gin, with recovery, request logging, CORS, and database middleware. Handlers are grouped into subpackages by domain (scoring, users, misc).
 - **services** -- Generates the full check queue by combining every team with every box and service, shuffles it, and serves checks round-robin to agents.
 
@@ -120,7 +120,7 @@ Key direct dependencies:
 | `spf13/cobra` | CLI command tree and flag parsing |
 | `spf13/viper` | Config loading from files, env vars, and flags |
 | `gin-gonic/gin` | HTTP framework and routing |
-| `mattn/go-sqlite3` | SQLite database driver (CGo) |
+| `jackc/pgx/v5` | PostgreSQL driver and connection pool |
 | `go.uber.org/zap` | Structured logging |
 | `google/uuid` | UUID generation for agent goroutine IDs |
 | `joho/godotenv` | `.env` file loading |

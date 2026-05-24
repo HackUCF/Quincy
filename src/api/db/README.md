@@ -1,5 +1,5 @@
 # db
 
-The SQLite database layer for the API server. Coordinates connection setup, schema execution, and initial data seeding through a single initializer called at startup. Uses WAL journal mode and a single shared connection to balance concurrency with SQLite's write limitations.
+The PostgreSQL database layer for the API server. Coordinates connection setup, schema execution, and initial data seeding through a single initializer called at startup. Uses a connection pool and runs all writes as explicit transactions.
 
 The schema defines four tables. The scores table is a full append-only archive of every check result, with indexes optimized for queries filtered by team and status or by team, timestamp, and status. The recent_scores table stores only the most recent result per team/box/service combination using a composite primary key, enabling fast current-status lookups without scanning the full archive. The final_scores table holds running pass and total counters per team/box/service for instant aggregate queries without aggregating over the archive. The scoring_users table is the persistent credential store, keyed on team, userlist, and username, so password changes survive API restarts. Subpackages handle scoring queries, user queries, graph data queries, and miscellaneous utilities independently.

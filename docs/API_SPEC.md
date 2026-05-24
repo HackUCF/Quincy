@@ -324,7 +324,14 @@ Returns the full parsed API configuration. Useful for frontends to discover boxe
 ```json
 {
   "num_teams": 5,
-  "db_file":   "quincy.sqlite3",
+  "db": {
+    "host":     "localhost",
+    "port":     5432,
+    "username": "quincy",
+    "password": "secret",
+    "database": "quincy",
+    "ssl_mode": "disable"
+  },
   "boxes": [
     {
       "name":  "web",
