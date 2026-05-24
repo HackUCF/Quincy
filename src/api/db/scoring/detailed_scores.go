@@ -1,12 +1,11 @@
 package scoring
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 
 	"github.com/HackUCF/quincy/common/types"
-
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // DetailedScores is a double-nested map that can be used to quickly reference stats for a specific teams' boxes' services.
@@ -15,12 +14,12 @@ import (
 type DetailedScores map[types.TeamNum]ServiceScores
 
 // GetDetailedScores pulls the full final scoring data as it is stored in the db.
-func GetDetailedScores(db *sql.DB) (DetailedScores, error) {
+func GetDetailedScores(ctx context.Context, db *pgxpool.Pool) (DetailedScores, error) {
 	// ugly nested dictionary
 	var scores = make(DetailedScores)
 
 	// get every row from db
-	rows, err := db.Query(`
+	rows, err := db.Query(ctx, `
     SELECT
       team_num,
     	box,

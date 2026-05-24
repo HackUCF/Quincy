@@ -59,7 +59,7 @@ func SubmitPCR(c *gin.Context) {
 		return
 	}
 
-	err = users.UpdateUser(db, pcr.UserListName, pcr.TeamNum, pcr.User)
+	err = users.UpdateUser(c.Request.Context(), db, pcr.UserListName, pcr.TeamNum, pcr.User)
 	if err != nil {
 		resp := gin.H{
 			"message": "could not update userlist",

@@ -13,7 +13,7 @@ import (
 func GetCheck(c *gin.Context) {
 	db := conn.Get(c)
 
-	check, err := services.GetNext(db)
+	check, err := services.GetNext(c.Request.Context(), db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get check",

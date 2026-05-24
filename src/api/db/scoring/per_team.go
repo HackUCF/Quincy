@@ -1,26 +1,25 @@
 package scoring
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 
 	"github.com/HackUCF/quincy/common/types"
-
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // TeamScores is a map that can be used to quickly reference a specific teams stats.
 type TeamScores map[types.TeamNum]types.ScoreResult
 
 // GetTeamScores collates and calculates competion scores for all teams.
-func GetTeamScores(db *sql.DB) (TeamScores, error) {
+func GetTeamScores(ctx context.Context, db *pgxpool.Pool) (TeamScores, error) {
 
 	// dict of team number to scoring results
 	var scores = make(TeamScores)
 
 	// get totals for each team
 	// outputs n rows, where n is the number of teams
-	rows, err := db.Query(`
+	rows, err := db.Query(ctx, `
     SELECT
     	team_num,
       SUM(total) as total,

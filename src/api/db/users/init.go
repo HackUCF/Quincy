@@ -6,24 +6,30 @@ It requires the DB conneciton to have already been initialized.
 package users
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 
 	"github.com/HackUCF/quincy/api/config"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // InitUsers fills the users table in the database with default usernames and passwords.
 // Users that have had passwords changed in a previous run of the API will be ignored.
 // This keeps consistent state between restarts.
 // This requires the config to be loaded.
-func InitUsers(db *sql.DB, cfg *config.APIConfigSpec) error {
+func InitUsers(
+	ctx context.Context,
+	db *pgxpool.Pool,
+	cfg *config.APIConfigSpec,
+) error {
 
 	query := `
-	  INSERT OR IGNORE INTO scoring_users (team_num, user_list, username, password, domain, netbios)
-		VALUES (?, ?, ?, ?, ?, ?)
+		INSERT INTO scoring_users (team_num, user_list, username, password, domain, netbios)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		ON CONFLICT DO NOTHING
 	`
 
-	tx, err := db.Begin()
+	tx, err := db.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("could not begin database transaction: %w", err)
 	}
@@ -33,6 +39,7 @@ func InitUsers(db *sql.DB, cfg *config.APIConfigSpec) error {
 			for _, u := range ul.Users {
 				// for every team, userlist, and user
 				_, err := tx.Exec(
+					ctx,
 					query,
 					t,
 					ul.Name,
@@ -48,7 +55,7 @@ func InitUsers(db *sql.DB, cfg *config.APIConfigSpec) error {
 		}
 	}
 
-	err = tx.Commit()
+	err = tx.Commit(ctx)
 	if err != nil {
 		return fmt.Errorf("could not commit database transaction: %w", err)
 	}

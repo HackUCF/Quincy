@@ -5,10 +5,19 @@ import "github.com/HackUCF/quincy/common/types"
 // APIConfigSpec defines the entire API configuration file.
 type APIConfigSpec struct {
 	NumTeams  types.TeamNum  `yaml:"num_teams"  mapstructure:"num_teams"  json:"num_teams"`
-	DBFile    string         `yaml:"db_file"    mapstructure:"db_file"    json:"db_file"`
+	DB        DBConfig       `yaml:"db"         mapstructure:"db"         json:"db"`
 	Boxes     []BoxSpec      `yaml:"boxes"      mapstructure:"boxes"      json:"boxes"`
 	UserLists []UserListSpec `yaml:"user_lists" mapstructure:"user_lists" json:"user_lists"`
 	HTTP      HTTPSpec       `yaml:"http"       mapstructure:"http"       json:"http"`
+}
+
+type DBConfig struct {
+	Host     string `yaml:"host"     mapstructure:"host"     json:"host"`
+	Port     uint16 `yaml:"port"     mapstructure:"port"     json:"port"`
+	Username string `yaml:"username" mapstructure:"username" json:"username"`
+	Password string `yaml:"password" mapstructure:"password" json:"password"`
+	Database string `yaml:"database" mapstructure:"database" json:"database"`
+	SSLMode  string `yaml:"ssl_mode" mapstructure:"ssl_mode" json:"ssl_mode"`
 }
 
 // BoxSpec contains the config specification of one box.

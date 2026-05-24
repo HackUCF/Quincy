@@ -1,23 +1,25 @@
 package scoring
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"math"
 
 	"github.com/HackUCF/quincy/api/config"
 	"github.com/HackUCF/quincy/common/types"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // InitScoring creates rows in the final scores table for each team/box/service combo.
-func InitScoring(db *sql.DB, cfg *config.APIConfigSpec) error {
+func InitScoring(ctx context.Context, db *pgxpool.Pool, cfg *config.APIConfigSpec) error {
 
 	query := `
-	  INSERT OR IGNORE INTO final_scores (service, box, team_num, total, passed)
-		VALUES (?, ?, ?, 0, 0)
+		INSERT INTO final_scores (service, box, team_num, total, passed)
+		VALUES ($1, $2, $3, 0, 0)
+		ON CONFLICT DO NOTHING
 	`
 
-	tx, err := db.Begin()
+	tx, err := db.Begin(ctx)
 	if err != nil {
 		return fmt.Errorf("could not begin database transaction: %w", err)
 	}
@@ -27,6 +29,7 @@ func InitScoring(db *sql.DB, cfg *config.APIConfigSpec) error {
 			for _, svc := range box.Services {
 				// for every team, box, and service
 				_, err := tx.Exec(
+					ctx,
 					query,
 					svc.Name,
 					box.Name,
@@ -39,7 +42,7 @@ func InitScoring(db *sql.DB, cfg *config.APIConfigSpec) error {
 		}
 	}
 
-	err = tx.Commit()
+	err = tx.Commit(ctx)
 	if err != nil {
 		return fmt.Errorf("could not commit database transaction: %w", err)
 	}

@@ -12,7 +12,7 @@ import (
 func GetHeatmap(c *gin.Context) {
 	db := conn.Get(c)
 
-	data, err := graphs.GetHeatmapData(db)
+	data, err := graphs.GetHeatmapData(c.Request.Context(), db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get heatmap data",

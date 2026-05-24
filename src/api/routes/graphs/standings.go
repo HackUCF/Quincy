@@ -12,7 +12,7 @@ import (
 func GetStandings(c *gin.Context) {
 	db := conn.Get(c)
 
-	data, err := graphs.GetStandingsData(db)
+	data, err := graphs.GetStandingsData(c.Request.Context(), db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get standings data",

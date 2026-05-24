@@ -44,7 +44,7 @@ func AddScore(c *gin.Context) {
 		return
 	}
 
-	err = scoring.AddScore(db, score)
+	err = scoring.AddScore(c.Request.Context(), db, score)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to add score to database",

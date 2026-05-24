@@ -12,7 +12,7 @@ import (
 func GetAllUsers(c *gin.Context) {
 	db := conn.Get(c)
 
-	users, err := users.GetAllUsers(db)
+	users, err := users.GetAllUsers(c.Request.Context(), db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get all users",

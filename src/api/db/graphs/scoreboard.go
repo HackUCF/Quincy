@@ -5,7 +5,7 @@ These are relatively slow functions that do a lot of construction and transforma
 package graphs
 
 import (
-	"database/sql"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -13,6 +13,7 @@ import (
 
 	"github.com/HackUCF/quincy/common/log"
 	"github.com/HackUCF/quincy/common/types"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // scoreboardPoint is the a specific check on the scoreboard chart.
@@ -45,9 +46,9 @@ type ScoreboardData struct {
 
 // GetScoreboardData returns the template data needed to render a scoreboard chart.
 // data contains rendered json strings.
-func GetScoreboardData(db *sql.DB) (*ScoreboardData, error) {
+func GetScoreboardData(ctx context.Context, db *pgxpool.Pool) (*ScoreboardData, error) {
 
-	rows, err := db.Query(`
+	rows, err := db.Query(ctx, `
 		SELECT service, box, team_num, status, timestamp, message
     FROM recent_scores
     ORDER BY team_num, box, service

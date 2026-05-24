@@ -1,7 +1,7 @@
 package graphs
 
 import (
-	"database/sql"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -10,6 +10,7 @@ import (
 
 	"github.com/HackUCF/quincy/api/db/misc"
 	"github.com/HackUCF/quincy/common/types"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type scoresDataset struct {
@@ -37,23 +38,23 @@ const labelFmt = "team %d"
 const numIntervals = 100
 
 // GetScoresData contains the data required to render a line chart with all team scores.
-func GetScoresData(db *sql.DB) (*ScoresData, error) {
+func GetScoresData(ctx context.Context, db *pgxpool.Pool) (*ScoresData, error) {
 
 	// get microsecond intervals for this competition
 	// compeition duration divided, in microseconds
-	duration, err := misc.GetCompDuration(db)
+	duration, err := misc.GetCompDuration(ctx, db)
 	if err != nil {
 		return nil, err
 	}
 	bucketUs := (duration / numIntervals).Truncate(time.Second).Microseconds()
 
 	// contains evil integer rounding hack. i do not like this
-	rows, err := db.Query(`
-			SELECT team_num, (timestamp / ?) * ? as bucket, SUM(status)
-			FROM scores
-			GROUP BY team_num, bucket
-			ORDER BY team_num, bucket;
-		`, bucketUs, bucketUs)
+	rows, err := db.Query(ctx, `
+    SELECT team_num, (timestamp / $1) * $1 as bucket, SUM(status::int)
+    FROM scores
+    GROUP BY team_num, bucket
+    ORDER BY team_num, bucket;
+	`, bucketUs, bucketUs)
 	if err != nil {
 		return nil, err
 	}

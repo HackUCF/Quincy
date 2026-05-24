@@ -1,11 +1,11 @@
 package conn
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // DBKey is the key used to store the database object in the request context.
@@ -29,12 +29,14 @@ func DBMiddleware() gin.HandlerFunc {
 
 // Get returns the database object stored in the request context.
 // Panics on error.
-func Get(c *gin.Context) *sql.DB {
-	return c.MustGet(DBKey).(*sql.DB)
+func Get(c *gin.Context) *pgxpool.Pool {
+
+	return c.MustGet(DBKey).(*pgxpool.Pool)
 }
 
 // GetE returns the database object stored in the request context.
-func GetE(c *gin.Context) (*sql.DB, error) {
+func GetE(c *gin.Context) (*pgxpool.Pool, error) {
+
 	// pull from context
 	obj, ok := c.Get(DBKey)
 	if !ok {
@@ -43,7 +45,7 @@ func GetE(c *gin.Context) (*sql.DB, error) {
 	}
 
 	// cast as database object
-	db, ok := obj.(*sql.DB)
+	db, ok := obj.(*pgxpool.Pool)
 	if !ok {
 		err := fmt.Errorf("object with key %q is not a sql database", DBKey)
 		return nil, err

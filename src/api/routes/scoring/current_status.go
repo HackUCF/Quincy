@@ -20,7 +20,7 @@ func GetRecentChecks(c *gin.Context) {
 	db := conn.Get(c)
 	cfg := config.Get(c)
 
-	status, err := scoring.GetCurrentServiceStatus(db, cfg)
+	status, err := scoring.GetCurrentServiceStatus(c.Request.Context(), db, cfg)
 	if err != nil {
 		resp := gin.H{
 			"message": "could not get current service status",
