@@ -9,8 +9,8 @@ import (
 	"net/http"
 
 	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/db/conn"
-	"github.com/HackUCF/quincy/api/db/users"
+	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
+	"github.com/HackUCF/quincy/api/sinks/postgres/users"
 	"github.com/HackUCF/quincy/common/types"
 	"github.com/gin-gonic/gin"
 )

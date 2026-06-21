@@ -10,9 +10,9 @@ import (
 	"fmt"
 
 	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/db/conn"
-	"github.com/HackUCF/quincy/api/db/scoring"
-	"github.com/HackUCF/quincy/api/db/users"
+	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
+	"github.com/HackUCF/quincy/api/sinks/postgres/scoring"
+	"github.com/HackUCF/quincy/api/sinks/postgres/users"
 )
 
 //go:embed schema.sql

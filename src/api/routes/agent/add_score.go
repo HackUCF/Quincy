@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/HackUCF/quincy/api/db/agent"
-	"github.com/HackUCF/quincy/api/db/conn"
+	"github.com/HackUCF/quincy/api/sinks/postgres/agent"
+	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
 	"github.com/HackUCF/quincy/common/types"
 	"github.com/gin-gonic/gin"
 )

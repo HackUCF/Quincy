@@ -14,9 +14,9 @@ import (
 	"fmt"
 
 	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/db"
 	"github.com/HackUCF/quincy/api/routes"
 	"github.com/HackUCF/quincy/api/services"
+	db "github.com/HackUCF/quincy/api/sinks/postgres"
 )
 
 // Start is the entry point for the API server.

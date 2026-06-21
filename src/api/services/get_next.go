@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"github.com/HackUCF/quincy/api/db/agent"
+	"github.com/HackUCF/quincy/api/sinks/postgres/agent"
 	"github.com/HackUCF/quincy/common/types"
 	"github.com/jackc/pgx/v5/pgxpool"
 )

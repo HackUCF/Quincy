@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	dbpkg "github.com/HackUCF/quincy/api/db"
+	dbpkg "github.com/HackUCF/quincy/api/sinks/postgres"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"

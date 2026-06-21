@@ -9,14 +9,14 @@ package routes
 
 import (
 	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/db/conn"
+	_ "github.com/HackUCF/quincy/api/openapi"
 	"github.com/HackUCF/quincy/api/routes/agent"
 	"github.com/HackUCF/quincy/api/routes/graphs"
 	"github.com/HackUCF/quincy/api/routes/misc"
 	"github.com/HackUCF/quincy/api/routes/scoring"
 	"github.com/HackUCF/quincy/api/routes/users"
+	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
 	"github.com/HackUCF/quincy/common/middleware"
-	_ "github.com/HackUCF/quincy/api/openapi"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"

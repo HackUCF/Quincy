@@ -3,8 +3,8 @@ package users
 import (
 	"net/http"
 
-	"github.com/HackUCF/quincy/api/db/conn"
-	"github.com/HackUCF/quincy/api/db/users"
+	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
+	"github.com/HackUCF/quincy/api/sinks/postgres/users"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +14,7 @@ import (
 //	@Description	Returns every user in every userlist for every team, including current passwords. Shape: {"team": {"userlist": [User]}}.
 //	@Tags			users
 //	@Produce		json
-//	@Success		200	{object}	object
+//	@Success		200	{object}	map[string]map[string][]types.User
 //	@Failure		400	{object}	object
 //	@Router			/users [get]
 func GetAllUsers(c *gin.Context) {

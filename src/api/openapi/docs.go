@@ -277,7 +277,16 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "$ref": "#/definitions/types.ScoreResult"
+                                    }
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -303,7 +312,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "$ref": "#/definitions/types.ScoreResult"
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -358,7 +373,16 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/types.User"
+                                    }
+                                }
+                            }
                         }
                     },
                     "400": {
