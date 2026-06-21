@@ -16,6 +16,14 @@ import (
 
 // GetRecentChecks gets a list of the the most recent checks for every service.
 // It is sorted by team number, then box ID, then service ID
+//
+//	@Summary		Get most recent check result per service per team
+//	@Description	Returns the latest pass/fail score for every (team, box, service) combination. Sorted by team, box, service.
+//	@Tags			scores
+//	@Produce		json
+//	@Success		200	{array}		types.Score
+//	@Failure		400	{object}	object
+//	@Router			/scores/current [get]
 func GetRecentChecks(c *gin.Context) {
 	db := conn.Get(c)
 	cfg := config.Get(c)

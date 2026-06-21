@@ -94,6 +94,26 @@ See the [check scripts section of USAGE.md](USAGE.md#check-scripts) for the full
 1. Create a Gin handler function in the appropriate routes subpackage (or create a new one).
 2. Register the route in the router setup within the routes package.
 3. If you need new database queries, add them in the relevant db subpackage.
+4. Add swaggo annotations (see below) and regenerate the Swagger docs.
+
+## Swagger / OpenAPI Docs
+
+The API ships with a Swagger UI at `/swagger/`. The spec is auto-generated from source annotations and re-generated automatically by a pre-commit hook when `.go` files are staged.
+
+Install `swag`, then wire up the hook once per clone:
+
+```bash
+go install github.com/swaggo/swag/cmd/swag@latest
+git config core.hooksPath .githooks
+```
+
+Works on Linux, macOS, and Windows (Git for Windows includes bash). If `swag` is not installed, the hook warns and skips without failing the commit.
+
+To audit annotation coverage or add missing annotations:
+
+```
+/swagger-docs
+```
 
 ## Updating Documentation
 
@@ -101,14 +121,20 @@ Documentation is kept in sync manually after code changes. Three Claude Code ski
 
 | Skill | Invocation | Updates |
 |-------|------------|---------|
-| `all-docs` | `/all-docs` | Everything — module READMEs and the API spec |
+| `all-docs` | `/all-docs` | Module READMEs across all packages |
 | `module-docs` | `/module-docs` | Module READMEs only |
-| `api-docs` | `/api-docs` | `docs/API_SPEC.md` only |
+| `swagger-docs` | `/swagger-docs` | Swagger annotations on route handlers + regenerates OpenAPI spec |
 
 Run a full documentation update after any non-trivial code change:
 
 ```
 /all-docs
+```
+
+If routes or types changed, also regenerate the OpenAPI spec:
+
+```
+/swagger-docs
 ```
 
 ## Dependencies
@@ -124,6 +150,9 @@ Key direct dependencies:
 | `go.uber.org/zap` | Structured logging |
 | `google/uuid` | UUID generation for agent goroutine IDs |
 | `joho/godotenv` | `.env` file loading |
+| `swaggo/swag` | OpenAPI spec generation from source annotations |
+| `swaggo/gin-swagger` | Gin middleware that serves the Swagger UI |
+| `swaggo/files` | Embedded Swagger UI static assets |
 
 Update dependencies:
 

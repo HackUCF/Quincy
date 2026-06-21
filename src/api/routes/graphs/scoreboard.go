@@ -9,6 +9,14 @@ import (
 )
 
 // GetScoreboard returns html and js containing a simple scoreaboard.
+//
+//	@Summary		Scoreboard chart
+//	@Description	Returns an embeddable HTML/JS fragment rendering the current scoreboard heatmap for all teams and services.
+//	@Tags			graphs
+//	@Produce		html
+//	@Success		200		{string}	string
+//	@Failure		500		{object}	object
+//	@Router			/graphs/scoreboard [get]
 func GetScoreboard(c *gin.Context) {
 	db := conn.Get(c)
 

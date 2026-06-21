@@ -1,0 +1,695 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "CCDC-style competition scoring engine. Manages scoring data and serves check assignments to agents.",
+        "title": "Quincy API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/api/v1",
+    "paths": {
+        "/agent/completed-score": {
+            "post": {
+                "description": "Accepts a completed score check result from an agent and persists it to the database.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "Submit a completed score check",
+                "parameters": [
+                    {
+                        "description": "Completed score check",
+                        "name": "score",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.Score"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/agent/new-check": {
+            "get": {
+                "description": "Returns the next fully-rendered service check for the agent to execute. Rotates round-robin across all services and teams.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agent"
+                ],
+                "summary": "Get next check to run",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.Service"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/config": {
+            "get": {
+                "description": "Returns the loaded API config, including box definitions, user lists, and team count. Useful for building dynamic PCR forms.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "misc"
+                ],
+                "summary": "Get API configuration",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/config.APIConfigSpec"
+                        }
+                    }
+                }
+            }
+        },
+        "/graphs/heatmap": {
+            "get": {
+                "description": "Returns an embeddable HTML/JS fragment showing historical uptime percentage as a heatmap.",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "graphs"
+                ],
+                "summary": "Uptime heatmap",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/graphs/scoreboard": {
+            "get": {
+                "description": "Returns an embeddable HTML/JS fragment rendering the current scoreboard heatmap for all teams and services.",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "graphs"
+                ],
+                "summary": "Scoreboard chart",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/graphs/scores": {
+            "get": {
+                "description": "Returns an embeddable HTML/JS fragment rendering a chart of score trends over time.",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "graphs"
+                ],
+                "summary": "Scores over time chart",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/graphs/standings": {
+            "get": {
+                "description": "Returns an embeddable HTML/JS fragment showing current total points per team as a bar chart.",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "graphs"
+                ],
+                "summary": "Standings bar chart",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/scores/box": {
+            "get": {
+                "description": "Returns pass/fail check stats aggregated across all teams and services, keyed by box name.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scores"
+                ],
+                "summary": "Get cumulative scores per box",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/types.ScoreResult"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/scores/current": {
+            "get": {
+                "description": "Returns the latest pass/fail score for every (team, box, service) combination. Sorted by team, box, service.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scores"
+                ],
+                "summary": "Get most recent check result per service per team",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.Score"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/scores/detailed": {
+            "get": {
+                "description": "Returns pass/fail stats keyed by team, then box, then service. Shape: {\"team\": {\"box\": {\"service\": ScoreResult}}}.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scores"
+                ],
+                "summary": "Get fully detailed scores",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/scores/service": {
+            "get": {
+                "description": "Returns pass/fail check stats keyed by box name, then service name. Shape: {\"box\": {\"service\": ScoreResult}}.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scores"
+                ],
+                "summary": "Get cumulative scores per box per service",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/scores/team": {
+            "get": {
+                "description": "Returns pass/fail check stats aggregated across all boxes and services, keyed by team number.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scores"
+                ],
+                "summary": "Get cumulative scores per team",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/types.ScoreResult"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "description": "Returns every user in every userlist for every team, including current passwords. Shape: {\"team\": {\"userlist\": [User]}}.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Get all scoring users",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Updates the password for a scoring user in the specified userlist for the specified team.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Submit a password change request (PCR)",
+                "parameters": [
+                    {
+                        "description": "Password change request",
+                        "name": "pcr",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/users.PCR"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "config.APIConfigSpec": {
+            "type": "object",
+            "properties": {
+                "boxes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/config.BoxSpec"
+                    }
+                },
+                "db": {
+                    "$ref": "#/definitions/config.DBConfig"
+                },
+                "http": {
+                    "$ref": "#/definitions/config.HTTPSpec"
+                },
+                "num_teams": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "user_lists": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/config.UserListSpec"
+                    }
+                }
+            }
+        },
+        "config.BoxSpec": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string",
+                    "example": "127.0.0.{}"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "scrapyard"
+                },
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/types.ServiceSpec"
+                    }
+                }
+            }
+        },
+        "config.DBConfig": {
+            "type": "object",
+            "properties": {
+                "database": {
+                    "type": "string",
+                    "example": "quincy"
+                },
+                "host": {
+                    "type": "string",
+                    "example": "localhost"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "postgres"
+                },
+                "port": {
+                    "type": "integer",
+                    "example": 5432
+                },
+                "ssl_mode": {
+                    "type": "string",
+                    "example": "prefer"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "postgres"
+                }
+            }
+        },
+        "config.HTTPSpec": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string",
+                    "example": "127.0.0.1"
+                },
+                "port": {
+                    "type": "integer",
+                    "example": 8888
+                }
+            }
+        },
+        "config.UserListSpec": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "type": "string",
+                    "example": "quin.cy"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "local users"
+                },
+                "netbios": {
+                    "type": "string",
+                    "example": "QUIN"
+                },
+                "users": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/config.UserSpec"
+                    }
+                }
+            }
+        },
+        "config.UserSpec": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "BuyMyNFT1!"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "geraldo"
+                }
+            }
+        },
+        "types.Score": {
+            "type": "object",
+            "properties": {
+                "box": {
+                    "type": "string",
+                    "example": "scrapyard"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "HTTP 200 OK\nexit 0"
+                },
+                "service": {
+                    "type": "string",
+                    "example": "blog"
+                },
+                "status": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "team_num": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "timestamp": {
+                    "description": "Timestamp is inserted by the api on submission.\nDoes not need to added when building manually.",
+                    "type": "integer",
+                    "example": 1700000000000000
+                }
+            }
+        },
+        "types.ScoreResult": {
+            "type": "object",
+            "properties": {
+                "checks_failed": {
+                    "type": "integer",
+                    "example": 8
+                },
+                "checks_passed": {
+                    "type": "integer",
+                    "example": 42
+                },
+                "total_checks": {
+                    "type": "integer",
+                    "example": 50
+                },
+                "uptime_percent": {
+                    "type": "number",
+                    "example": 84
+                }
+            }
+        },
+        "types.Service": {
+            "type": "object",
+            "properties": {
+                "box": {
+                    "type": "string",
+                    "example": "scrapyard"
+                },
+                "check": {
+                    "type": "string",
+                    "example": "100percent.py"
+                },
+                "host": {
+                    "type": "string",
+                    "example": "127.0.0.1"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "blog"
+                },
+                "team_num": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "timeout": {
+                    "type": "number",
+                    "example": 30
+                },
+                "user": {
+                    "$ref": "#/definitions/types.User"
+                },
+                "user_list": {
+                    "type": "string",
+                    "example": "local users"
+                }
+            }
+        },
+        "types.ServiceSpec": {
+            "type": "object",
+            "properties": {
+                "check": {
+                    "type": "string",
+                    "example": "100percent.py"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "blog"
+                },
+                "timeout": {
+                    "type": "number",
+                    "example": 30
+                },
+                "user_list": {
+                    "type": "string",
+                    "example": "local users"
+                }
+            }
+        },
+        "types.User": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "type": "string",
+                    "example": "quin.cy"
+                },
+                "netbios": {
+                    "type": "string",
+                    "example": "QUIN"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "BuyMyNFT1!"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "geraldo"
+                }
+            }
+        },
+        "users.PCR": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "type": "string",
+                    "example": "quin.cy"
+                },
+                "netbios": {
+                    "type": "string",
+                    "example": "QUIN"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "BuyMyNFT1!"
+                },
+                "team_num": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "user_list": {
+                    "type": "string",
+                    "example": "local users"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "geraldo"
+                }
+            }
+        }
+    }
+}

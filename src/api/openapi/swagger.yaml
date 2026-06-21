@@ -1,0 +1,489 @@
+basePath: /api/v1
+definitions:
+  config.APIConfigSpec:
+    properties:
+      boxes:
+        items:
+          $ref: '#/definitions/config.BoxSpec'
+        type: array
+      db:
+        $ref: '#/definitions/config.DBConfig'
+      http:
+        $ref: '#/definitions/config.HTTPSpec'
+      num_teams:
+        example: 5
+        type: integer
+      user_lists:
+        items:
+          $ref: '#/definitions/config.UserListSpec'
+        type: array
+    type: object
+  config.BoxSpec:
+    properties:
+      host:
+        example: 127.0.0.{}
+        type: string
+      name:
+        example: scrapyard
+        type: string
+      services:
+        items:
+          $ref: '#/definitions/types.ServiceSpec'
+        type: array
+    type: object
+  config.DBConfig:
+    properties:
+      database:
+        example: quincy
+        type: string
+      host:
+        example: localhost
+        type: string
+      password:
+        example: postgres
+        type: string
+      port:
+        example: 5432
+        type: integer
+      ssl_mode:
+        example: prefer
+        type: string
+      username:
+        example: postgres
+        type: string
+    type: object
+  config.HTTPSpec:
+    properties:
+      host:
+        example: 127.0.0.1
+        type: string
+      port:
+        example: 8888
+        type: integer
+    type: object
+  config.UserListSpec:
+    properties:
+      domain:
+        example: quin.cy
+        type: string
+      name:
+        example: local users
+        type: string
+      netbios:
+        example: QUIN
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/config.UserSpec'
+        type: array
+    type: object
+  config.UserSpec:
+    properties:
+      password:
+        example: BuyMyNFT1!
+        type: string
+      username:
+        example: geraldo
+        type: string
+    type: object
+  types.Score:
+    properties:
+      box:
+        example: scrapyard
+        type: string
+      message:
+        example: |-
+          HTTP 200 OK
+          exit 0
+        type: string
+      service:
+        example: blog
+        type: string
+      status:
+        example: true
+        type: boolean
+      team_num:
+        example: 1
+        type: integer
+      timestamp:
+        description: |-
+          Timestamp is inserted by the api on submission.
+          Does not need to added when building manually.
+        example: 1700000000000000
+        type: integer
+    type: object
+  types.ScoreResult:
+    properties:
+      checks_failed:
+        example: 8
+        type: integer
+      checks_passed:
+        example: 42
+        type: integer
+      total_checks:
+        example: 50
+        type: integer
+      uptime_percent:
+        example: 84
+        type: number
+    type: object
+  types.Service:
+    properties:
+      box:
+        example: scrapyard
+        type: string
+      check:
+        example: 100percent.py
+        type: string
+      host:
+        example: 127.0.0.1
+        type: string
+      name:
+        example: blog
+        type: string
+      team_num:
+        example: 1
+        type: integer
+      timeout:
+        example: 30
+        type: number
+      user:
+        $ref: '#/definitions/types.User'
+      user_list:
+        example: local users
+        type: string
+    type: object
+  types.ServiceSpec:
+    properties:
+      check:
+        example: 100percent.py
+        type: string
+      name:
+        example: blog
+        type: string
+      timeout:
+        example: 30
+        type: number
+      user_list:
+        example: local users
+        type: string
+    type: object
+  types.User:
+    properties:
+      domain:
+        example: quin.cy
+        type: string
+      netbios:
+        example: QUIN
+        type: string
+      password:
+        example: BuyMyNFT1!
+        type: string
+      username:
+        example: geraldo
+        type: string
+    type: object
+  users.PCR:
+    properties:
+      domain:
+        example: quin.cy
+        type: string
+      netbios:
+        example: QUIN
+        type: string
+      password:
+        example: BuyMyNFT1!
+        type: string
+      team_num:
+        example: 1
+        type: integer
+      user_list:
+        example: local users
+        type: string
+      username:
+        example: geraldo
+        type: string
+    type: object
+info:
+  contact: {}
+  description: CCDC-style competition scoring engine. Manages scoring data and serves
+    check assignments to agents.
+  title: Quincy API
+  version: "1.0"
+paths:
+  /agent/completed-score:
+    post:
+      consumes:
+      - application/json
+      description: Accepts a completed score check result from an agent and persists
+        it to the database.
+      parameters:
+      - description: Completed score check
+        in: body
+        name: score
+        required: true
+        schema:
+          $ref: '#/definitions/types.Score'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Submit a completed score check
+      tags:
+      - agent
+  /agent/new-check:
+    get:
+      description: Returns the next fully-rendered service check for the agent to
+        execute. Rotates round-robin across all services and teams.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.Service'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get next check to run
+      tags:
+      - agent
+  /config:
+    get:
+      description: Returns the loaded API config, including box definitions, user
+        lists, and team count. Useful for building dynamic PCR forms.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/config.APIConfigSpec'
+      summary: Get API configuration
+      tags:
+      - misc
+  /graphs/heatmap:
+    get:
+      description: Returns an embeddable HTML/JS fragment showing historical uptime
+        percentage as a heatmap.
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
+      summary: Uptime heatmap
+      tags:
+      - graphs
+  /graphs/scoreboard:
+    get:
+      description: Returns an embeddable HTML/JS fragment rendering the current scoreboard
+        heatmap for all teams and services.
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
+      summary: Scoreboard chart
+      tags:
+      - graphs
+  /graphs/scores:
+    get:
+      description: Returns an embeddable HTML/JS fragment rendering a chart of score
+        trends over time.
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
+      summary: Scores over time chart
+      tags:
+      - graphs
+  /graphs/standings:
+    get:
+      description: Returns an embeddable HTML/JS fragment showing current total points
+        per team as a bar chart.
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
+      summary: Standings bar chart
+      tags:
+      - graphs
+  /scores/box:
+    get:
+      description: Returns pass/fail check stats aggregated across all teams and services,
+        keyed by box name.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/types.ScoreResult'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get cumulative scores per box
+      tags:
+      - scores
+  /scores/current:
+    get:
+      description: Returns the latest pass/fail score for every (team, box, service)
+        combination. Sorted by team, box, service.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.Score'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get most recent check result per service per team
+      tags:
+      - scores
+  /scores/detailed:
+    get:
+      description: 'Returns pass/fail stats keyed by team, then box, then service.
+        Shape: {"team": {"box": {"service": ScoreResult}}}.'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get fully detailed scores
+      tags:
+      - scores
+  /scores/service:
+    get:
+      description: 'Returns pass/fail check stats keyed by box name, then service
+        name. Shape: {"box": {"service": ScoreResult}}.'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get cumulative scores per box per service
+      tags:
+      - scores
+  /scores/team:
+    get:
+      description: Returns pass/fail check stats aggregated across all boxes and services,
+        keyed by team number.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/types.ScoreResult'
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get cumulative scores per team
+      tags:
+      - scores
+  /users:
+    get:
+      description: 'Returns every user in every userlist for every team, including
+        current passwords. Shape: {"team": {"userlist": [User]}}.'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get all scoring users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Updates the password for a scoring user in the specified userlist
+        for the specified team.
+      parameters:
+      - description: Password change request
+        in: body
+        name: pcr
+        required: true
+        schema:
+          $ref: '#/definitions/users.PCR'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
+      summary: Submit a password change request (PCR)
+      tags:
+      - users
+swagger: "2.0"

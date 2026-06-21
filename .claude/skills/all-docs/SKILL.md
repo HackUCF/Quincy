@@ -1,9 +1,11 @@
 ---
 name: all-docs
-description: Update all Quincy documentation — module READMEs and the API spec — to reflect the current state of the code. Use after any non-trivial code change, or when asked to bring docs up to date.
+description: Update all Quincy documentation — module READMEs — to reflect the current state of the code. Use after any non-trivial code change, or when asked to bring docs up to date. Does NOT update swagger/OpenAPI annotations — use /swagger-docs for that.
 ---
 
-You are performing a full documentation update for the Quincy scoring engine. This covers two separate concerns that must both be completed: module READMEs and the API specification. Work through them in order.
+You are performing a full documentation update for the Quincy scoring engine. This covers module READMEs across all packages.
+
+The OpenAPI spec (`src/api/openapi/swagger.json`) is auto-generated from source annotations and is not maintained manually. If route handlers or types changed, run `/swagger-docs` after this skill to regenerate it.
 
 ---
 
@@ -22,9 +24,9 @@ If the change touched:
 - Any file under `src/common/` → module READMEs in `src/common/` are likely affected
 - Any file under `src/api/config/` → `src/api/config/README.md` and `docs/USAGE.md` may be affected
 - Any file under `src/api/db/` → the relevant `src/api/db/*/README.md` may be affected
-- Any file under `src/api/routes/` → the relevant `src/api/routes/*/README.md` **and** `docs/API_SPEC.md` are likely affected
+- Any file under `src/api/routes/` → the relevant `src/api/routes/*/README.md` may be affected; if route behavior changed also run `/swagger-docs`
 - Any file under `src/agent/` → `src/agent/README.md` and/or `src/scripts/README.md` may be affected
-- Any type definition → `src/common/types/README.md` and `docs/API_SPEC.md` are likely affected
+- Any type definition → `src/common/types/README.md` may be affected; if JSON shapes changed also run `/swagger-docs`
 
 Also check whether the project structure itself changed — new packages added, packages removed or moved. If the set of Go packages has changed, update `docs/DEVELOPMENT.md`'s project layout section to match.
 
@@ -52,34 +54,7 @@ Module READMEs are technical documentation. The goal is not to avoid detail — 
 
 ---
 
-## Step 3: Update the API Spec
-
-`docs/API_SPEC.md` must reflect every currently registered route. The three sources of truth are:
-
-1. **Route registrations** (`src/api/routes/init.go`) — the canonical list of what paths and methods exist
-2. **Route handlers** (`src/api/routes/**/*.go`) — what input they parse, what responses they construct, what error conditions they return
-3. **Shared types** (`src/common/types/*.go`) — exact JSON field names and shapes via struct tags
-
-Read all three for any endpoint you are updating. Do not rely on memory.
-
-**Each endpoint entry must include:**
-- HTTP method and exact URL path (copy from the route registration, including trailing slashes)
-- Plain-English description of what it does
-- Request body shape with a JSON example and field table, if applicable
-- Success response with a JSON example
-- All error responses with their status codes and exact `message` key values from the handler source
-
-**What "up to date" means:**
-- JSON field names must match the `json:` struct tags exactly
-- `omitempty` fields must be documented as omitted when empty
-- Fields set server-side and ignored on input must say so
-- Error response keys (`"error"` vs `"err"`) must match the handler source exactly
-- Routes removed from `routes.go` must be removed from the spec
-- Routes added to `routes.go` must be added to the spec
-
----
-
-## Step 4: Verify
+## Step 3: Verify
 
 After making changes, re-read each updated doc and ask: does this match what the code actually does right now? Fix anything that doesn't.
 

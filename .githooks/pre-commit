@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# Regenerate OpenAPI spec when Go source files are staged.
+# Warns but does not fail if swag is not installed.
+
+staged_go=$(git diff --cached --name-only | grep '\.go$' || true)
+if [ -z "$staged_go" ]; then
+    exit 0
+fi
+
+if ! command -v swag &>/dev/null; then
+    echo "warning: swag not installed — skipping OpenAPI spec regeneration" >&2
+    echo "         to regenerate manually: cd src && swag init --pd --parseInternal -g api/doc.go -o ./api/openapi" >&2
+    echo "         to install: go install github.com/swaggo/swag/cmd/swag@latest" >&2
+    exit 0
+fi
+
+repo_root="$(git rev-parse --show-toplevel)"
+echo "go files staged — regenerating OpenAPI spec..."
+
+if ! (cd "$repo_root/src" && swag init --pd --parseInternal -g api/doc.go -o ./api/openapi -q 2>&1); then
+    echo "warning: swag init failed — OpenAPI spec not updated" >&2
+    exit 0
+fi
+
+git add \
+    "$repo_root/src/api/openapi/docs.go" \
+    "$repo_root/src/api/openapi/swagger.json" \
+    "$repo_root/src/api/openapi/swagger.yaml"
+
+echo "OpenAPI spec regenerated and staged."
+exit 0

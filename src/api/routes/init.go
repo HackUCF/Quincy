@@ -16,7 +16,10 @@ import (
 	"github.com/HackUCF/quincy/api/routes/scoring"
 	"github.com/HackUCF/quincy/api/routes/users"
 	"github.com/HackUCF/quincy/common/middleware"
+	_ "github.com/HackUCF/quincy/api/openapi"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // create a gin router
@@ -65,6 +68,8 @@ func initRoutes() *gin.Engine {
 
 		v1.GET("/config", misc.GetConfig) // /api/v1/config
 	}
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.NoRoute(misc.NoRoute(router))
 

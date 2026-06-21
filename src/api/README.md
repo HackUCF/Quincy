@@ -4,4 +4,4 @@ The central API server. It loads competition configuration from a YAML file, ini
 
 The binary also supports a subcommand to generate a default config file on disk. The default config is embedded in the binary at build time, so the binary is self-contained and can bootstrap a new setup without any external files.
 
-Read the specification [in the docs.](/docs/API_SPEC.md)
+The OpenAPI spec is auto-generated from source annotations and served interactively at `/swagger/` when the server is running. The raw spec files live in `src/api/openapi/`.

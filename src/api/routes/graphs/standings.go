@@ -9,6 +9,14 @@ import (
 )
 
 // GetStandings returns html and js containing a bar chart of current total points per team.
+//
+//	@Summary		Standings bar chart
+//	@Description	Returns an embeddable HTML/JS fragment showing current total points per team as a bar chart.
+//	@Tags			graphs
+//	@Produce		html
+//	@Success		200		{string}	string
+//	@Failure		500		{object}	object
+//	@Router			/graphs/standings [get]
 func GetStandings(c *gin.Context) {
 	db := conn.Get(c)
 

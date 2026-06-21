@@ -4,10 +4,10 @@ package types
 // This always belongs to a box, but the object is not linked directly.
 // Service Names are only unique per individual box.
 type ServiceSpec struct {
-	Name      ServiceName  `yaml:"name"      mapstructure:"name"      json:"name"`
-	CheckName CheckName    `yaml:"check"     mapstructure:"check"     json:"check"`
-	UserList  UserListName `yaml:"user_list" mapstructure:"user_list" json:"user_list,omitempty"`
-	Timeout   float64      `yaml:"timeout"   mapstructure:"timeout"   json:"timeout,omitempty"`
+	Name      ServiceName  `yaml:"name"      mapstructure:"name"      json:"name"                 example:"blog"`
+	CheckName CheckName    `yaml:"check"     mapstructure:"check"     json:"check"                example:"100percent.py"`
+	UserList  UserListName `yaml:"user_list" mapstructure:"user_list" json:"user_list,omitempty"  example:"local users"`
+	Timeout   float64      `yaml:"timeout"   mapstructure:"timeout"   json:"timeout,omitempty"    example:"30"`
 }
 
 // ServiceTemplate contains *almost* everything an agent needs to run a check.
@@ -16,17 +16,17 @@ type ServiceSpec struct {
 type ServiceTemplate struct {
 	ServiceSpec
 
-	BoxName BoxName `json:"box"`
-	Host    string  `json:"host"`
-	TeamNum TeamNum `json:"team_num"`
+	BoxName BoxName `json:"box"      example:"scrapyard"`
+	Host    string  `json:"host"     example:"127.0.0.1"`
+	TeamNum TeamNum `json:"team_num" example:"1"`
 }
 
 // User contains all the information relating to a single user.
 type User struct {
-	Username    string `json:"username"`
-	Password    string `json:"password"`
-	DomainName  string `json:"domain,omitempty,omitzero"`
-	NetBIOSName string `json:"netbios,omitempty,omitzero"`
+	Username    string `json:"username"                    example:"geraldo"`
+	Password    string `json:"password"                    example:"BuyMyNFT1!"`
+	DomainName  string `json:"domain,omitempty,omitzero"   example:"quin.cy"`
+	NetBIOSName string `json:"netbios,omitempty,omitzero"  example:"QUIN"`
 }
 
 // Service is a fully rendered service ready to be run by the agent.

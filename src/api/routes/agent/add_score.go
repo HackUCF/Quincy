@@ -14,10 +14,18 @@ func validateScore(types.Score) error {
 	return nil
 }
 
-/*
-AddScore is a POST route for submitting a completed scorecheck,
-only meant for interaction from an agent.
-*/
+// AddScore is a POST route for submitting a completed scorecheck,
+// only meant for interaction from an agent.
+//
+//	@Summary		Submit a completed score check
+//	@Description	Accepts a completed score check result from an agent and persists it to the database.
+//	@Tags			agent
+//	@Accept			json
+//	@Produce		json
+//	@Param			score	body		types.Score	true	"Completed score check"
+//	@Success		200		{object}	object
+//	@Failure		400		{object}	object
+//	@Router			/agent/completed-score [post]
 func AddScore(c *gin.Context) {
 	db := conn.Get(c)
 

@@ -9,6 +9,14 @@ import (
 )
 
 // GetTeamScores returns the final stats per team.
+//
+//	@Summary		Get cumulative scores per team
+//	@Description	Returns pass/fail check stats aggregated across all boxes and services, keyed by team number.
+//	@Tags			scores
+//	@Produce		json
+//	@Success		200	{object}	map[string]types.ScoreResult
+//	@Failure		400	{object}	object
+//	@Router			/scores/team [get]
 func GetTeamScores(c *gin.Context) {
 	db := conn.Get(c)
 

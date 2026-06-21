@@ -18,8 +18,8 @@ import (
 // PCR is the JSON object that must be posted to the server to complete a PCR.
 type PCR struct {
 	types.User
-	UserListName types.UserListName `json:"user_list"`
-	TeamNum      types.TeamNum      `json:"team_num"`
+	UserListName types.UserListName `json:"user_list" example:"local users"`
+	TeamNum      types.TeamNum      `json:"team_num"  example:"1"`
 }
 
 func userListExists(cfg *config.APIConfigSpec, name types.UserListName) bool {
@@ -32,7 +32,17 @@ func userListExists(cfg *config.APIConfigSpec, name types.UserListName) bool {
 }
 
 // SubmitPCR is a POST route for changing a scoring users password.
-// Takes the following input:
+//
+//	@Summary		Submit a password change request (PCR)
+//	@Description	Updates the password for a scoring user in the specified userlist for the specified team.
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			pcr	body		PCR		true	"Password change request"
+//	@Success		200	{object}	object
+//	@Failure		400	{object}	object
+//	@Failure		500	{object}	object
+//	@Router			/users [post]
 func SubmitPCR(c *gin.Context) {
 	db := conn.Get(c)
 	cfg := config.Get(c)

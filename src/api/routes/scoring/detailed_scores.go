@@ -10,6 +10,14 @@ import (
 
 // GetDetailedScores returns the final stats per team per box per service.
 // This is as detailed as final scores can be.
+//
+//	@Summary		Get fully detailed scores
+//	@Description	Returns pass/fail stats keyed by team, then box, then service. Shape: {"team": {"box": {"service": ScoreResult}}}.
+//	@Tags			scores
+//	@Produce		json
+//	@Success		200	{object}	object
+//	@Failure		400	{object}	object
+//	@Router			/scores/detailed [get]
 func GetDetailedScores(c *gin.Context) {
 	db := conn.Get(c)
 

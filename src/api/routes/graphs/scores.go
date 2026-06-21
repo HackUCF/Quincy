@@ -9,6 +9,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetScores returns an HTML chart of scores over time.
+//
+//	@Summary		Scores over time chart
+//	@Description	Returns an embeddable HTML/JS fragment rendering a chart of score trends over time.
+//	@Tags			graphs
+//	@Produce		html
+//	@Success		200		{string}	string
+//	@Failure		500		{object}	object
+//	@Router			/graphs/scores [get]
 func GetScores(c *gin.Context) {
 	db := conn.Get(c)
 
