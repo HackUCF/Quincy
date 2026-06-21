@@ -47,3 +47,9 @@ func InitServices(cfg *config.APIConfigSpec) error {
 
 	return nil
 }
+
+func resetForTest() {
+	services = nil
+	servicesIdx.Store(0)
+	servicesLen = 0
+}

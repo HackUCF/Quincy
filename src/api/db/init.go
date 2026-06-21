@@ -16,7 +16,7 @@ import (
 )
 
 //go:embed schema.sql
-var schema string
+var Schema string
 
 // InitDB runs all db initialization steps.
 // It creates the datbase connections, sets driver settings, executes the schema, and seeds users.
@@ -30,7 +30,7 @@ func InitDB(cfg *config.APIConfigSpec) error {
 	}
 
 	// run startup commands
-	_, err = db.Exec(ctx, schema)
+	_, err = db.Exec(ctx, Schema)
 	if err != nil {
 		return fmt.Errorf("failed to execute db schema: %w", err)
 	}

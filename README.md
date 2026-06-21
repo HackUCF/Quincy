@@ -40,17 +40,16 @@ This <ins><b>is not</b></ins> meant to be an all-in-one or one-size-fits-all sol
   - Simple: It needs to have very little overhead to get it up and running. The project needs to be maintainable into the future by a small team of student developers. Complex components or advanced architecture can't be involved.
   - Stable: Failure resistance needs to be taken seriously. The scoring engine needs to behave for the entire competition.
 
-<!-- WIP: i can't figure out a good way to format/write this section -->
 ### Justifications for Strange Decisions (uhhh guys?)
 
-| Decision | Reasoning | Solution |
-|----------|-----------|----------|
+| Decision | Reason | Implementation |
+|----------|--------|----------------|
 | Quincy has no UI or UX | By using an off-the-shelf scoreboard, the competition ends up needing to be shaped around its behavior and functionality. Adding inject submission to the same application as service uptime monitoring seems like feature creep. | Only expose an HTTP REST API. The frontend (scoreboard, injects, password changes) needs to be implemented to explicity meet the needs of each competition. Want to run the competition entirely through a Discord bot? Go ahead. Quincy will handle the service uptime monitoring. |
-| Quincy is unauthenticated | The API has no authentication. Every endpoint is exposed to anyone with network access. <br><br> This one might change in the future. | Limit network access to the API with reverse proxies, firewalls, or security groups. Assume trust between the agent and API. It sounds like this adds complexity, but it actually simplifies deployment. It does effectively require the frontend to perform server-side requests on behalf of the user. |
+| Quincy is unauthenticated | Competitors should never have network access to the competition control plane or scoring architecture. Authentication adds needless complexity to the codebase | The API has no authentication. Every endpoint is exposed to anyone with network access. <br><br> This might change in the future. |
 | Quincy has no usable service checks | 1. Realism: it helps that every check is as detailed and specific to the service usecase. <br> 2. Competitive integrity: simple HTTP GET requests don't test much and can be easily cheesed. <br> 3. Performance: custom score checks can be written with performance in mind. | *Only* support custom score checks, but be inclusive within that. Agents can run on all common OSes, and can use any executable as a scorecheck. Quick drafts can be written and use Python/Bash scripts. Detailed browser automation can be run with Selenium scripts. Heavily optimized score checks can be written in Rust. |
-
+| Quincy has no notion of rounds | This adds a lot of complexity, and doesn't really make the competition significantly fairer. | Scorechecks run as fast as agents complete them, plus how long they are configured to wait them. Scorechecks are served in a random order. With significant agents running at a significant speed, this is good enough™ | 
 
 ### Slop :)
 
-1. AI is used for *some* but not all documentation, scripting, troubleshooting, and research.
+1. AI is used for *some* but not all documentation, scripting, tests, troubleshooting, and research.
 2. AI was not (and should not be) used for the writing of any application source code.
