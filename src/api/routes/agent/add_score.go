@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/sinks/postgres/agent"
+	"github.com/HackUCF/quincy/api/sinks"
 	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
 	"github.com/HackUCF/quincy/common/types"
 	"github.com/gin-gonic/gin"
@@ -31,12 +31,12 @@ func validateScore(types.Score) error {
 func AddScore(c *gin.Context) {
 
 	// grab globals from gin context
-	sinks := config.Get(c).Sinks
+	cfg := config.Get(c)
 	db, err := conn.GetE(c)
 
 	// check for db errors, fail only if the db sink is enabled.
 	// if this fails `db` is safely null and will be ignored by AddScore.
-	if err != nil && sinks.DBEnabled() {
+	if err != nil && cfg.Sinks.DBEnabled() {
 		resp := gin.H{
 			"message": "failed to get database connection from request context",
 			"error":   err,
@@ -68,10 +68,9 @@ func AddScore(c *gin.Context) {
 		return
 	}
 
-	err = agent.AddScore(c.Request.Context(), db, score)
-	if err != nil {
+	if err := sinks.AddScore(c.Request.Context(), cfg.Sinks, db, score); err != nil {
 		resp := gin.H{
-			"message": "failed to add score to database",
+			"message": "failed to add score",
 			"error":   err,
 			"score":   score,
 		}

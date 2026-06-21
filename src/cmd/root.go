@@ -20,7 +20,7 @@ func rootCmd() *cobra.Command {
 		Short: "Cybersecurity competition scoring engine",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			viper.SetEnvPrefix("QU")
-			viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+			viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
 			viper.AutomaticEnv()
 			return nil
 		},

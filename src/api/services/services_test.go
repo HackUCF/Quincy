@@ -55,7 +55,7 @@ func TestGetNext_noCredentials(t *testing.T) {
 		t.Fatalf("InitServices: %v", err)
 	}
 
-	svc, err := GetNext(context.Background(), nil) // nil db: safe when UserList == ""
+	svc, err := GetNext(context.Background(), cfg, nil) // nil db: safe when UserList == ""
 	if err != nil {
 		t.Fatalf("GetNext: %v", err)
 	}
@@ -80,7 +80,7 @@ func TestGetNext_roundRobin(t *testing.T) {
 	}
 	seen := make(map[key]bool)
 	for i := 0; i < int(servicesLen); i++ {
-		svc, err := GetNext(context.Background(), nil)
+		svc, err := GetNext(context.Background(), cfg, nil)
 		if err != nil {
 			t.Fatalf("GetNext at i=%d: %v", i, err)
 		}
@@ -102,7 +102,7 @@ func TestGetNext_wrapsAround(t *testing.T) {
 	}
 
 	for i := 0; i < int(servicesLen)*3; i++ {
-		if _, err := GetNext(context.Background(), nil); err != nil {
+		if _, err := GetNext(context.Background(), cfg, nil); err != nil {
 			t.Fatalf("GetNext at i=%d: %v", i, err)
 		}
 	}

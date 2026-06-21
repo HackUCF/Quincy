@@ -6,6 +6,7 @@ import (
 	"math/rand/v2"
 
 	"github.com/HackUCF/quincy/api/config"
+	"github.com/HackUCF/quincy/api/sinks/opentelemetry"
 	"github.com/HackUCF/quincy/api/sinks/postgres"
 	"github.com/HackUCF/quincy/api/sinks/postgres/agent"
 	"github.com/HackUCF/quincy/common/types"
@@ -15,15 +16,22 @@ import (
 // InitSinks calls the correct initialization functions for each of the enabled sinks.
 func InitSinks(cfg *config.APIConfigSpec) error {
 
-	// if postgres is configured
-	if cfg.Sinks.PGConfig != (config.PGConfig{}) {
-		postgres.InitDB(cfg)
+	if cfg.Sinks.DBEnabled() {
+		if err := postgres.InitDB(cfg); err != nil {
+			return fmt.Errorf("postgres sink: %w", err)
+		}
+	}
+
+	if cfg.Sinks.OTelEnabled() {
+		if _, err := opentelemetry.Init(context.Background(), cfg.Sinks.OTelConfig); err != nil {
+			return fmt.Errorf("opentelemetry sink: %w", err)
+		}
 	}
 
 	return nil
 }
 
-// Add score calls the right
+// AddScore sends the score to every configured sink.
 func AddScore(
 	ctx context.Context,
 	sinks config.Sinks,
@@ -32,7 +40,15 @@ func AddScore(
 ) error {
 
 	if sinks.DBEnabled() {
-		agent.AddScore(ctx, db, score)
+		if err := agent.AddScore(ctx, db, score); err != nil {
+			return err
+		}
+	}
+
+	if sinks.OTelEnabled() {
+		if err := opentelemetry.AddScore(ctx, score); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -43,7 +59,7 @@ func AddScore(
 // otherwise it just pulls the default creds from the config.
 func GetRandomUser(
 	ctx context.Context,
-	cfg config.APIConfigSpec,
+	cfg *config.APIConfigSpec,
 	db *pgxpool.Pool,
 	userListID types.UserListName,
 	teamNum types.TeamNum,
@@ -60,7 +76,7 @@ func GetRandomUser(
 	// loop through the user lists
 	for _, ul := range cfg.UserLists {
 
-		// find the requests one
+		// find the requested one
 		if ul.Name == userListID {
 
 			if len(ul.Users) == 0 {
@@ -69,7 +85,7 @@ func GetRandomUser(
 				return types.User{}, fmt.Errorf("user list %q is empty", userListID)
 			}
 
-			// otherrwise grab a random one
+			// otherwise grab a random one
 			u := ul.Users[rand.IntN(len(ul.Users))]
 			return types.User{
 				Username:    u.Username,

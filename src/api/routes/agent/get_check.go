@@ -23,12 +23,12 @@ import (
 func GetCheck(c *gin.Context) {
 
 	// grab globals from gin context
-	sinks := config.Get(c).Sinks
+	cfg := config.Get(c)
 	db, err := conn.GetE(c)
 
 	// check for db errors, failed if the db sink is enabled
 	// if this fails `db` is safely null and will be ignored by GetNext.
-	if err != nil && sinks.DBEnabled() {
+	if err != nil && cfg.Sinks.DBEnabled() {
 		resp := gin.H{
 			"message": "failed to get database connection from request context",
 			"error":   err,
@@ -37,7 +37,7 @@ func GetCheck(c *gin.Context) {
 		return
 	}
 
-	check, err := services.GetNext(c.Request.Context(), db)
+	check, err := services.GetNext(c.Request.Context(), cfg, db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get check",

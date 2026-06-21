@@ -71,7 +71,7 @@ func initRoutes(sinks config.Sinks) *gin.Engine {
 		middleware.Logging(),
 		middleware.InsecureCORS(),
 		config.ConfigMiddleware(),
-		sinks.DBOrNOP(conn.DBMiddleware()),
+		sinks.DBOrNOP(conn.DBMiddleware),
 	)
 	RegisterRoutes(router, sinks)
 	return router

@@ -2,7 +2,6 @@ package conn
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -13,18 +12,9 @@ const DBKey string = "db-object"
 
 // Middleware stores the database connection object in the gin context.
 // This can be retrieved as necessary by routes.
-func DBMiddleware() gin.HandlerFunc {
+func DBMiddleware(c *gin.Context) {
 
-	// runs at router initialization-time
-	if !dbIsValid.Load() {
-		// panic if connection not created
-		log.Panic("database connection not initialized, cannot create middleware")
-	}
-
-	// runs during each request
-	return func(c *gin.Context) {
-		c.Set(DBKey, db)
-	}
+	c.Set(DBKey, db)
 }
 
 // Get returns the database object stored in the request context.
