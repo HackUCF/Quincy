@@ -27,7 +27,7 @@ jobs:
           cache: false
 
       - name: test
-        run: go test -C src -count=1 -race ./...
+        run: go test -C src -v -count=1 -race ./...
 
       - name: generate tag
         id: tag

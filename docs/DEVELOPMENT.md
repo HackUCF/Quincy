@@ -35,15 +35,15 @@ go build -o quincy .
 Run the full test suite from `src/`:
 
 ```bash
-go test ./...
+go test -v ./...
 ```
 
-All tests — unit and database-backed — run with this single command. No build tags or environment variables required under a standard Docker setup. Database-backed tests use testcontainers-go to spin up a disposable Postgres container per package; each container is torn down automatically when the test binary exits.
+All tests — unit and database-backed — run with this single command. No build tags or environment variables required under a standard Docker setup. Database-backed tests use testcontainers-go to spin up a disposable Postgres container per package; each container is torn down automatically when the test binary exits. The `-v` flag is recommended so that skip warnings from packages that require Docker are visible in the output.
 
 On non-standard Docker setups (Colima, Podman, etc.), point testcontainers at the correct socket:
 
 ```bash
-DOCKER_HOST=unix:///path/to/docker.sock go test ./...
+DOCKER_HOST=unix:///path/to/docker.sock go test -v ./...
 ```
 
 If using Colima on macOS, also set `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock` to prevent Ryuk (the container reaper) from trying to bind-mount a macOS host path into the Linux VM.

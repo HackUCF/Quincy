@@ -22,6 +22,10 @@ func NewTestRouter(pool *pgxpool.Pool, cfg *config.APIConfigSpec) *gin.Engine {
 			c.Next()
 		},
 	)
-	routes.RegisterRoutes(r, cfg.Sinks)
+	sinks := cfg.Sinks
+	if pool != nil && !sinks.DBEnabled() {
+		sinks.PGConfig = config.PGConfig{Host: "test"}
+	}
+	routes.RegisterRoutes(r, sinks)
 	return r
 }

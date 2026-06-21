@@ -20,7 +20,7 @@ func TestMain(m *testing.M) {
 
 	pool, cleanup, err := testutil.NewTestDB(ctx)
 	if err != nil {
-		panic(err)
+		testutil.SkipDBTests(err)
 	}
 	defer cleanup()
 
