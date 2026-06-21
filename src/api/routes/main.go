@@ -12,7 +12,7 @@ import (
 // ServeRoutes generates an HTTP router and starts listening!
 // Requires the config to be loaded.
 func ServeRoutes(cfg *config.APIConfigSpec) error {
-	router := initRoutes()
+	router := initRoutes(cfg.Sinks)
 
 	if router == nil {
 		return fmt.Errorf("cannot serve from nil router")

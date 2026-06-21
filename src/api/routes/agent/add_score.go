@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/HackUCF/quincy/api/config"
 	"github.com/HackUCF/quincy/api/sinks/postgres/agent"
 	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
 	"github.com/HackUCF/quincy/common/types"
@@ -27,11 +28,25 @@ func validateScore(types.Score) error {
 //	@Failure		400		{object}	object
 //	@Router			/agent/completed-score [post]
 func AddScore(c *gin.Context) {
-	db := conn.Get(c)
+
+	// grab globals from gin context
+	sinks := config.Get(c).Sinks
+	db, err := conn.GetE(c)
+
+	// check for db errors, fail only if the db sink is enabled.
+	// if this fails `db` is safely null and will be ignored by AddScore.
+	if err != nil && sinks.DBEnabled() {
+		resp := gin.H{
+			"message": "failed to get database connection from request context",
+			"error":   err,
+		}
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
 
 	// load score from request body
 	var score types.Score
-	err := json.NewDecoder(c.Request.Body).Decode(&score)
+	err = json.NewDecoder(c.Request.Body).Decode(&score)
 	if err != nil {
 		resp := gin.H{
 			"message": "couldn't marshall json from request body",

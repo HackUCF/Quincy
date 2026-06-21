@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/db/misc"
+	"github.com/HackUCF/quincy/api/sinks/postgres/misc"
 	"github.com/HackUCF/quincy/testutil"
 	"github.com/jackc/pgx/v5/pgxpool"
 )

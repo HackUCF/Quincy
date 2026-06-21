@@ -22,6 +22,6 @@ func NewTestRouter(pool *pgxpool.Pool, cfg *config.APIConfigSpec) *gin.Engine {
 			c.Next()
 		},
 	)
-	routes.RegisterRoutes(r)
+	routes.RegisterRoutes(r, cfg.Sinks)
 	return r
 }

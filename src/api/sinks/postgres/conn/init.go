@@ -26,16 +26,16 @@ var (
 	dbIsValid atomic.Bool
 )
 
-func createURL(cfg config.DBConfig) string {
+func createURL(cfg *config.PGConfig) string {
 
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s?sslmode=%s",
-		cfg.Username,
+		url.QueryEscape(cfg.Username),
 		url.QueryEscape(cfg.Password),
-		cfg.Host,
+		url.QueryEscape(cfg.Host),
 		cfg.Port,
-		cfg.Database,
-		cfg.SSLMode,
+		url.QueryEscape(cfg.Database),
+		url.QueryEscape(cfg.SSLMode),
 	)
 }
 
@@ -68,13 +68,13 @@ func ensureDatabase(ctx context.Context, connString, dbName string) error {
 
 // InitDBConnection connects to the database and changes some of the driver settings.
 // It requires that the config be loaded before running.
-func InitDBConnection(ctx context.Context, cfg *config.APIConfigSpec) (*pgxpool.Pool, error) {
+func InitDBConnection(ctx context.Context, cfg *config.PGConfig) (*pgxpool.Pool, error) {
 
 	// add configs to filename to create connection string
-	connString := createURL(cfg.DB)
+	connString := createURL(cfg)
 
 	// try and create the db if it exists
-	err := ensureDatabase(ctx, connString, cfg.DB.Database)
+	err := ensureDatabase(ctx, connString, cfg.Database)
 	if err != nil {
 		return nil, fmt.Errorf("could not access or create database: %w", err)
 	}
@@ -92,8 +92,8 @@ func InitDBConnection(ctx context.Context, cfg *config.APIConfigSpec) (*pgxpool.
 
 	log.Info(
 		"database connection initialized",
-		"host", cfg.DB.Host,
-		"username", cfg.DB.Username,
+		"host", cfg.Host,
+		"username", cfg.Username,
 	)
 
 	dbIsValid.Store(true)

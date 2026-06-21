@@ -16,7 +16,7 @@ import (
 	"github.com/HackUCF/quincy/api/config"
 	"github.com/HackUCF/quincy/api/routes"
 	"github.com/HackUCF/quincy/api/services"
-	db "github.com/HackUCF/quincy/api/sinks/postgres"
+	"github.com/HackUCF/quincy/api/sinks"
 )
 
 // Start is the entry point for the API server.
@@ -29,8 +29,8 @@ func Start(cfg *config.APIConfigSpec) error {
 	// Store config globally so route handlers and db code can access it.
 	config.SetConfig(cfg)
 
-	if err := db.InitDB(cfg); err != nil {
-		return fmt.Errorf("failed to set up database: %w", err)
+	if err := sinks.InitSinks(cfg); err != nil {
+		return fmt.Errorf("failed to initialize sinks: %w", err)
 	}
 
 	if err := services.InitServices(cfg); err != nil {

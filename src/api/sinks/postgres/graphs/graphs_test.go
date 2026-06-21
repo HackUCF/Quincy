@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/db/graphs"
+	"github.com/HackUCF/quincy/api/sinks/postgres/graphs"
 	"github.com/HackUCF/quincy/testutil"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
