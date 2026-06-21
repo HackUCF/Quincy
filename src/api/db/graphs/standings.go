@@ -1,12 +1,13 @@
 package graphs
 
 import (
-	"database/sql"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
 
 	"github.com/HackUCF/quincy/common/types"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // StandingsData contains the rendered strings required for the standings graph template.
@@ -19,10 +20,10 @@ type StandingsData struct {
 
 // GetStandingsData returns the template data needed to render a current standings bar chart.
 // data contains rendered json strings.
-func GetStandingsData(db *sql.DB) (*StandingsData, error) {
+func GetStandingsData(ctx context.Context, db *pgxpool.Pool) (*StandingsData, error) {
 
 	// query each teams scores
-	rows, err := db.Query(`
+	rows, err := db.Query(ctx, `
 		SELECT team_num, SUM(passed)
 		FROM final_scores
 		GROUP BY team_num

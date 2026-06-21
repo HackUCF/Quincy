@@ -36,7 +36,7 @@ func agentStartCmd() *cobra.Command {
 	}
 
 	cmd.Flags().String("api-url", "http://127.0.0.1:8888", "URL of the API server")
-	cmd.Flags().Int("loop-time", 5, "seconds between scoring loops")
+	cmd.Flags().Int("loop-time", 1, "seconds between scoring loops")
 	cmd.Flags().Int("num-threads", 10, "number of concurrent scoring threads")
 
 	return cmd

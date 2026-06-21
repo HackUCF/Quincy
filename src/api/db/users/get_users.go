@@ -1,22 +1,25 @@
 package users
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 
 	"github.com/HackUCF/quincy/common/types"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type AllUsers map[types.TeamNum]map[types.UserListName][]types.User
 
-func GetAllUsers(db *sql.DB) (AllUsers, error) {
+func GetAllUsers(ctx context.Context, db *pgxpool.Pool) (AllUsers, error) {
+
 	allUsers := make(AllUsers)
 
 	query := `
-	  SELECT team_num, user_list, username, password, domain, netbios
+		SELECT team_num, user_list, username, password, domain, netbios
 		FROM scoring_users
 	`
-	rows, err := db.Query(query)
+
+	rows, err := db.Query(ctx, query)
 	if err != nil {
 		return allUsers, fmt.Errorf("failed to list users in db: %w", err)
 	}

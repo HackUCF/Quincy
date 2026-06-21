@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/HackUCF/quincy/common/types"
 
@@ -17,7 +18,13 @@ import (
 var messageTpl string
 
 // shared http client for requests to api
-var apiClient http.Client
+var apiTransport = &http.Transport{
+	MaxIdleConns:        1000,
+	MaxIdleConnsPerHost: 1000,
+	MaxConnsPerHost:     0,
+	IdleConnTimeout:     90 * time.Second,
+}
+var apiClient = &http.Client{Transport: apiTransport}
 
 // grab next service to check from api
 func getService(url string) (*types.Service, error) {
@@ -41,6 +48,28 @@ func getService(url string) (*types.Service, error) {
 	}
 
 	return &svc, nil
+}
+
+// get the timeout from config or service.
+// if the service-specific timeout is specified, use it.
+// if the loop time is reasonable (>5s), use it.
+// otherwise just pick a chill 30s.
+func getTimeout(cfg *AgentConfig, svc *types.Service) time.Duration {
+
+	var timeout time.Duration
+
+	if svc.Timeout != 0 {
+		// use the service-specific timeout if provided
+		timeout = time.Duration(svc.Timeout * float64(time.Second))
+	} else if cfg.LoopTime >= 5 {
+		// use the loop time if long enough
+		timeout = time.Duration(cfg.LoopTime) * time.Second
+	} else {
+		// default to 30s (unlikely to trigger)
+		timeout = 30 * time.Second
+	}
+
+	return timeout
 }
 
 // convert the output into api compatible object
@@ -76,6 +105,7 @@ func postScore(url string, score *types.Score) error {
 		err := fmt.Errorf("failed to request check from quincy: %w", err)
 		return err
 	}
+	defer resp.Body.Close()
 
 	// ensure it was recieved
 	if resp.StatusCode != http.StatusOK {

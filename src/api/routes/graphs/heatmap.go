@@ -9,10 +9,18 @@ import (
 )
 
 // GetHeatmap returns html and js containing a heatmap of historical uptime percentage per team per box/service.
+//
+//	@Summary		Uptime heatmap
+//	@Description	Returns an embeddable HTML/JS fragment showing historical uptime percentage as a heatmap.
+//	@Tags			graphs
+//	@Produce		html
+//	@Success		200		{string}	string
+//	@Failure		500		{object}	object
+//	@Router			/graphs/heatmap [get]
 func GetHeatmap(c *gin.Context) {
 	db := conn.Get(c)
 
-	data, err := graphs.GetHeatmapData(db)
+	data, err := graphs.GetHeatmapData(c.Request.Context(), db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get heatmap data",

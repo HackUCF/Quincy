@@ -1,0 +1,7 @@
+# testutil
+
+Shared infrastructure for database-backed tests across the Quincy module. This package exists solely for use in `_test.go` files and is never compiled into production binaries. It is not under `src/api/` or `src/agent/` because both import it and placing it inside either would create a circular dependency.
+
+The package provides three things. A test database constructor that spins up a disposable `postgres:18.4` container via testcontainers-go, applies the full production schema, and returns a connection pool along with a cleanup function — no manual setup, no persistent state between test runs. A set of fixture helpers that produce a minimal but realistic configuration (two teams, one box, two services, one userlist) and seed the corresponding rows into the database. A test router constructor that builds a Gin engine registered with the full production route tree, bypassing the global middleware that normally reads from environment state and instead injecting a connection pool and config directly into each request's context — this includes panic recovery so routes that call `log.Panic` on errors don't crash the test process.
+
+Docker must be available for any test that uses this package. On non-standard socket paths (Colima, Podman, etc.) set `DOCKER_HOST` before running. Testcontainers-go handles container lifecycle automatically; each package that calls the database constructor gets its own isolated Postgres instance that is torn down after the test binary exits.

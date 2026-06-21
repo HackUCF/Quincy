@@ -28,6 +28,8 @@ func (cfg *AgentConfig) Loop() {
 		// start with sleep so continues don't skip it
 		time.Sleep(loopTime)
 
+		start := time.Now()
+
 		// get service from quincy
 		svc, err := getService(serviceURL)
 		if err != nil {
@@ -40,7 +42,7 @@ func (cfg *AgentConfig) Loop() {
 		}
 
 		// run it (with the configured timeout)
-		timeout := time.Second * time.Duration(cfg.LoopTime)
+		timeout := getTimeout(cfg, svc)
 		output, err := runCheck(svc, timeout)
 		if err != nil {
 			log.Error(
@@ -67,10 +69,10 @@ func (cfg *AgentConfig) Loop() {
 		}
 
 		// log success then loop again!
-		// go here may be stupid, but i figure it is slightly more optimal
-		go log.Info(
+		dur := time.Since(start)
+		log.Info(
 			"successfully posted score to server",
-			"score", score,
+			"duration", dur.Seconds(),
 		)
 	}
 }

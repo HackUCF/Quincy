@@ -1,15 +1,16 @@
 package services
 
 import (
-	"database/sql"
+	"context"
 
-	"github.com/HackUCF/quincy/api/db/users"
+	"github.com/HackUCF/quincy/api/db/agent"
 	"github.com/HackUCF/quincy/common/types"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // GetNext returns the next service in the queue.
 // This is a fully templated service, with check info, team number, and a username/password.
-func GetNext(db *sql.DB) (types.Service, error) {
+func GetNext(ctx context.Context, db *pgxpool.Pool) (types.Service, error) {
 
 	// atomically read the next service
 	// this is so incredibly safe and fast i love it
@@ -26,7 +27,7 @@ func GetNext(db *sql.DB) (types.Service, error) {
 	}
 
 	// otherwise get a username/password
-	u, err := users.GetRandomUser(db, st.UserList, st.TeamNum)
+	u, err := agent.GetRandomUser(ctx, db, st.UserList, st.TeamNum)
 	if err != nil {
 		return types.Service{}, err
 	}

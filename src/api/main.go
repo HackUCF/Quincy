@@ -1,7 +1,13 @@
-/*
-Package api contains the initialization logic for the API server.
-Once initialized, it starts the server.
-*/
+// Quincy is a CCDC-style competition scoring engine.
+// It consists of two components: this API server, which manages scoring data,
+// configuration, and user credentials; and a distributed check agent that
+// polls the API for work, runs service checks, and posts results back.
+//
+// @title       Quincy API
+// @version     1.0
+// @description CCDC-style competition scoring engine. Manages scoring data and serves check assignments to agents.
+//
+// @BasePath    /api/v1
 package api
 
 import (

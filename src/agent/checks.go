@@ -74,7 +74,17 @@ func runCheck(svc *types.Service, timeout time.Duration) (*scriptOutput, error) 
 	err = cmd.Run()
 
 	// sample error for condition
+	//   (golang error checking is stupid)
 	var exitError *exec.ExitError
+
+	// script timing out is an organizer failure
+	// user logic should manage it's own timeouts and fail gracefully
+	select {
+	case <-ctx.Done():
+		err := fmt.Errorf("check timed out (ran past %0.2f seconds)", timeout.Seconds())
+		return nil, err
+	default:
+	}
 
 	if err == nil {
 		// no failure!
@@ -86,7 +96,7 @@ func runCheck(svc *types.Service, timeout time.Duration) (*scriptOutput, error) 
 		// strange error running command
 		// could be reading stdout or stderr
 		// also could be bad command / args
-		// no matter what this is organizer error
+		// no matter what this is organizer or developer error
 		err := fmt.Errorf("failed to run command: %w", err)
 		return nil, err
 	}

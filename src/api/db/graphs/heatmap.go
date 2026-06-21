@@ -1,7 +1,7 @@
 package graphs
 
 import (
-	"database/sql"
+	"context"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/HackUCF/quincy/common/log"
 	"github.com/HackUCF/quincy/common/types"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // heatmapPoint is a single cell in the heatmap chart.
@@ -40,9 +41,9 @@ type HeatmapData struct {
 // GetHeatmapData returns the template data needed to render a heatmap chart.
 // data contains rendered json strings.
 // each cell value is the historical uptime percentage for that team/box/service combination.
-func GetHeatmapData(db *sql.DB) (*HeatmapData, error) {
+func GetHeatmapData(ctx context.Context, db *pgxpool.Pool) (*HeatmapData, error) {
 
-	rows, err := db.Query(`
+	rows, err := db.Query(ctx, `
 		SELECT service, box, team_num, passed, total
 		FROM final_scores
 		ORDER BY team_num, box, service

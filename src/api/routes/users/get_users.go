@@ -9,10 +9,18 @@ import (
 )
 
 // GetAllUsers returns all users from all userlists and their up to date passwords for all teams.
+//
+//	@Summary		Get all scoring users
+//	@Description	Returns every user in every userlist for every team, including current passwords. Shape: {"team": {"userlist": [User]}}.
+//	@Tags			users
+//	@Produce		json
+//	@Success		200	{object}	object
+//	@Failure		400	{object}	object
+//	@Router			/users [get]
 func GetAllUsers(c *gin.Context) {
 	db := conn.Get(c)
 
-	users, err := users.GetAllUsers(db)
+	users, err := users.GetAllUsers(c.Request.Context(), db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get all users",

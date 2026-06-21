@@ -15,12 +15,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # checkout repo
+      # checkout the entire repo, not just most recent commit — needed for auto versioning
       - uses: actions/checkout@v4
         with:
-          # clone the entire repo, not just the most recent commit
-          # needed for auto versioning
-          fetch-depth: 0 
+          fetch-depth: 0
 
       # install golang dependencies
       - uses: actions/setup-go@v5
@@ -28,7 +26,9 @@ jobs:
           go-version-file: src/go.mod
           cache: false
 
-      # create the version tag from recent branch
+      - name: test
+        run: go test -C src -count=1 -race ./...
+
       - name: generate tag
         id: tag
         run: |
@@ -50,7 +50,6 @@ jobs:
           # GOOS=darwin  GOARCH=arm64 go build -C src -ldflags "$LDFLAGS" -o ../dist/quincy-darwin-arm64 .
           # GOOS=windows GOARCH=amd64 go build -C src -ldflags "$LDFLAGS" -o ../dist/quincy-windows-amd64.exe .
 
-      # release the binaries under the tag
       - name: create release
         uses: softprops/action-gh-release@v2
         with:

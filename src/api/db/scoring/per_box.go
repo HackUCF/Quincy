@@ -1,26 +1,25 @@
 package scoring
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 
 	"github.com/HackUCF/quincy/common/types"
-
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // BoxScores is a map that can be used to quickly reference stats for a specific box.
 type BoxScores map[types.BoxName]types.ScoreResult
 
 // GetBoxScores collates and calculates competion scores for all teams.
-func GetBoxScores(db *sql.DB) (BoxScores, error) {
+func GetBoxScores(ctx context.Context, db *pgxpool.Pool) (BoxScores, error) {
 
 	// dict of box id to scoring results
 	var scores = make(BoxScores)
 
 	// get totals for each box
 	// outputs n rows, where n is the number of boxes
-	rows, err := db.Query(`
+	rows, err := db.Query(ctx, `
     SELECT
     	box,
       SUM(total) as total,

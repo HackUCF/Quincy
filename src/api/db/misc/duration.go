@@ -1,18 +1,20 @@
 package misc
 
 import (
-	"database/sql"
+	"context"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // GetCompDuration returns how long the competition has been running
-func GetCompDuration(db *sql.DB) (time.Duration, error) {
+func GetCompDuration(ctx context.Context, db *pgxpool.Pool) (time.Duration, error) {
 
 	var start uint64
 	var end uint64
 
 	// get the first and last timestamp in the scores table
-	rows, err := db.Query(`
+	rows, err := db.Query(ctx, `
 		SELECT * FROM (SELECT timestamp FROM scores ORDER BY timestamp ASC LIMIT 1)
 		UNION ALL
 		SELECT * FROM (SELECT timestamp FROM scores ORDER BY timestamp DESC LIMIT 1);
