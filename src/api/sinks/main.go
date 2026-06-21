@@ -2,6 +2,8 @@ package sinks
 
 import (
 	"context"
+	"fmt"
+	"math/rand/v2"
 
 	"github.com/HackUCF/quincy/api/config"
 	"github.com/HackUCF/quincy/api/sinks/postgres"
@@ -54,5 +56,30 @@ func GetRandomUser(
 	}
 
 	// otherwise pull random user from the config file
-	return types.User{}, nil
+
+	// loop through the user lists
+	for _, ul := range cfg.UserLists {
+
+		// find the requests one
+		if ul.Name == userListID {
+
+			if len(ul.Users) == 0 {
+
+				// fail if it's empty
+				return types.User{}, fmt.Errorf("user list %q is empty", userListID)
+			}
+
+			// otherrwise grab a random one
+			u := ul.Users[rand.IntN(len(ul.Users))]
+			return types.User{
+				Username:    u.Username,
+				Password:    u.Password,
+				DomainName:  ul.DomainName,
+				NetBIOSName: ul.NetBIOSName,
+			}, nil
+		}
+	}
+
+	// error if userlist doesn't exist
+	return types.User{}, fmt.Errorf("user list %q not found", userListID)
 }
