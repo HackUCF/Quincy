@@ -86,16 +86,17 @@ Use the tab-aligned swaggo style:
 - Simple struct: `{object} package.TypeName`
 - Array of structs: `{array} package.TypeName`
 - `map[string]StructType`: `{object} map[string]package.TypeName`
-- Deeply nested maps (>1 level of map): `{object} object` — describe the shape in `@Description` instead
+- Nested maps: use the full explicit type — `map[string]map[string]types.ScoreResult`, `map[string]map[string][]types.User`, etc. Prefer explicit types over `{object} object` so the spec is machine-readable.
 - HTML response: `{string} string`
 - Swag resolves types by their package path; use the full `package.TypeName` form
 
 **Failure entries** — one per distinct HTTP status code the handler can return. Read the handler source; don't guess.
 
-**`@Description`** — required when `@Success` uses `{object} object` (nested maps). Describe the JSON shape clearly:
-- `"Map of team number (string key) → ScoreResult. Shape: {\"1\": {checks_passed: N, ...}}"`
+**DB-gated routes** — any route wrapped with `s.DBOr501(...)` in `init.go` MUST include `@Failure 501 {object} object`. This documents that the endpoint returns 501 Not Implemented when the PostgreSQL sink is not configured.
 
-**Omit `@Accept`** on GET routes. Omit `@Description` if `@Summary` is already self-explanatory and the response type is a named struct that swag can introspect.
+**`@Description`** — include when the response shape cannot be inferred from the type alone (e.g. deeply nested maps or non-obvious key semantics). Omit if `@Summary` is already self-explanatory and the response type is a named struct that swag can introspect.
+
+**Omit `@Accept`** on GET routes.
 
 ### Type reference quick reference for this project
 
@@ -106,9 +107,9 @@ Use the tab-aligned swaggo style:
 | `config.APIConfigSpec` | `{object} config.APIConfigSpec` |
 | `map[TeamNum]ScoreResult` | `{object} map[string]types.ScoreResult` |
 | `map[BoxName]ScoreResult` | `{object} map[string]types.ScoreResult` |
-| `map[BoxName]map[ServiceName]ScoreResult` | `{object} object` + describe in @Description |
-| `map[TeamNum]ServiceScores` | `{object} object` + describe in @Description |
-| `map[TeamNum]map[UserListName][]User` | `{object} object` + describe in @Description |
+| `map[BoxName]map[ServiceName]ScoreResult` | `{object} map[string]map[string]types.ScoreResult` |
+| `map[TeamNum]map[BoxName]map[ServiceName]ScoreResult` | `{object} map[string]map[string]map[string]types.ScoreResult` |
+| `map[TeamNum]map[UserListName][]User` | `{object} map[string]map[string][]types.User` |
 | `users.PCR` (local type) | `{object} users.PCR` |
 | HTML template output | `{string} string` |
 
@@ -119,7 +120,7 @@ Use the tab-aligned swaggo style:
 A pre-commit hook (`.githooks/pre-commit`) runs this automatically when `.go` files are staged, if `swag` is installed. To regenerate manually from `src/`:
 
 ```bash
-swag init --pd --parseInternal -g api/doc.go -o ./api/openapi
+swag init --pd --parseInternal -g api/main.go -o ./api/openapi
 ```
 
 This regenerates `src/api/openapi/docs.go`, `src/api/openapi/swagger.json`, and `src/api/openapi/swagger.yaml`. All three are committed to the repo.

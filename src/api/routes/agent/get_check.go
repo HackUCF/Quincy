@@ -18,6 +18,7 @@ import (
 //	@Produce		json
 //	@Success		200	{object}	types.Service
 //	@Failure		400	{object}	object
+//	@Failure		500	{object}	object
 //	@Router			/agent/new-check [get]
 func GetCheck(c *gin.Context) {
 

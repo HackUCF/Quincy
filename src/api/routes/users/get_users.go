@@ -16,6 +16,7 @@ import (
 //	@Produce		json
 //	@Success		200	{object}	map[string]map[string][]types.User
 //	@Failure		400	{object}	object
+//	@Failure		501	{object}	object
 //	@Router			/users [get]
 func GetAllUsers(c *gin.Context) {
 	db := conn.Get(c)

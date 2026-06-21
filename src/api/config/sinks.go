@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Sinks) DBEnabled() bool {
-	return (PGConfig{}) == s.PGConfig
+	return (PGConfig{}) != s.PGConfig
 }
 
 // DBOr501 returns the original endpoint if the db is configured. Otherwise it returns a simple 501 not implemented.

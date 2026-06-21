@@ -23,6 +23,7 @@ import (
 //	@Produce		json
 //	@Success		200	{array}		types.Score
 //	@Failure		400	{object}	object
+//	@Failure		501	{object}	object
 //	@Router			/scores/current [get]
 func GetRecentChecks(c *gin.Context) {
 	db := conn.Get(c)

@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/agent/completed-score": {
             "post": {
-                "description": "Accepts a completed score check result from an agent and persists it to the database.",
+                "description": "Accepts a completed score check result from an agent and persists it to the database. The timestamp field is assigned by the server on receipt and must not be included in the request body.",
                 "consumes": [
                     "application/json"
                 ],
@@ -51,6 +51,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -74,6 +80,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object"
                         }
@@ -123,6 +135,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -146,6 +164,12 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "type": "object"
                         }
@@ -175,6 +199,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -198,6 +228,12 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "type": "object"
                         }
@@ -230,6 +266,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -256,6 +298,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "type": "object"
                         }
@@ -294,6 +342,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -326,6 +380,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -352,6 +412,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "type": "object"
                         }
@@ -387,6 +453,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "type": "object"
                         }
@@ -434,6 +506,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -449,15 +527,15 @@ const docTemplate = `{
                         "$ref": "#/definitions/config.BoxSpec"
                     }
                 },
-                "db": {
-                    "$ref": "#/definitions/config.DBConfig"
-                },
                 "http": {
                     "$ref": "#/definitions/config.HTTPSpec"
                 },
                 "num_teams": {
                     "type": "integer",
                     "example": 5
+                },
+                "sinks": {
+                    "$ref": "#/definitions/config.Sinks"
                 },
                 "user_lists": {
                     "type": "array",
@@ -486,7 +564,20 @@ const docTemplate = `{
                 }
             }
         },
-        "config.DBConfig": {
+        "config.HTTPSpec": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string",
+                    "example": "127.0.0.1"
+                },
+                "port": {
+                    "type": "integer",
+                    "example": 8888
+                }
+            }
+        },
+        "config.PGConfig": {
             "type": "object",
             "properties": {
                 "database": {
@@ -515,16 +606,11 @@ const docTemplate = `{
                 }
             }
         },
-        "config.HTTPSpec": {
+        "config.Sinks": {
             "type": "object",
             "properties": {
-                "host": {
-                    "type": "string",
-                    "example": "127.0.0.1"
-                },
-                "port": {
-                    "type": "integer",
-                    "example": 8888
+                "postgres": {
+                    "$ref": "#/definitions/config.PGConfig"
                 }
             }
         },

@@ -17,6 +17,7 @@ import (
 //	@Produce		html
 //	@Success		200		{string}	string
 //	@Failure		500		{object}	object
+//	@Failure		501		{object}	object
 //	@Router			/graphs/scores [get]
 func GetScores(c *gin.Context) {
 	db := conn.Get(c)

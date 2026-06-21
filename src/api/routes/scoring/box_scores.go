@@ -16,6 +16,7 @@ import (
 //	@Produce		json
 //	@Success		200	{object}	map[string]types.ScoreResult
 //	@Failure		400	{object}	object
+//	@Failure		501	{object}	object
 //	@Router			/scores/box [get]
 func GetBoxScores(c *gin.Context) {
 	db := conn.Get(c)

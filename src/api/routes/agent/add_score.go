@@ -19,13 +19,14 @@ func validateScore(types.Score) error {
 // only meant for interaction from an agent.
 //
 //	@Summary		Submit a completed score check
-//	@Description	Accepts a completed score check result from an agent and persists it to the database.
+//	@Description	Accepts a completed score check result from an agent and persists it to the database. The timestamp field is assigned by the server on receipt and must not be included in the request body.
 //	@Tags			agent
 //	@Accept			json
 //	@Produce		json
 //	@Param			score	body		types.Score	true	"Completed score check"
 //	@Success		200		{object}	object
 //	@Failure		400		{object}	object
+//	@Failure		500		{object}	object
 //	@Router			/agent/completed-score [post]
 func AddScore(c *gin.Context) {
 
