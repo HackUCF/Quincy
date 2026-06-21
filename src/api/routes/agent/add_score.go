@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/HackUCF/quincy/api/db/agent"
 	"github.com/HackUCF/quincy/api/db/conn"
-	"github.com/HackUCF/quincy/api/db/scoring"
 	"github.com/HackUCF/quincy/common/types"
 	"github.com/gin-gonic/gin"
 )
@@ -44,7 +44,7 @@ func AddScore(c *gin.Context) {
 		return
 	}
 
-	err = scoring.AddScore(c.Request.Context(), db, score)
+	err = agent.AddScore(c.Request.Context(), db, score)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to add score to database",

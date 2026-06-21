@@ -54,7 +54,7 @@ func GetScoresData(ctx context.Context, db *pgxpool.Pool) (*ScoresData, error) {
     FROM scores
     GROUP BY team_num, bucket
     ORDER BY team_num, bucket;
-	`, bucketUs, bucketUs)
+	`, bucketUs)
 	if err != nil {
 		return nil, err
 	}
