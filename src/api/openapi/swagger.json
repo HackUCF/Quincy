@@ -10,7 +10,7 @@
     "paths": {
         "/agent/completed-score": {
             "post": {
-                "description": "Accepts a completed score check result from an agent and persists it to the database. The timestamp field is assigned by the server on receipt and must not be included in the request body.",
+                "description": "Accepts a completed score check result from an agent and forwards it to all configured sinks. The timestamp field is assigned by the server on receipt and must not be included in the request body.",
                 "consumes": [
                     "application/json"
                 ],
@@ -570,6 +570,61 @@
                 }
             }
         },
+        "config.OTelBatching": {
+            "type": "object",
+            "properties": {
+                "batch_size": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "export_interval": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/time.Duration"
+                        }
+                    ],
+                    "example": 5000000000
+                },
+                "max_queue_size": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "config.OTelConfig": {
+            "type": "object",
+            "properties": {
+                "basic_auth": {
+                    "type": "string",
+                    "example": "dXNlcjpwYXNz"
+                },
+                "batching": {
+                    "description": "Batching settings",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/config.OTelBatching"
+                        }
+                    ]
+                },
+                "endpoint": {
+                    "type": "string",
+                    "example": "http://localhost:4318"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "secret"
+                },
+                "stream_name": {
+                    "description": "OpenObserve specific header",
+                    "type": "string",
+                    "example": "quincy"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "admin"
+                }
+            }
+        },
         "config.PGConfig": {
             "type": "object",
             "properties": {
@@ -602,6 +657,9 @@
         "config.Sinks": {
             "type": "object",
             "properties": {
+                "otel": {
+                    "$ref": "#/definitions/config.OTelConfig"
+                },
                 "postgres": {
                     "$ref": "#/definitions/config.PGConfig"
                 }
@@ -642,6 +700,30 @@
                     "example": "geraldo"
                 }
             }
+        },
+        "time.Duration": {
+            "type": "integer",
+            "format": "int64",
+            "enum": [
+                -9223372036854775808,
+                9223372036854775807,
+                1,
+                1000,
+                1000000,
+                1000000000,
+                60000000000,
+                3600000000000
+            ],
+            "x-enum-varnames": [
+                "minDuration",
+                "maxDuration",
+                "Nanosecond",
+                "Microsecond",
+                "Millisecond",
+                "Second",
+                "Minute",
+                "Hour"
+            ]
         },
         "types.Score": {
             "type": "object",

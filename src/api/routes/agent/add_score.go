@@ -19,7 +19,7 @@ func validateScore(types.Score) error {
 // only meant for interaction from an agent.
 //
 //	@Summary		Submit a completed score check
-//	@Description	Accepts a completed score check result from an agent and persists it to the database. The timestamp field is assigned by the server on receipt and must not be included in the request body.
+//	@Description	Accepts a completed score check result from an agent and forwards it to all configured sinks. The timestamp field is assigned by the server on receipt and must not be included in the request body.
 //	@Tags			agent
 //	@Accept			json
 //	@Produce		json

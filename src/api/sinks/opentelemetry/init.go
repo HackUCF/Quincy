@@ -36,10 +36,11 @@ func Init(ctx context.Context, cfg config.OTelConfig) (func(), error) {
 	if batchSize == 0 {
 		batchSize = 20
 	}
-	exportInterval := cfg.Batching.ExportInterval
-	if exportInterval == 0 {
-		exportInterval = 5 * time.Second
+	exportIntervalSecs := cfg.Batching.ExportInterval
+	if exportIntervalSecs == 0 {
+		exportIntervalSecs = 5
 	}
+	exportInterval := time.Duration(exportIntervalSecs) * time.Second
 	maxQueueSize := cfg.Batching.MaxQueueSize
 	if maxQueueSize == 0 {
 		maxQueueSize = 200

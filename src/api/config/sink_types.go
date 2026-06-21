@@ -1,7 +1,5 @@
 package config
 
-import "time"
-
 type Sinks struct {
 	PGConfig   PGConfig   `yaml:"postgres" mapstructure:"postgres" json:"postgres"`
 	OTelConfig OTelConfig `yaml:"otel"     mapstructure:"otel"     json:"otel"`
@@ -23,9 +21,9 @@ type OTelConfig struct {
 // OTelBatching controls how log records are batched before export.
 // Zero values use defaults (BatchSize: 20, ExportInterval: 5s, MaxQueueSize: 200).
 type OTelBatching struct {
-	BatchSize      int           `yaml:"batch_size"      mapstructure:"batch_size"      json:"batch_size"      example:"20"`
-	ExportInterval time.Duration `yaml:"export_interval" mapstructure:"export_interval" json:"export_interval" example:"5s"`
-	MaxQueueSize   int           `yaml:"max_queue_size"  mapstructure:"max_queue_size"  json:"max_queue_size"  example:"200"`
+	BatchSize      int `yaml:"batch_size"      mapstructure:"batch_size"      json:"batch_size"      example:"20"`
+	ExportInterval int `yaml:"export_interval" mapstructure:"export_interval" json:"export_interval" example:"5"`
+	MaxQueueSize   int `yaml:"max_queue_size"  mapstructure:"max_queue_size"  json:"max_queue_size"  example:"200"`
 }
 
 type PGConfig struct {

@@ -76,3 +76,17 @@ func TestSinks_DBOrNOP_noDB_isNOP(t *testing.T) {
 		t.Error("DBOrNOP without DB should not call the handler")
 	}
 }
+
+func TestSinks_OTelEnabled_empty(t *testing.T) {
+	s := Sinks{}
+	if s.OTelEnabled() {
+		t.Error("OTelEnabled() should be false when no endpoint is set")
+	}
+}
+
+func TestSinks_OTelEnabled_configured(t *testing.T) {
+	s := Sinks{OTelConfig: OTelConfig{Endpoint: "http://localhost:4318"}}
+	if !s.OTelEnabled() {
+		t.Error("OTelEnabled() should be true when endpoint is set")
+	}
+}
