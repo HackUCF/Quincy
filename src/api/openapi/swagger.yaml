@@ -46,9 +46,8 @@ definitions:
         example: 20
         type: integer
       export_interval:
-        allOf:
-        - $ref: '#/definitions/time.Duration'
-        example: 5000000000
+        example: 5
+        type: integer
       max_queue_size:
         example: 200
         type: integer
@@ -129,27 +128,6 @@ definitions:
         example: geraldo
         type: string
     type: object
-  time.Duration:
-    enum:
-    - -9223372036854775808
-    - 9223372036854775807
-    - 1
-    - 1000
-    - 1000000
-    - 1000000000
-    - 60000000000
-    - 3600000000000
-    format: int64
-    type: integer
-    x-enum-varnames:
-    - minDuration
-    - maxDuration
-    - Nanosecond
-    - Microsecond
-    - Millisecond
-    - Second
-    - Minute
-    - Hour
   types.Score:
     properties:
       box:
@@ -576,10 +554,6 @@ paths:
             type: object
         "400":
           description: Bad Request
-          schema:
-            type: object
-        "501":
-          description: Not Implemented
           schema:
             type: object
       summary: Get all scoring users

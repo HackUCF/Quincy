@@ -456,12 +456,6 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
-                    },
-                    "501": {
-                        "description": "Not Implemented",
-                        "schema": {
-                            "type": "object"
-                        }
                     }
                 }
             },
@@ -585,12 +579,8 @@ const docTemplate = `{
                     "example": 20
                 },
                 "export_interval": {
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/time.Duration"
-                        }
-                    ],
-                    "example": 5000000000
+                    "type": "integer",
+                    "example": 5
                 },
                 "max_queue_size": {
                     "type": "integer",
@@ -707,30 +697,6 @@ const docTemplate = `{
                     "example": "geraldo"
                 }
             }
-        },
-        "time.Duration": {
-            "type": "integer",
-            "format": "int64",
-            "enum": [
-                -9223372036854775808,
-                9223372036854775807,
-                1,
-                1000,
-                1000000,
-                1000000000,
-                60000000000,
-                3600000000000
-            ],
-            "x-enum-varnames": [
-                "minDuration",
-                "maxDuration",
-                "Nanosecond",
-                "Microsecond",
-                "Millisecond",
-                "Second",
-                "Minute",
-                "Hour"
-            ]
         },
         "types.Score": {
             "type": "object",

@@ -97,7 +97,7 @@ Shared packages used by both the API server and agent:
 
 ### `src/testutil/`
 
-Shared test infrastructure used by database-backed tests across the module. Provides a Postgres container factory, fixture helpers for seeding a minimal config and dataset, and a test router that wires the full production route tree without requiring global server state. Never compiled into production binaries.
+Shared test infrastructure used by database-backed and container-backed tests across the module. Provides a Postgres container factory with Docker-unavailable skip handling, fixture helpers for seeding a minimal config and dataset, and a test router that wires the full production route tree without requiring global server state. The `container/` sub-package provides a generic container launcher for integration tests that need containers other than Postgres; it lives in a separate package to avoid an import cycle with the OTel sink. Never compiled into production binaries.
 
 ## Initialization Flow
 
