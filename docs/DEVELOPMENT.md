@@ -3,7 +3,8 @@
 ## Prerequisites
 
 - **Go 1.25+** -- [install instructions](https://go.dev/doc/install)
-- **PostgreSQL** -- database backend (must be running and accessible)
+- **Docker** -- required to run tests (testcontainers-go spins up a real Postgres container per test package)
+- **PostgreSQL** -- database backend for the running server (must be accessible when starting the API)
 - **Python 3** -- for running the included check scripts
 - **Air** (optional) -- for hot-reload during development
 
@@ -28,6 +29,26 @@ Build the single binary:
 ```bash
 go build -o quincy .
 ```
+
+## Testing
+
+Run the full test suite from `src/`:
+
+```bash
+go test ./...
+```
+
+All tests — unit and database-backed — run with this single command. No build tags or environment variables required under a standard Docker setup. Database-backed tests use testcontainers-go to spin up a disposable Postgres container per package; each container is torn down automatically when the test binary exits.
+
+On non-standard Docker setups (Colima, Podman, etc.), point testcontainers at the correct socket:
+
+```bash
+DOCKER_HOST=unix:///path/to/docker.sock go test ./...
+```
+
+If using Colima on macOS, also set `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock` to prevent Ryuk (the container reaper) from trying to bind-mount a macOS host path into the Linux VM.
+
+Shared test infrastructure lives in `src/testutil/`. See its README for details.
 
 ## Development with Hot-Reload
 
@@ -73,6 +94,10 @@ Shared packages used by both the API server and agent:
 - **types** -- Shared type aliases and structs (scores, services, team numbers, names).
 - **log** -- Thin structured logging wrapper around Zap.
 - **middleware** -- Gin middleware for panic recovery and request logging.
+
+### `src/testutil/`
+
+Shared test infrastructure used by database-backed tests across the module. Provides a Postgres container factory, fixture helpers for seeding a minimal config and dataset, and a test router that wires the full production route tree without requiring global server state. Never compiled into production binaries.
 
 ## Initialization Flow
 

@@ -30,6 +30,8 @@ If the change touched:
 
 Also check whether the project structure itself changed — new packages added, packages removed or moved. If the set of Go packages has changed, update `docs/DEVELOPMENT.md`'s project layout section to match.
 
+If test infrastructure changed (new packages in `src/testutil/`, new test patterns, changes to how tests are run) → update `docs/DEVELOPMENT.md`'s Testing section and `src/testutil/README.md`.
+
 ---
 
 ## Step 2: Update Module READMEs
@@ -51,6 +53,7 @@ Module READMEs are technical documentation. The goal is not to avoid detail — 
 - Describe *kinds* of things exported (e.g. "an initializer and a global accessor"), not specific ones
 - Implementation details are encouraged at a conceptual level (e.g. "uses SQLite with WAL mode", "served over HTTP via Gin", "cached after first lookup using a read-write mutex") — just not as Go code
 - Keep it factual and current — if something was removed, remove it from the docs
+- **Do not document tests in module READMEs.** Test coverage, test patterns, and how to run tests for a specific package do not belong in individual `README.md` files. Comments in `_test.go` files are the right place for that. The only place that documents testing as a whole is `docs/DEVELOPMENT.md`.
 
 ---
 
