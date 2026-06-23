@@ -3,8 +3,8 @@ package scoring
 import (
 	"net/http"
 
-	"github.com/HackUCF/quincy/api/db/conn"
-	"github.com/HackUCF/quincy/api/db/scoring"
+	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
+	"github.com/HackUCF/quincy/api/sinks/postgres/scoring"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,8 +14,9 @@ import (
 //	@Description	Returns pass/fail check stats keyed by box name, then service name. Shape: {"box": {"service": ScoreResult}}.
 //	@Tags			scores
 //	@Produce		json
-//	@Success		200	{object}	object
+//	@Success		200	{object}	map[string]map[string]types.ScoreResult
 //	@Failure		400	{object}	object
+//	@Failure		501	{object}	object
 //	@Router			/scores/service [get]
 func GetServiceScores(c *gin.Context) {
 	db := conn.Get(c)

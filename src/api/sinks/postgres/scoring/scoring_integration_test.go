@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
-	dbagent "github.com/HackUCF/quincy/api/db/agent"
 	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/db/scoring"
+	dbagent "github.com/HackUCF/quincy/api/sinks/postgres/agent"
+	"github.com/HackUCF/quincy/api/sinks/postgres/scoring"
 	"github.com/HackUCF/quincy/common/types"
 	"github.com/HackUCF/quincy/testutil"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -21,7 +21,7 @@ func TestMain(m *testing.M) {
 
 	pool, cleanup, err := testutil.NewTestDB(ctx)
 	if err != nil {
-		panic(err)
+		testutil.SkipDBTests(err)
 	}
 	defer cleanup()
 

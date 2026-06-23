@@ -3,8 +3,8 @@ package graphs
 import (
 	"net/http"
 
-	"github.com/HackUCF/quincy/api/db/conn"
-	"github.com/HackUCF/quincy/api/db/graphs"
+	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
+	"github.com/HackUCF/quincy/api/sinks/postgres/graphs"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +16,7 @@ import (
 //	@Produce		html
 //	@Success		200		{string}	string
 //	@Failure		500		{object}	object
+//	@Failure		501		{object}	object
 //	@Router			/graphs/heatmap [get]
 func GetHeatmap(c *gin.Context) {
 	db := conn.Get(c)

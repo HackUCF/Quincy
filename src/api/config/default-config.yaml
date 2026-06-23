@@ -3,13 +3,14 @@
 num_teams: 5
 
 # postgres settings
-db:
-  host: localhost
-  port: 5432
-  username: postgres
-  password: postgres
-  database: quincy
-  ssl_mode: prefer
+sinks:
+  postgres:
+    host: localhost
+    port: 5432
+    username: postgres
+    password: postgres
+    database: quincy
+    ssl_mode: prefer
 
 # credential lists used by one or more service
 user_lists:

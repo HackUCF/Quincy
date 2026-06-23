@@ -1,8 +1,8 @@
 /*
-Package db contains all SQLite databse connection logic and queries.
+Package postgres contains all PostgreSQL databse connection logic and queries.
 You probably want to import the conn subpackage and run conn.Get()
 */
-package db
+package postgres
 
 import (
 	"context"
@@ -10,9 +10,9 @@ import (
 	"fmt"
 
 	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/db/conn"
-	"github.com/HackUCF/quincy/api/db/scoring"
-	"github.com/HackUCF/quincy/api/db/users"
+	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
+	"github.com/HackUCF/quincy/api/sinks/postgres/scoring"
+	"github.com/HackUCF/quincy/api/sinks/postgres/users"
 )
 
 //go:embed schema.sql
@@ -24,7 +24,7 @@ func InitDB(cfg *config.APIConfigSpec) error {
 
 	ctx := context.Background()
 
-	db, err := conn.InitDBConnection(ctx, cfg)
+	db, err := conn.InitDBConnection(ctx, &cfg.Sinks.PGConfig)
 	if err != nil {
 		return fmt.Errorf("failed to connect to db: %w", err)
 	}

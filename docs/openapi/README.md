@@ -5,8 +5,7 @@
 To regenerate after changing handler annotations or adding routes:
 
 ```bash
-cd src
-swag init --pd --parseInternal -g api/doc.go -o ./api/openapi
+cd src && swag init --pd --parseInternal -g api/main.go -o ./api/openapi
 ```
 
 The interactive Swagger UI is served at `/swagger/` when the API server is running.

@@ -9,8 +9,8 @@ import (
 	"net/http"
 
 	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/db/conn"
-	"github.com/HackUCF/quincy/api/db/users"
+	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
+	"github.com/HackUCF/quincy/api/sinks/postgres/users"
 	"github.com/HackUCF/quincy/common/types"
 	"github.com/gin-gonic/gin"
 )
@@ -42,6 +42,7 @@ func userListExists(cfg *config.APIConfigSpec, name types.UserListName) bool {
 //	@Success		200	{object}	object
 //	@Failure		400	{object}	object
 //	@Failure		500	{object}	object
+//	@Failure		501	{object}	object
 //	@Router			/users [post]
 func SubmitPCR(c *gin.Context) {
 	db := conn.Get(c)

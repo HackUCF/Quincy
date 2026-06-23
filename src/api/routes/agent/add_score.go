@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/HackUCF/quincy/api/db/agent"
-	"github.com/HackUCF/quincy/api/db/conn"
+	"github.com/HackUCF/quincy/api/config"
+	"github.com/HackUCF/quincy/api/sinks"
+	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
 	"github.com/HackUCF/quincy/common/types"
 	"github.com/gin-gonic/gin"
 )
@@ -18,20 +19,35 @@ func validateScore(types.Score) error {
 // only meant for interaction from an agent.
 //
 //	@Summary		Submit a completed score check
-//	@Description	Accepts a completed score check result from an agent and persists it to the database.
+//	@Description	Accepts a completed score check result from an agent and forwards it to all configured sinks. The timestamp field is assigned by the server on receipt and must not be included in the request body.
 //	@Tags			agent
 //	@Accept			json
 //	@Produce		json
 //	@Param			score	body		types.Score	true	"Completed score check"
 //	@Success		200		{object}	object
 //	@Failure		400		{object}	object
+//	@Failure		500		{object}	object
 //	@Router			/agent/completed-score [post]
 func AddScore(c *gin.Context) {
-	db := conn.Get(c)
+
+	// grab globals from gin context
+	cfg := config.Get(c)
+	db, err := conn.GetE(c)
+
+	// check for db errors, fail only if the db sink is enabled.
+	// if this fails `db` is safely null and will be ignored by AddScore.
+	if err != nil && cfg.Sinks.DBEnabled() {
+		resp := gin.H{
+			"message": "failed to get database connection from request context",
+			"error":   err,
+		}
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
 
 	// load score from request body
 	var score types.Score
-	err := json.NewDecoder(c.Request.Body).Decode(&score)
+	err = json.NewDecoder(c.Request.Body).Decode(&score)
 	if err != nil {
 		resp := gin.H{
 			"message": "couldn't marshall json from request body",
@@ -52,10 +68,9 @@ func AddScore(c *gin.Context) {
 		return
 	}
 
-	err = agent.AddScore(c.Request.Context(), db, score)
-	if err != nil {
+	if err := sinks.AddScore(c.Request.Context(), cfg.Sinks, db, score); err != nil {
 		resp := gin.H{
-			"message": "failed to add score to database",
+			"message": "failed to add score",
 			"error":   err,
 			"score":   score,
 		}

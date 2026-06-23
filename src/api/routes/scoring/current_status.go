@@ -9,8 +9,8 @@ import (
 	"net/http"
 
 	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/db/conn"
-	"github.com/HackUCF/quincy/api/db/scoring"
+	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
+	"github.com/HackUCF/quincy/api/sinks/postgres/scoring"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +23,7 @@ import (
 //	@Produce		json
 //	@Success		200	{array}		types.Score
 //	@Failure		400	{object}	object
+//	@Failure		501	{object}	object
 //	@Router			/scores/current [get]
 func GetRecentChecks(c *gin.Context) {
 	db := conn.Get(c)

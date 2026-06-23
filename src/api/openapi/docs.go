@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/agent/completed-score": {
             "post": {
-                "description": "Accepts a completed score check result from an agent and persists it to the database.",
+                "description": "Accepts a completed score check result from an agent and forwards it to all configured sinks. The timestamp field is assigned by the server on receipt and must not be included in the request body.",
                 "consumes": [
                     "application/json"
                 ],
@@ -51,6 +51,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -74,6 +80,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object"
                         }
@@ -123,6 +135,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -146,6 +164,12 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "type": "object"
                         }
@@ -175,6 +199,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -198,6 +228,12 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "type": "object"
                         }
@@ -230,6 +266,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -259,6 +301,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -277,11 +325,26 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "$ref": "#/definitions/types.ScoreResult"
+                                    }
+                                }
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "type": "object"
                         }
@@ -303,11 +366,23 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "$ref": "#/definitions/types.ScoreResult"
+                                }
+                            }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "type": "object"
                         }
@@ -340,6 +415,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -358,7 +439,16 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/types.User"
+                                    }
+                                }
+                            }
                         }
                     },
                     "400": {
@@ -410,6 +500,12 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
@@ -425,15 +521,15 @@ const docTemplate = `{
                         "$ref": "#/definitions/config.BoxSpec"
                     }
                 },
-                "db": {
-                    "$ref": "#/definitions/config.DBConfig"
-                },
                 "http": {
                     "$ref": "#/definitions/config.HTTPSpec"
                 },
                 "num_teams": {
                     "type": "integer",
                     "example": 5
+                },
+                "sinks": {
+                    "$ref": "#/definitions/config.Sinks"
                 },
                 "user_lists": {
                     "type": "array",
@@ -462,7 +558,71 @@ const docTemplate = `{
                 }
             }
         },
-        "config.DBConfig": {
+        "config.HTTPSpec": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string",
+                    "example": "127.0.0.1"
+                },
+                "port": {
+                    "type": "integer",
+                    "example": 8888
+                }
+            }
+        },
+        "config.OTelBatching": {
+            "type": "object",
+            "properties": {
+                "batch_size": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "export_interval": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "max_queue_size": {
+                    "type": "integer",
+                    "example": 200
+                }
+            }
+        },
+        "config.OTelConfig": {
+            "type": "object",
+            "properties": {
+                "basic_auth": {
+                    "type": "string",
+                    "example": "dXNlcjpwYXNz"
+                },
+                "batching": {
+                    "description": "Batching settings",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/config.OTelBatching"
+                        }
+                    ]
+                },
+                "endpoint": {
+                    "type": "string",
+                    "example": "http://localhost:4318"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "secret"
+                },
+                "stream_name": {
+                    "description": "OpenObserve specific header",
+                    "type": "string",
+                    "example": "quincy"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "admin"
+                }
+            }
+        },
+        "config.PGConfig": {
             "type": "object",
             "properties": {
                 "database": {
@@ -491,16 +651,14 @@ const docTemplate = `{
                 }
             }
         },
-        "config.HTTPSpec": {
+        "config.Sinks": {
             "type": "object",
             "properties": {
-                "host": {
-                    "type": "string",
-                    "example": "127.0.0.1"
+                "otel": {
+                    "$ref": "#/definitions/config.OTelConfig"
                 },
-                "port": {
-                    "type": "integer",
-                    "example": 8888
+                "postgres": {
+                    "$ref": "#/definitions/config.PGConfig"
                 }
             }
         },

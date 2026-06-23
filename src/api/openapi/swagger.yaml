@@ -6,13 +6,13 @@ definitions:
         items:
           $ref: '#/definitions/config.BoxSpec'
         type: array
-      db:
-        $ref: '#/definitions/config.DBConfig'
       http:
         $ref: '#/definitions/config.HTTPSpec'
       num_teams:
         example: 5
         type: integer
+      sinks:
+        $ref: '#/definitions/config.Sinks'
       user_lists:
         items:
           $ref: '#/definitions/config.UserListSpec'
@@ -31,7 +31,51 @@ definitions:
           $ref: '#/definitions/types.ServiceSpec'
         type: array
     type: object
-  config.DBConfig:
+  config.HTTPSpec:
+    properties:
+      host:
+        example: 127.0.0.1
+        type: string
+      port:
+        example: 8888
+        type: integer
+    type: object
+  config.OTelBatching:
+    properties:
+      batch_size:
+        example: 20
+        type: integer
+      export_interval:
+        example: 5
+        type: integer
+      max_queue_size:
+        example: 200
+        type: integer
+    type: object
+  config.OTelConfig:
+    properties:
+      basic_auth:
+        example: dXNlcjpwYXNz
+        type: string
+      batching:
+        allOf:
+        - $ref: '#/definitions/config.OTelBatching'
+        description: Batching settings
+      endpoint:
+        example: http://localhost:4318
+        type: string
+      password:
+        example: secret
+        type: string
+      stream_name:
+        description: OpenObserve specific header
+        example: quincy
+        type: string
+      username:
+        example: admin
+        type: string
+    type: object
+  config.PGConfig:
     properties:
       database:
         example: quincy
@@ -52,14 +96,12 @@ definitions:
         example: postgres
         type: string
     type: object
-  config.HTTPSpec:
+  config.Sinks:
     properties:
-      host:
-        example: 127.0.0.1
-        type: string
-      port:
-        example: 8888
-        type: integer
+      otel:
+        $ref: '#/definitions/config.OTelConfig'
+      postgres:
+        $ref: '#/definitions/config.PGConfig'
     type: object
   config.UserListSpec:
     properties:
@@ -215,8 +257,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Accepts a completed score check result from an agent and persists
-        it to the database.
+      description: Accepts a completed score check result from an agent and forwards
+        it to all configured sinks. The timestamp field is assigned by the server
+        on receipt and must not be included in the request body.
       parameters:
       - description: Completed score check
         in: body
@@ -235,6 +278,10 @@ paths:
           description: Bad Request
           schema:
             type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
       summary: Submit a completed score check
       tags:
       - agent
@@ -251,6 +298,10 @@ paths:
             $ref: '#/definitions/types.Service'
         "400":
           description: Bad Request
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
           schema:
             type: object
       summary: Get next check to run
@@ -285,6 +336,10 @@ paths:
           description: Internal Server Error
           schema:
             type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
       summary: Uptime heatmap
       tags:
       - graphs
@@ -301,6 +356,10 @@ paths:
             type: string
         "500":
           description: Internal Server Error
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
           schema:
             type: object
       summary: Scoreboard chart
@@ -321,6 +380,10 @@ paths:
           description: Internal Server Error
           schema:
             type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
       summary: Scores over time chart
       tags:
       - graphs
@@ -337,6 +400,10 @@ paths:
             type: string
         "500":
           description: Internal Server Error
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
           schema:
             type: object
       summary: Standings bar chart
@@ -359,6 +426,10 @@ paths:
           description: Bad Request
           schema:
             type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
       summary: Get cumulative scores per box
       tags:
       - scores
@@ -379,6 +450,10 @@ paths:
           description: Bad Request
           schema:
             type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
       summary: Get most recent check result per service per team
       tags:
       - scores
@@ -392,9 +467,19 @@ paths:
         "200":
           description: OK
           schema:
+            additionalProperties:
+              additionalProperties:
+                additionalProperties:
+                  $ref: '#/definitions/types.ScoreResult'
+                type: object
+              type: object
             type: object
         "400":
           description: Bad Request
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
           schema:
             type: object
       summary: Get fully detailed scores
@@ -410,9 +495,17 @@ paths:
         "200":
           description: OK
           schema:
+            additionalProperties:
+              additionalProperties:
+                $ref: '#/definitions/types.ScoreResult'
+              type: object
             type: object
         "400":
           description: Bad Request
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
           schema:
             type: object
       summary: Get cumulative scores per box per service
@@ -435,6 +528,10 @@ paths:
           description: Bad Request
           schema:
             type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
       summary: Get cumulative scores per team
       tags:
       - scores
@@ -448,6 +545,12 @@ paths:
         "200":
           description: OK
           schema:
+            additionalProperties:
+              additionalProperties:
+                items:
+                  $ref: '#/definitions/types.User'
+                type: array
+              type: object
             type: object
         "400":
           description: Bad Request
@@ -481,6 +584,10 @@ paths:
             type: object
         "500":
           description: Internal Server Error
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
           schema:
             type: object
       summary: Submit a password change request (PCR)

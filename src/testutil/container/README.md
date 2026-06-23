@@ -1,0 +1,5 @@
+# testutil/container
+
+A thin wrapper around testcontainers-go's generic container launcher, designed for integration tests that need to start arbitrary Docker containers. It is a sub-package of `testutil` rather than part of the parent package to avoid an import cycle: the parent `testutil` imports `api/routes`, which imports `api/sinks`, which imports the OpenTelemetry sink — and the OTel integration tests import this package. Keeping the container launcher in its own package breaks that cycle.
+
+The package exposes a single launcher that accepts a standard testcontainers request, wraps the container start in a `recover()` closure, and converts any failure — including panics from testcontainers when the Docker daemon is unreachable or the Ryuk reaper fails to initialize — into a `t.Skip` with a visible warning message. If the container starts successfully, termination is registered as a `t.Cleanup` so the caller never needs to manage lifecycle. This package is never compiled into production binaries.
