@@ -43,6 +43,7 @@ jobs:
       # LDFLAGS sets the version number in the binary at build time
       - name: build binaries
         run: |
+          export CGO_ENABLED=0
           LDFLAGS="-X github.com/HackUCF/quincy/cmd.Version=${{ steps.tag.outputs.tag }}"
           GOOS=linux   GOARCH=amd64 go build -C src -ldflags "$LDFLAGS" -o ../dist/quincy-linux-amd64 .
           # GOOS=linux   GOARCH=arm64 go build -C src -ldflags "$LDFLAGS" -o ../dist/quincy-linux-arm64 .
