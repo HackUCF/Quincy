@@ -21,7 +21,8 @@ func rootCmd() *cobra.Command {
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			viper.SetEnvPrefix("QU")
 			viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
-			viper.AutomaticEnv()
+			viper.AutomaticEnv()                             // loads environment variables over the config file (for secrets n stuff)
+			viper.SetOptions(viper.ExperimentalBindStruct()) // fixes that option's stupid behavior ^^
 			return nil
 		},
 	}
@@ -49,6 +50,9 @@ func rootCmd() *cobra.Command {
 }
 
 func Execute() {
+	// prevent a bug where some get skipped
+	cobra.EnableTraverseRunHooks = true
+
 	err := rootCmd().Execute()
 	if err != nil {
 		os.Exit(1)
