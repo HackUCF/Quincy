@@ -33,4 +33,5 @@ type PGConfig struct {
 	Password string `yaml:"password" mapstructure:"password" json:"password" example:"postgres"`
 	Database string `yaml:"database" mapstructure:"database" json:"database" example:"quincy"`
 	SSLMode  string `yaml:"ssl_mode" mapstructure:"ssl_mode" json:"ssl_mode" example:"prefer"`
+	MaxConns int32  `yaml:"max_conns" mapstructure:"max_conns" json:"max_conns" example:"10"`
 }
