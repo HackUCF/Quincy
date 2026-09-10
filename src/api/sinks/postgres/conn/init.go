@@ -80,20 +80,26 @@ func InitDBConnection(ctx context.Context, cfg *config.PGConfig) (*pgxpool.Pool,
 	}
 
 	// create connection
-	db, err = pgxpool.New(ctx, connString)
+	poolCfg, err := pgxpool.ParseConfig(connString)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse database connection config: %w", err)
+	}
+
+	// if the user specifies a max connection count, use it
+	if cfg.MaxConns > 0 {
+		poolCfg.MaxConns = cfg.MaxConns
+	}
+
+	db, err = pgxpool.NewWithConfig(ctx, poolCfg)
 	if err != nil {
 		return nil, fmt.Errorf("could not create database connection: %w", err)
 	}
-
-	// // not sure if these are necessary or correct
-	// db.SetMaxOpenConns(1)
-	// db.SetMaxIdleConns(1)
-	// db.SetConnMaxIdleTime(1 * time.Minute)
 
 	log.Info(
 		"database connection initialized",
 		"host", cfg.Host,
 		"username", cfg.Username,
+		"max_conns", poolCfg.MaxConns,
 	)
 
 	dbIsValid.Store(true)
