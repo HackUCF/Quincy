@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS scores (
   box       VARCHAR(16)  NOT NULL,
   team_num  INTEGER      NOT NULL,
   status    BOOLEAN      NOT NULL,
-  message   TEXT         NOT NULL,
+  stdout    TEXT         NOT NULL,
+  stderr    TEXT         NOT NULL,
   timestamp BIGINT       NOT NULL, -- unix microseconds as integer
   id        SERIAL       PRIMARY KEY
 );
@@ -22,7 +23,8 @@ CREATE TABLE IF NOT EXISTS recent_scores (
   box       VARCHAR(16) NOT NULL,
   team_num  INTEGER     NOT NULL,
   status    BOOLEAN     NOT NULL,
-  message   TEXT        NOT NULL,
+  stdout    TEXT        NOT NULL,
+  stderr    TEXT        NOT NULL,
   timestamp BIGINT      NOT NULL,
   PRIMARY KEY (team_num, service, box)
 );

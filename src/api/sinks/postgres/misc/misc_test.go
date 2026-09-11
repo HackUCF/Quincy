@@ -34,9 +34,9 @@ func TestMain(m *testing.M) {
 
 	// Seed two scores with distinct timestamps for GetCompDuration.
 	_, err = pool.Exec(ctx, `
-		INSERT INTO scores (service, box, team_num, status, message, timestamp)
-		VALUES ('http', 'testbox', 1, true, 'ok', 1000000000),
-		       ('http', 'testbox', 1, true, 'ok', 2000000000)
+		INSERT INTO scores (service, box, team_num, status, stdout, stderr, timestamp)
+		VALUES ('http', 'testbox', 1, true, 'ok', '', 1000000000),
+		       ('http', 'testbox', 1, true, 'ok', '', 2000000000)
 	`)
 	if err != nil {
 		panic(err)
@@ -92,7 +92,7 @@ func TestGetCompDuration_singleRow(t *testing.T) {
 	}
 
 	_, err = pool.Exec(ctx,
-		`INSERT INTO scores (service, box, team_num, status, message, timestamp) VALUES ($1,$2,$3,$4,$5,$6)`,
+		`INSERT INTO scores (service, box, team_num, status, stdout, stderr, timestamp) VALUES ($1,$2,$3,$4,$5,'',$6)`,
 		"http", "testbox", 1, true, "ok", time.Now().UnixMicro(),
 	)
 	if err != nil {

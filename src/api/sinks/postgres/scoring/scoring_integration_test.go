@@ -39,7 +39,7 @@ func TestMain(m *testing.M) {
 		BoxName:     "testbox",
 		TeamNum:     1,
 		Status:      true,
-		Message:     "ok",
+		Stdout:      "ok",
 	})
 
 	os.Exit(m.Run())
@@ -107,5 +107,42 @@ func TestGetTeamScores_team1HasPassedChecks(t *testing.T) {
 	}
 	if r.ChecksPassed == 0 {
 		t.Error("team 1 should have at least one passed check from seeded score")
+	}
+}
+
+func TestGetCurrentServiceStatus_returnsStdoutAndStderr(t *testing.T) {
+	ctx := context.Background()
+
+	if err := dbagent.AddScore(ctx, testPool, types.Score{
+		ServiceName: "ssh",
+		BoxName:     "testbox",
+		TeamNum:     2,
+		Status:      false,
+		Stdout:      "banner grabbed",
+		Stderr:      "auth failed",
+	}); err != nil {
+		t.Fatalf("AddScore: %v", err)
+	}
+
+	rows, err := scoring.GetCurrentServiceStatus(ctx, testPool, testCfg)
+	if err != nil {
+		t.Fatalf("GetCurrentServiceStatus: %v", err)
+	}
+
+	var found bool
+	for _, r := range rows {
+		if r.ServiceName != "ssh" || r.BoxName != "testbox" || r.TeamNum != 2 {
+			continue
+		}
+		found = true
+		if r.Stdout != "banner grabbed" {
+			t.Errorf("Stdout = %q, want %q", r.Stdout, "banner grabbed")
+		}
+		if r.Stderr != "auth failed" {
+			t.Errorf("Stderr = %q, want %q", r.Stderr, "auth failed")
+		}
+	}
+	if !found {
+		t.Error("no current status row for ssh/testbox/team 2")
 	}
 }

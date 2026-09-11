@@ -83,6 +83,9 @@ definitions:
       host:
         example: localhost
         type: string
+      max_conns:
+        example: 10
+        type: integer
       password:
         example: postgres
         type: string
@@ -133,17 +136,20 @@ definitions:
       box:
         example: scrapyard
         type: string
-      message:
-        example: |-
-          HTTP 200 OK
-          exit 0
-        type: string
       service:
         example: blog
         type: string
       status:
         example: true
         type: boolean
+      stderr:
+        example: something got past your bow :(
+        type: string
+      stdout:
+        example: |-
+          HTTP 200 OK
+          exit 0
+        type: string
       team_num:
         example: 1
         type: integer

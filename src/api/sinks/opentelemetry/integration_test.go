@@ -99,7 +99,8 @@ func TestIntegration_scoreReachesCollector(t *testing.T) {
 		ServiceName: "integration-svc",
 		TeamNum:     42,
 		Status:      true,
-		Message:     "integration test ok",
+		Stdout:      "integration test ok",
+		Stderr:      "integration test stderr",
 	}
 	if err := AddScore(ctx, score); err != nil {
 		t.Fatalf("AddScore: %v", err)
@@ -118,7 +119,7 @@ func TestIntegration_scoreReachesCollector(t *testing.T) {
 	io.Copy(&buf, logs)
 	output := buf.String()
 
-	for _, want := range []string{"integration-box", "integration-svc", "integration test ok"} {
+	for _, want := range []string{"integration-box", "integration-svc", "integration test ok", "integration test stderr"} {
 		if !strings.Contains(output, want) {
 			t.Errorf("collector logs missing %q\nfull output:\n%s", want, output)
 		}
@@ -149,7 +150,7 @@ func TestIntegration_failedCheckReachesCollector(t *testing.T) {
 		ServiceName: "fail-svc",
 		TeamNum:     7,
 		Status:      false,
-		Message:     "connection refused",
+		Stderr:      "connection refused",
 	}); err != nil {
 		t.Fatalf("AddScore: %v", err)
 	}

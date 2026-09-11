@@ -45,7 +45,8 @@ func TestAddScore_insertsToAllTables(t *testing.T) {
 		BoxName:     "testbox",
 		TeamNum:     1,
 		Status:      true,
-		Message:     "ok",
+		Stdout:      "ok",
+		Stderr:      "warn",
 	}
 	if err := dbagent.AddScore(ctx, testPool, score); err != nil {
 		t.Fatalf("AddScore: %v", err)
@@ -102,7 +103,8 @@ func TestAddScore_failDoesNotIncrementPassed(t *testing.T) {
 		BoxName:     "testbox",
 		TeamNum:     2,
 		Status:      false,
-		Message:     "timed out",
+		Stdout:      "",
+		Stderr:      "timed out",
 	}
 	if err := dbagent.AddScore(ctx, testPool, score); err != nil {
 		t.Fatalf("AddScore: %v", err)
@@ -139,5 +141,127 @@ func TestGetRandomUser_unknownList(t *testing.T) {
 	_, err := dbagent.GetRandomUser(ctx, testPool, "nonexistent", 1)
 	if err == nil {
 		t.Fatal("expected error for unknown user list, got nil")
+	}
+}
+
+func TestAddScore_persistsStdoutAndStderr(t *testing.T) {
+	ctx := context.Background()
+	score := types.Score{
+		ServiceName: "http",
+		BoxName:     "testbox",
+		TeamNum:     2,
+		Status:      true,
+		Stdout:      "HTTP 200 OK",
+		Stderr:      "cert nearly expired",
+	}
+	if err := dbagent.AddScore(ctx, testPool, score); err != nil {
+		t.Fatalf("AddScore: %v", err)
+	}
+
+	var stdout, stderr string
+	if err := testPool.QueryRow(ctx,
+		`SELECT stdout, stderr FROM scores
+		 WHERE service = $1 AND box = $2 AND team_num = $3
+		 ORDER BY id DESC LIMIT 1`,
+		"http", "testbox", 2,
+	).Scan(&stdout, &stderr); err != nil {
+		t.Fatalf("query scores: %v", err)
+	}
+	if stdout != "HTTP 200 OK" {
+		t.Errorf("scores.stdout = %q, want %q", stdout, "HTTP 200 OK")
+	}
+	if stderr != "cert nearly expired" {
+		t.Errorf("scores.stderr = %q, want %q", stderr, "cert nearly expired")
+	}
+
+	if err := testPool.QueryRow(ctx,
+		`SELECT stdout, stderr FROM recent_scores
+		 WHERE service = $1 AND box = $2 AND team_num = $3`,
+		"http", "testbox", 2,
+	).Scan(&stdout, &stderr); err != nil {
+		t.Fatalf("query recent_scores: %v", err)
+	}
+	if stdout != "HTTP 200 OK" {
+		t.Errorf("recent_scores.stdout = %q, want %q", stdout, "HTTP 200 OK")
+	}
+	if stderr != "cert nearly expired" {
+		t.Errorf("recent_scores.stderr = %q, want %q", stderr, "cert nearly expired")
+	}
+}
+
+func TestAddScore_upsertOverwritesStdoutAndStderr(t *testing.T) {
+	ctx := context.Background()
+	base := types.Score{ServiceName: "ssh", BoxName: "testbox", TeamNum: 1}
+
+	first := base
+	first.Status = true
+	first.Stdout = "first stdout"
+	first.Stderr = "first stderr"
+	if err := dbagent.AddScore(ctx, testPool, first); err != nil {
+		t.Fatalf("AddScore (first): %v", err)
+	}
+
+	second := base
+	second.Status = false
+	second.Stdout = "second stdout"
+	second.Stderr = "second stderr"
+	if err := dbagent.AddScore(ctx, testPool, second); err != nil {
+		t.Fatalf("AddScore (second): %v", err)
+	}
+
+	var stdout, stderr string
+	var status bool
+	if err := testPool.QueryRow(ctx,
+		`SELECT stdout, stderr, status FROM recent_scores
+		 WHERE service = $1 AND box = $2 AND team_num = $3`,
+		"ssh", "testbox", 1,
+	).Scan(&stdout, &stderr, &status); err != nil {
+		t.Fatalf("query recent_scores: %v", err)
+	}
+	if stdout != "second stdout" {
+		t.Errorf("stdout = %q, want %q", stdout, "second stdout")
+	}
+	if stderr != "second stderr" {
+		t.Errorf("stderr = %q, want %q", stderr, "second stderr")
+	}
+	if status {
+		t.Error("status should be false after upsert with a failing score")
+	}
+
+	// both checks must still be recorded in the append-only scores table
+	var count int
+	if err := testPool.QueryRow(ctx,
+		`SELECT COUNT(*) FROM scores WHERE service = $1 AND box = $2 AND team_num = $3`,
+		"ssh", "testbox", 1,
+	).Scan(&count); err != nil {
+		t.Fatalf("query scores: %v", err)
+	}
+	if count < 2 {
+		t.Errorf("scores rows = %d, want at least 2", count)
+	}
+}
+
+func TestAddScore_emptyStdoutAndStderr(t *testing.T) {
+	ctx := context.Background()
+	score := types.Score{
+		ServiceName: "ssh",
+		BoxName:     "testbox",
+		TeamNum:     2,
+		Status:      true,
+	}
+	if err := dbagent.AddScore(ctx, testPool, score); err != nil {
+		t.Fatalf("AddScore: %v", err)
+	}
+
+	var stdout, stderr string
+	if err := testPool.QueryRow(ctx,
+		`SELECT stdout, stderr FROM recent_scores
+		 WHERE service = $1 AND box = $2 AND team_num = $3`,
+		"ssh", "testbox", 2,
+	).Scan(&stdout, &stderr); err != nil {
+		t.Fatalf("query recent_scores: %v", err)
+	}
+	if stdout != "" || stderr != "" {
+		t.Errorf("stdout/stderr = %q/%q, want empty/empty", stdout, stderr)
 	}
 }

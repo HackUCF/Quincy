@@ -1,4 +1,0 @@
-========= check output =========
-%s
-======== error messages ========
-%s

@@ -181,7 +181,7 @@ Call DB functions directly with `testPool`. Verify by querying the DB again or b
 ```go
 func TestAddScore_insertsRow(t *testing.T) {
     ctx := context.Background()
-    score := types.Score{ServiceName: "http", BoxName: "testbox", TeamNum: 1, Status: true, Message: "ok"}
+    score := types.Score{ServiceName: "http", BoxName: "testbox", TeamNum: 1, Status: true, Stdout: "ok", Stderr: ""}
     if err := dbagent.AddScore(ctx, testPool, score); err != nil {
         t.Fatalf("AddScore: %v", err)
     }
