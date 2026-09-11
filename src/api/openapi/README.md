@@ -1,0 +1,7 @@
+# api/openapi
+
+The generated OpenAPI description of the API server's HTTP surface. Nothing in this package is written by hand — the entire contents are produced by swaggo from the annotation comments on the route handlers and the struct tags on the types those handlers accept and return. It exists so the specification can be embedded in the binary and served alongside the API itself, giving operators and agent authors a live, always-matching contract without a separate publishing step.
+
+The package holds the spec in three forms: a Go source file that registers the document with the swaggo runtime registry at import time, and standalone JSON and YAML copies of the same document for consumption by external tooling. The Go form carries the document as a template, with the title, version, host, and base path substituted at registration time from the values declared in the server's top-level annotations. Route handlers elsewhere in the server reference this registration to serve the interactive documentation UI.
+
+Because every file here is generated, changes are made by editing the annotations at the source and regenerating, never by editing this directory. Regeneration is required whenever a route is added or removed, a handler's parameters, responses, or descriptions change, or the JSON shape of a type crossing the API boundary changes — a stale spec here will silently misdescribe the server rather than fail to build.
