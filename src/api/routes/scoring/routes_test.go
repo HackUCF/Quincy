@@ -43,7 +43,7 @@ func TestMain(m *testing.M) {
 		BoxName:     "testbox",
 		TeamNum:     1,
 		Status:      true,
-		Message:     "ok",
+		Stdout:      "ok",
 	})
 
 	testRouter = testutil.NewTestRouter(pool, testCfg)

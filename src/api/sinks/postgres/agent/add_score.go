@@ -21,9 +21,9 @@ func AddScore(ctx context.Context, db *pgxpool.Pool, score types.Score) error {
 	defer tx.Rollback(ctx)
 
 	tag, err := tx.Exec(ctx, `
-		INSERT INTO scores (service, box, team_num, status, message, timestamp)
-		VALUES ($1, $2, $3, $4, $5, $6)
-	`, score.ServiceName, score.BoxName, score.TeamNum, score.Status, score.Message, ts)
+		INSERT INTO scores (service, box, team_num, status, stdout, stderr, timestamp)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`, score.ServiceName, score.BoxName, score.TeamNum, score.Status, score.Stdout, score.Stderr, ts)
 	if err != nil {
 		return fmt.Errorf("failed to insert into scores table: %w", err)
 	}
@@ -32,13 +32,14 @@ func AddScore(ctx context.Context, db *pgxpool.Pool, score types.Score) error {
 	}
 
 	tag, err = tx.Exec(ctx, `
-		INSERT INTO recent_scores (service, box, team_num, status, message, timestamp)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO recent_scores (service, box, team_num, status, stdout, stderr, timestamp)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		ON CONFLICT (team_num, service, box) DO UPDATE SET
 			status    = EXCLUDED.status,
-			message   = EXCLUDED.message,
+			stdout    = EXCLUDED.stdout,
+			stderr    = EXCLUDED.stderr,
 			timestamp = EXCLUDED.timestamp
-	`, score.ServiceName, score.BoxName, score.TeamNum, score.Status, score.Message, ts)
+	`, score.ServiceName, score.BoxName, score.TeamNum, score.Status, score.Stdout, score.Stderr, ts)
 	if err != nil {
 		return fmt.Errorf("failed to insert into recent_scores table: %w", err)
 	}

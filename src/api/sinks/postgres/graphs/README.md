@@ -1,4 +1,4 @@
-# db/graphs
+# api/sinks/postgres/graphs
 
 Database queries that produce data pre-formatted for chart rendering. Rather than returning raw rows, each query shapes its output into structures with pre-serialized label and data arrays ready to be dropped into Chart.js templates.
 

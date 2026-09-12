@@ -1,4 +1,4 @@
-# db/conn
+# api/sinks/postgres/conn
 
 Manages the PostgreSQL connection pool for the rest of the database layer. Builds a connection URL from the config, auto-creates the target database if it does not yet exist by briefly connecting to the default `postgres` database, then opens a pgxpool connection pool. The pool is used by all concurrent request handlers without contention.
 

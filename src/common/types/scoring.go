@@ -1,13 +1,14 @@
 package types
 
 // Score is the results of a completed score check.
-// It has a boolean pass/fail, and a string containing an output message.
+// It has a boolean pass/fail, and the stdout/stderr captured from the check.
 type Score struct {
 	TeamNum     TeamNum     `json:"team_num"  example:"1"`
 	Status      bool        `json:"status"    example:"true"`
 	BoxName     BoxName     `json:"box"       example:"scrapyard"`
 	ServiceName ServiceName `json:"service"   example:"blog"`
-	Message     string      `json:"message"   example:"HTTP 200 OK\nexit 0"`
+	Stdout      string      `json:"stdout"   example:"HTTP 200 OK\nexit 0"`
+	Stderr      string      `json:"stderr"   example:"something got past your bow :("`
 
 	// Timestamp is inserted by the api on submission.
 	// Does not need to added when building manually.

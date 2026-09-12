@@ -1,4 +1,4 @@
-# db/agent
+# api/sinks/postgres/agent
 
 Database functions used exclusively by the agent-facing API routes. Two operations are covered: submitting a completed check result, and pulling a random credential for a given team and userlist.
 

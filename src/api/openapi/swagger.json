@@ -626,6 +626,10 @@
                     "type": "string",
                     "example": "localhost"
                 },
+                "max_conns": {
+                    "type": "integer",
+                    "example": 10
+                },
                 "password": {
                     "type": "string",
                     "example": "postgres"
@@ -698,10 +702,6 @@
                     "type": "string",
                     "example": "scrapyard"
                 },
-                "message": {
-                    "type": "string",
-                    "example": "HTTP 200 OK\nexit 0"
-                },
                 "service": {
                     "type": "string",
                     "example": "blog"
@@ -709,6 +709,14 @@
                 "status": {
                     "type": "boolean",
                     "example": true
+                },
+                "stderr": {
+                    "type": "string",
+                    "example": "something got past your bow :("
+                },
+                "stdout": {
+                    "type": "string",
+                    "example": "HTTP 200 OK\nexit 0"
                 },
                 "team_num": {
                     "type": "integer",

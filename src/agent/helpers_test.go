@@ -68,7 +68,51 @@ func TestMakeScore_fields(t *testing.T) {
 	if score.Status != Pass {
 		t.Errorf("Status = %v, want Pass", score.Status)
 	}
-	if score.Message == "" {
-		t.Error("Message is empty")
+	if score.Stdout != "check output" {
+		t.Errorf("Stdout = %q, want %q", score.Stdout, "check output")
+	}
+	if score.Stderr != "" {
+		t.Errorf("Stderr = %q, want empty", score.Stderr)
+	}
+}
+
+func TestMakeScore_capturesStderr(t *testing.T) {
+	svc := &types.Service{
+		ServiceTemplate: types.ServiceTemplate{
+			ServiceSpec: types.ServiceSpec{Name: "ssh"},
+			BoxName:     "box2",
+			TeamNum:     1,
+		},
+	}
+	out := &scriptOutput{Status: Fail}
+	out.Stdout.WriteString("partial output")
+	out.Stderr.WriteString("connection refused")
+
+	score := makeScore(svc, out)
+
+	if score.Stdout != "partial output" {
+		t.Errorf("Stdout = %q, want %q", score.Stdout, "partial output")
+	}
+	if score.Stderr != "connection refused" {
+		t.Errorf("Stderr = %q, want %q", score.Stderr, "connection refused")
+	}
+}
+
+func TestMakeScore_emptyOutput(t *testing.T) {
+	svc := &types.Service{
+		ServiceTemplate: types.ServiceTemplate{
+			ServiceSpec: types.ServiceSpec{Name: "http"},
+			BoxName:     "box1",
+			TeamNum:     2,
+		},
+	}
+
+	score := makeScore(svc, &scriptOutput{Status: Pass})
+
+	if score.Stdout != "" {
+		t.Errorf("Stdout = %q, want empty", score.Stdout)
+	}
+	if score.Stderr != "" {
+		t.Errorf("Stderr = %q, want empty", score.Stderr)
 	}
 }

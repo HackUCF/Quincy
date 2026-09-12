@@ -72,7 +72,8 @@ func TestAddScore_OK(t *testing.T) {
 		BoxName:     "testbox",
 		TeamNum:     1,
 		Status:      true,
-		Message:     "test ok",
+		Stdout:      "test ok",
+		Stderr:      "test warn",
 	}
 	body, _ := json.Marshal(score)
 

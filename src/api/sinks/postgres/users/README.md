@@ -1,4 +1,4 @@
-# db/users
+# api/sinks/postgres/users
 
 Database queries for the scoring user credential table. This table is the source of truth for credentials during a competition — it is seeded from the config on startup but persists changes made via password change requests across restarts.
 

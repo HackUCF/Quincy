@@ -17,7 +17,7 @@ func GetCurrentServiceStatus(ctx context.Context, db *pgxpool.Pool, cfg *config.
 	status := make([]types.Score, 0, cap)
 
 	rows, err := db.Query(ctx, `
-    SELECT service, box, team_num, status, message, timestamp
+    SELECT service, box, team_num, status, stdout, stderr, timestamp
     FROM recent_scores
     ORDER BY team_num, box, service
   `)
@@ -28,7 +28,10 @@ func GetCurrentServiceStatus(ctx context.Context, db *pgxpool.Pool, cfg *config.
 
 	for rows.Next() {
 		var s types.Score
-		rows.Scan(&s.ServiceName, &s.BoxName, &s.TeamNum, &s.Status, &s.Message, &s.Timestamp)
+		if err := rows.Scan(&s.ServiceName, &s.BoxName, &s.TeamNum, &s.Status, &s.Stdout, &s.Stderr, &s.Timestamp); err != nil {
+			err = fmt.Errorf("failed to scan recent score row: %w", err)
+			return status, err
+		}
 		status = append(status, s)
 	}
 

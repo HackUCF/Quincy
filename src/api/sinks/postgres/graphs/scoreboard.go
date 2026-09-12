@@ -49,7 +49,7 @@ type ScoreboardData struct {
 func GetScoreboardData(ctx context.Context, db *pgxpool.Pool) (*ScoreboardData, error) {
 
 	rows, err := db.Query(ctx, `
-		SELECT service, box, team_num, status, timestamp, message
+		SELECT service, box, team_num, status, timestamp, stdout, stderr
     FROM recent_scores
     ORDER BY team_num, box, service
 	`)
@@ -66,7 +66,9 @@ func GetScoreboardData(ctx context.Context, db *pgxpool.Pool) (*ScoreboardData, 
 	for rows.Next() {
 		// scan the necessary scores out
 		var s types.Score
-		rows.Scan(&s.ServiceName, &s.BoxName, &s.TeamNum, &s.Status, &s.Timestamp, &s.Message)
+		if err := rows.Scan(&s.ServiceName, &s.BoxName, &s.TeamNum, &s.Status, &s.Timestamp, &s.Stdout, &s.Stderr); err != nil {
+			return nil, fmt.Errorf("failed to scan recent score row: %w", err)
+		}
 
 		// get x, y, and v
 		var point scoreboardPoint
@@ -78,7 +80,7 @@ func GetScoreboardData(ctx context.Context, db *pgxpool.Pool) (*ScoreboardData, 
 			point.V = 0
 		}
 		point.Timestamp = fmt.Sprintf("%d", s.Timestamp)
-		point.Message = s.Message
+		point.Message = s.Stdout + "\n\n\n" + s.Stderr
 
 		// add to labels if not there already
 		if !slices.Contains(data.XLabels, point.X) {

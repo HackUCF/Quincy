@@ -1,4 +1,4 @@
-# db
+# api/sinks/postgres
 
 The PostgreSQL database layer for the API server. Coordinates connection setup, schema execution, and initial data seeding through a single initializer called at startup. Uses a connection pool and runs all writes as explicit transactions.
 

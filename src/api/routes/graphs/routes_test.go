@@ -37,9 +37,9 @@ func TestMain(m *testing.M) {
 
 	// Seed scores with distinct timestamps — required for GetScores (GetCompDuration + bucket math).
 	_, err = pool.Exec(ctx, `
-		INSERT INTO scores (service, box, team_num, status, message, timestamp)
-		VALUES ('http', 'testbox', 1, true, 'ok', 1000000000),
-		       ('http', 'testbox', 1, true, 'ok', 2000000000)
+		INSERT INTO scores (service, box, team_num, status, stdout, stderr, timestamp)
+		VALUES ('http', 'testbox', 1, true, 'ok', '', 1000000000),
+		       ('http', 'testbox', 1, true, 'ok', '', 2000000000)
 	`)
 	if err != nil {
 		panic(err)
@@ -47,9 +47,9 @@ func TestMain(m *testing.M) {
 
 	// Seed recent_scores for scoreboard.
 	_, err = pool.Exec(ctx, `
-		INSERT INTO recent_scores (service, box, team_num, status, message, timestamp)
-		VALUES ('http', 'testbox', 1, true, 'pass', 1000000000),
-		       ('ssh',  'testbox', 1, false, 'fail', 2000000000)
+		INSERT INTO recent_scores (service, box, team_num, status, stdout, stderr, timestamp)
+		VALUES ('http', 'testbox', 1, true,  'pass', '',        1000000000),
+		       ('ssh',  'testbox', 1, false, '',     'failerr', 2000000000)
 	`)
 	if err != nil {
 		panic(err)

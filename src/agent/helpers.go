@@ -8,14 +8,7 @@ import (
 	"time"
 
 	"github.com/HackUCF/quincy/common/types"
-
-	_ "embed"
 )
-
-// a template passed as the message for a completed check.
-//
-//go:embed message_template.txt
-var messageTpl string
 
 // shared http client for requests to api
 var apiTransport = &http.Transport{
@@ -80,12 +73,8 @@ func makeScore(svc *types.Service, output *scriptOutput) *types.Score {
 	score.ServiceName = svc.Name
 	score.TeamNum = svc.TeamNum
 	score.Status = output.Status
-	score.Message = fmt.Sprintf(
-		messageTpl,
-		output.Stdout.String(),
-		output.Stderr.String(),
-	)
-
+	score.Stdout = output.Stdout.String()
+	score.Stderr = output.Stderr.String()
 	return score
 }
 
