@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/common/types"
 )
 
 func makeTestSvc(checkName string) *types.Service {

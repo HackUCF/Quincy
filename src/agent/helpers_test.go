@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/common/types"
 )
 
 func TestGetTimeout_serviceOverride(t *testing.T) {

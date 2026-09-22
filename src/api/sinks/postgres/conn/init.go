@@ -14,8 +14,8 @@ import (
 
 	_ "embed"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/common/log"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/common/log"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"

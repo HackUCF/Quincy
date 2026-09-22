@@ -8,9 +8,9 @@ package scoring
 import (
 	"net/http"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
-	"github.com/HackUCF/quincy/api/sinks/postgres/scoring"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/scoring"
 	"github.com/gin-gonic/gin"
 )
 

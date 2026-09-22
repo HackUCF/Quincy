@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/HackUCF/quincy/api"
-	"github.com/HackUCF/quincy/api/config"
+	"github.com/HackUCF/Quincy/src/api"
+	"github.com/HackUCF/Quincy/src/api/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

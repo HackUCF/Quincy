@@ -8,8 +8,8 @@ import (
 	"slices"
 	"time"
 
-	"github.com/HackUCF/quincy/api/sinks/postgres/misc"
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/misc"
+	"github.com/HackUCF/Quincy/src/common/types"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

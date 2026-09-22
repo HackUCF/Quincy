@@ -9,10 +9,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/services"
-	"github.com/HackUCF/quincy/common/types"
-	"github.com/HackUCF/quincy/testutil"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/services"
+	"github.com/HackUCF/Quincy/src/common/types"
+	"github.com/HackUCF/Quincy/src/testutil"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 )

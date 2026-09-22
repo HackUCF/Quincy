@@ -3,9 +3,9 @@ package graphs
 import (
 	"net/http"
 
-	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
-	"github.com/HackUCF/quincy/api/sinks/postgres/graphs"
-	"github.com/HackUCF/quincy/common/log"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/graphs"
+	"github.com/HackUCF/Quincy/src/common/log"
 	"github.com/gin-gonic/gin"
 )
 

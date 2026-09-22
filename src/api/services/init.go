@@ -7,11 +7,11 @@ Users are randomly pulled from the database when needed.
 package services
 
 import (
-	"math/rand/v2"
+	// "math/rand/v2"
 	"sync/atomic"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/common/types"
 )
 
 var (
@@ -40,10 +40,13 @@ func InitServices(cfg *config.APIConfigSpec) error {
 
 	servicesLen = uint64(len(services))
 
-	// shuffle the array
-	rand.Shuffle(len(services), func(i, j int) {
-		services[i], services[j] = services[j], services[i]
-	})
+	// commented out because this only makes the competition marginally more fair.
+	// it's much better for the experience to get all of your services checked close to each other.
+	// this lets you see if your fix is reflected in the entire network at once.
+	// // shuffle the array
+	// rand.Shuffle(len(services), func(i, j int) {
+	// 	services[i], services[j] = services[j], services[i]
+	// })
 
 	return nil
 }

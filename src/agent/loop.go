@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/HackUCF/quincy/common/log"
+	"github.com/HackUCF/Quincy/src/common/log"
 )
 
 func (cfg *AgentConfig) Loop() {
@@ -38,6 +38,12 @@ func (cfg *AgentConfig) Loop() {
 				"error", err,
 				"url", serviceURL,
 			)
+			continue
+		}
+
+		// loop again if comp paused
+		if svc.NoOp {
+			log.Info("competition paused, looping")
 			continue
 		}
 

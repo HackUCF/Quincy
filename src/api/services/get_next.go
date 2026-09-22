@@ -3,15 +3,22 @@ package services
 import (
 	"context"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/sinks"
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/sinks"
+	"github.com/HackUCF/Quincy/src/common/types"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // GetNext returns the next service in the queue.
 // This is a fully templated service, with check info, team number, and a username/password.
 func GetNext(ctx context.Context, cfg *config.APIConfigSpec, db *pgxpool.Pool) (types.Service, error) {
+
+	// return a no-op service if competition is paused
+	if isPaused.Load() {
+		return types.Service{
+			NoOp: true,
+		}, nil
+	}
 
 	// atomically read the next service
 	// this is so incredibly safe and fast i love it

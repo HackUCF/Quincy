@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/sinks/postgres/misc"
-	"github.com/HackUCF/quincy/testutil"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/misc"
+	"github.com/HackUCF/Quincy/src/testutil"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

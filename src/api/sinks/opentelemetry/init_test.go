@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/common/types"
 )
 
 // fastBatchCfg returns a base config pointing at endpoint with aggressive flush settings for tests.

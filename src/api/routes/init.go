@@ -8,15 +8,15 @@ Most Gin handler functions are located in subpackages.
 package routes
 
 import (
-	"github.com/HackUCF/quincy/api/config"
-	_ "github.com/HackUCF/quincy/api/openapi"
-	"github.com/HackUCF/quincy/api/routes/agent"
-	"github.com/HackUCF/quincy/api/routes/graphs"
-	"github.com/HackUCF/quincy/api/routes/misc"
-	"github.com/HackUCF/quincy/api/routes/scoring"
-	"github.com/HackUCF/quincy/api/routes/users"
-	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
-	"github.com/HackUCF/quincy/common/middleware"
+	"github.com/HackUCF/Quincy/src/api/config"
+	_ "github.com/HackUCF/Quincy/src/api/openapi"
+	"github.com/HackUCF/Quincy/src/api/routes/agent"
+	"github.com/HackUCF/Quincy/src/api/routes/graphs"
+	"github.com/HackUCF/Quincy/src/api/routes/misc"
+	"github.com/HackUCF/Quincy/src/api/routes/scoring"
+	"github.com/HackUCF/Quincy/src/api/routes/users"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
+	"github.com/HackUCF/Quincy/src/common/middleware"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -57,6 +57,8 @@ func RegisterRoutes(router *gin.Engine, s config.Sinks) {
 		}
 
 		v1.GET("/config", misc.GetConfig) // /api/v1/config
+		v1.POST("/pause", misc.Pause)     // /api/v1/pause
+		v1.POST("/unpause", misc.Unpause) // /api/v1/unpause
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

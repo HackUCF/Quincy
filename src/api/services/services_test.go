@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/common/types"
 )
 
 func minimalServicesConfig() *config.APIConfigSpec {

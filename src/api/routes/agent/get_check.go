@@ -3,9 +3,9 @@ package agent
 import (
 	"net/http"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/services"
-	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/services"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
 	"github.com/gin-gonic/gin"
 )
 

@@ -23,7 +23,7 @@ jobs:
       # install golang dependencies
       - uses: actions/setup-go@v5
         with:
-          go-version-file: src/go.mod
+          go-version-file: go.mod
           cache: false
 
       - name: test
@@ -38,17 +38,17 @@ jobs:
       #   linux-amd64
       #   linux-arm64    (disabled)
       #   darwin-amd64   (disabled)
-      #   darwin-arm64   (disabled)
+      #   darwin-arm64
       #   windows-amd64  (disabled)
       # LDFLAGS sets the version number in the binary at build time
       - name: build binaries
         run: |
           export CGO_ENABLED=0
-          LDFLAGS="-X github.com/HackUCF/quincy/cmd.Version=${{ steps.tag.outputs.tag }}"
+          LDFLAGS="-X github.com/HackUCF/Quincy/src/cmd.Version=${{ steps.tag.outputs.tag }}"
           GOOS=linux   GOARCH=amd64 go build -C src -ldflags "$LDFLAGS" -o ../dist/quincy-linux-amd64 .
           # GOOS=linux   GOARCH=arm64 go build -C src -ldflags "$LDFLAGS" -o ../dist/quincy-linux-arm64 .
           # GOOS=darwin  GOARCH=amd64 go build -C src -ldflags "$LDFLAGS" -o ../dist/quincy-darwin-amd64 .
-          # GOOS=darwin  GOARCH=arm64 go build -C src -ldflags "$LDFLAGS" -o ../dist/quincy-darwin-arm64 .
+          GOOS=darwin  GOARCH=arm64 go build -C src -ldflags "$LDFLAGS" -o ../dist/quincy-darwin-arm64 .
           # GOOS=windows GOARCH=amd64 go build -C src -ldflags "$LDFLAGS" -o ../dist/quincy-windows-amd64.exe .
 
       - name: create release
