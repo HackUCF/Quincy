@@ -8,10 +8,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
-	"github.com/HackUCF/quincy/api/sinks/postgres/users"
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/users"
+	"github.com/HackUCF/Quincy/src/common/types"
 	"github.com/gin-gonic/gin"
 )
 

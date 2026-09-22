@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/HackUCF/quincy/cmd"
+	"github.com/HackUCF/Quincy/src/cmd"
 
 	// automatically load .env files
 	_ "github.com/joho/godotenv/autoload"

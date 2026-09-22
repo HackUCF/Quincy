@@ -3,9 +3,9 @@ package services
 import (
 	"context"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/sinks"
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/sinks"
+	"github.com/HackUCF/Quincy/src/common/types"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

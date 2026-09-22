@@ -7,8 +7,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/common/log"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/common/log"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
 	otellog "go.opentelemetry.io/otel/log"

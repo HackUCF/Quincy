@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/common/types"
 )
 
 // shared http client for requests to api

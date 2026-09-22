@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/HackUCF/quincy/api/config"
+	"github.com/HackUCF/Quincy/src/api/config"
 	"github.com/spf13/viper"
 )
 

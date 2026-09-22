@@ -5,10 +5,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/sinks/postgres/users"
-	"github.com/HackUCF/quincy/common/types"
-	"github.com/HackUCF/quincy/testutil"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/users"
+	"github.com/HackUCF/Quincy/src/common/types"
+	"github.com/HackUCF/Quincy/src/testutil"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

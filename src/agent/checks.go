@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/common/types"
 )
 
 // dumpService creates a json file with the service information.

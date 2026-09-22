@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/HackUCF/quincy/common/log"
+	"github.com/HackUCF/Quincy/src/common/log"
 )
 
 func (cfg *AgentConfig) Loop() {

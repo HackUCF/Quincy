@@ -5,11 +5,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/HackUCF/quincy/api/config"
-	dbagent "github.com/HackUCF/quincy/api/sinks/postgres/agent"
-	"github.com/HackUCF/quincy/api/sinks/postgres/scoring"
-	"github.com/HackUCF/quincy/common/types"
-	"github.com/HackUCF/quincy/testutil"
+	"github.com/HackUCF/Quincy/src/api/config"
+	dbagent "github.com/HackUCF/Quincy/src/api/sinks/postgres/agent"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/scoring"
+	"github.com/HackUCF/Quincy/src/common/types"
+	"github.com/HackUCF/Quincy/src/testutil"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

@@ -10,8 +10,8 @@ import (
 	// "math/rand/v2"
 	"sync/atomic"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/common/types"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/common/types"
 )
 
 var (

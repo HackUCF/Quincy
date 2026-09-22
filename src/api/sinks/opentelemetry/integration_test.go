@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/common/types"
-	testcontainer "github.com/HackUCF/quincy/testutil/container"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/common/types"
+	testcontainer "github.com/HackUCF/Quincy/src/testutil/container"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )

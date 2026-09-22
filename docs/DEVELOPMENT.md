@@ -66,7 +66,7 @@ air -c agent.air.toml
 
 ## Project Layout
 
-The project is a Go module (`github.com/HackUCF/Quincy`) rooted at `src/`, with a single entry point and four top-level packages:
+The project is a Go module (`github.com/HackUCF/Quincy`) rooted at the repo root, with all Go code under `src/` (so packages import as `github.com/HackUCF/Quincy/src/...`), with a single entry point and four top-level packages:
 
 ### `src/cmd/`
 

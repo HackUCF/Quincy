@@ -1,10 +1,10 @@
 package testutil
 
 import (
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/routes"
-	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
-	"github.com/HackUCF/quincy/common/middleware"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/routes"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
+	"github.com/HackUCF/Quincy/src/common/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 )

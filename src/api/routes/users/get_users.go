@@ -3,8 +3,8 @@ package users
 import (
 	"net/http"
 
-	"github.com/HackUCF/quincy/api/sinks/postgres/conn"
-	"github.com/HackUCF/quincy/api/sinks/postgres/users"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/users"
 	"github.com/gin-gonic/gin"
 )
 

@@ -3,7 +3,7 @@ package middleware
 import (
 	"runtime/debug"
 
-	"github.com/HackUCF/quincy/common/log"
+	"github.com/HackUCF/Quincy/src/common/log"
 	"github.com/gin-gonic/gin"
 )
 

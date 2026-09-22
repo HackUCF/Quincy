@@ -3,7 +3,7 @@ package misc
 import (
 	"net/http"
 
-	"github.com/HackUCF/quincy/api/services"
+	"github.com/HackUCF/Quincy/src/api/services"
 	"github.com/gin-gonic/gin"
 )
 

@@ -13,10 +13,10 @@ package api
 import (
 	"fmt"
 
-	"github.com/HackUCF/quincy/api/config"
-	"github.com/HackUCF/quincy/api/routes"
-	"github.com/HackUCF/quincy/api/services"
-	"github.com/HackUCF/quincy/api/sinks"
+	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/routes"
+	"github.com/HackUCF/Quincy/src/api/services"
+	"github.com/HackUCF/Quincy/src/api/sinks"
 )
 
 // Start is the entry point for the API server.
