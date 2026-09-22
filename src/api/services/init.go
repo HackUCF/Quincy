@@ -7,7 +7,7 @@ Users are randomly pulled from the database when needed.
 package services
 
 import (
-	"math/rand/v2"
+	// "math/rand/v2"
 	"sync/atomic"
 
 	"github.com/HackUCF/quincy/api/config"
@@ -40,10 +40,12 @@ func InitServices(cfg *config.APIConfigSpec) error {
 
 	servicesLen = uint64(len(services))
 
-	// shuffle the array
-	rand.Shuffle(len(services), func(i, j int) {
-		services[i], services[j] = services[j], services[i]
-	})
+	// commented out because this doesn't really make the competition feel more fair at all.
+	// its better for a team to get all their services checked close to each other.
+	// // shuffle the array
+	// rand.Shuffle(len(services), func(i, j int) {
+	// 	services[i], services[j] = services[j], services[i]
+	// })
 
 	return nil
 }

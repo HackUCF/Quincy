@@ -13,6 +13,13 @@ import (
 // This is a fully templated service, with check info, team number, and a username/password.
 func GetNext(ctx context.Context, cfg *config.APIConfigSpec, db *pgxpool.Pool) (types.Service, error) {
 
+	// return a no-op service if competition is paused
+	if isPaused.Load() {
+		return types.Service{
+			NoOp: true,
+		}, nil
+	}
+
 	// atomically read the next service
 	// this is so incredibly safe and fast i love it
 	idx := (servicesIdx.Add(1) - 1) % servicesLen

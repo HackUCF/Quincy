@@ -57,6 +57,8 @@ func RegisterRoutes(router *gin.Engine, s config.Sinks) {
 		}
 
 		v1.GET("/config", misc.GetConfig) // /api/v1/config
+		v1.POST("/pause", misc.Pause)     // /api/v1/pause
+		v1.POST("/unpause", misc.Unpause) // /api/v1/unpause
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
