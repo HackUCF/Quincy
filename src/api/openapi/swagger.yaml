@@ -189,6 +189,9 @@ definitions:
       name:
         example: blog
         type: string
+      no_op:
+        example: false
+        type: boolean
       team_num:
         example: 1
         type: integer
@@ -415,6 +418,27 @@ paths:
       summary: Standings bar chart
       tags:
       - graphs
+  /pause:
+    post:
+      description: Halts scoring for planned interruptions such as a lunch break.
+        While paused, agents requesting a check receive a no-op assignment instead,
+        so no checks run and no scores are recorded. Returns 418 if the competition
+        is already paused. The pause state is held in memory and does not survive
+        an API server restart.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "418":
+          description: I'm a teapot
+          schema:
+            type: object
+      summary: Pause the competition
+      tags:
+      - misc
   /scores/box:
     get:
       description: Returns pass/fail check stats aggregated across all teams and services,
@@ -541,6 +565,25 @@ paths:
       summary: Get cumulative scores per team
       tags:
       - scores
+  /unpause:
+    post:
+      description: Resumes scoring after a pause. Agents begin receiving real checks
+        again from wherever the queue left off. Returns 418 if the competition is
+        not currently paused.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "418":
+          description: I'm a teapot
+          schema:
+            type: object
+      summary: Resume the competition
+      tags:
+      - misc
   /users:
     get:
       description: 'Returns every user in every userlist for every team, including

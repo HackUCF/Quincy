@@ -40,8 +40,9 @@ func InitServices(cfg *config.APIConfigSpec) error {
 
 	servicesLen = uint64(len(services))
 
-	// commented out because this doesn't really make the competition feel more fair at all.
-	// its better for a team to get all their services checked close to each other.
+	// commented out because this only makes the competition marginally more fair.
+	// it's much better for the experience to get all of your services checked close to each other.
+	// this lets you see if your fix is reflected in the entire network at once.
 	// // shuffle the array
 	// rand.Shuffle(len(services), func(i, j int) {
 	// 	services[i], services[j] = services[j], services[i]

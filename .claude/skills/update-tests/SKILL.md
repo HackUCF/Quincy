@@ -12,27 +12,48 @@ You are writing or updating tests for the Quincy scoring engine. The test harnes
 src/
   testutil/              -- shared infrastructure for DB-backed tests
     db.go                -- NewTestDB(): spins up postgres:18.4 via testcontainers-go, applies schema
+                            SkipDBTests(): emits a SKIP record and exits 0 when Docker is unavailable
     fixtures.go          -- MinimalConfig(), SetupConfig(), SeedUsers(), SeedScoring()
     helpers.go           -- NewTestRouter(): Gin engine with DB+config injected, all routes registered
+    container/           -- RunContainer(): generic testcontainers launcher for non-Postgres containers.
+                            Separate package to avoid an import cycle with the OTel sink.
 
+  cmd/
+    config_env_test.go   -- unit, package cmd (white-box)
+  agent/
+    checks_test.go       -- unit, package agent (white-box, uses stub scripts on PATH)
+    helpers_test.go      -- unit, package agent (white-box)
+  common/middleware/
+    middleware_test.go   -- unit, package middleware (white-box)
   api/config/
     validation_test.go   -- unit, package config (white-box)
+    sinks_test.go        -- unit, package config (white-box)
   api/services/
     services_test.go     -- unit, package services (white-box, uses resetForTest)
-  api/db/scoring/
+  api/sinks/opentelemetry/
+    init_test.go         -- unit, package opentelemetry (white-box)
+    integration_test.go  -- container-backed, package opentelemetry (uses testutil/container)
+  api/sinks/postgres/scoring/
     scoring_test.go      -- unit, package scoring (white-box, tests round/getResult)
     scoring_integration_test.go -- DB-backed, package scoring_test
-  api/db/agent/
+  api/sinks/postgres/agent/
     agent_test.go        -- DB-backed, package agent_test
-  api/db/users/
+  api/sinks/postgres/users/
     users_test.go        -- DB-backed, package users_test
+  api/sinks/postgres/graphs/
+    graphs_test.go       -- DB-backed, package graphs_test
+  api/sinks/postgres/misc/
+    misc_test.go         -- DB-backed, package misc_test
   api/routes/agent/
     routes_test.go       -- DB-backed, package agent_test
   api/routes/scoring/
     routes_test.go       -- DB-backed, package scoring_test
-  agent/
-    checks_test.go       -- unit, package agent (white-box, uses stub scripts on PATH)
-    helpers_test.go      -- unit, package agent (white-box)
+  api/routes/graphs/
+    routes_test.go       -- DB-backed, package graphs_test
+  api/routes/users/
+    routes_test.go       -- DB-backed, package users_test
+  api/routes/misc/
+    routes_test.go       -- DB-backed, package misc_test
 ```
 
 ## Rule 1: Unit vs DB-backed
@@ -44,18 +65,20 @@ src/
 - Anything where you can pass `nil` for the DB pool safely
 
 **DB-backed** — needs Docker, also runs with `go test ./...` (testcontainers spins up Postgres automatically):
-- Anything that executes SQL (all `api/db/` query functions)
+- Anything that executes SQL (all `api/sinks/postgres/` query functions)
 - HTTP route handlers (via `httptest` + `NewTestRouter`)
 - Anything that calls `testutil.NewTestDB`
 
 **Deciding:** if the code under test touches `*pgxpool.Pool` in a real way, it's DB-backed. If you can stub the DB or avoid it entirely, it's unit.
 
-No build tags. All tests — unit and DB-backed — run with a single `go test ./...` from `src/`. Testcontainers handles Postgres container lifecycle automatically. Requires Docker to be available; set `DOCKER_HOST` if using a non-standard socket.
+No build tags. All tests — unit and DB-backed — run with a single `go test ./...` from `src/`. Testcontainers handles container lifecycle automatically. Requires Docker to be available; set `DOCKER_HOST` if using a non-standard socket. When Docker is missing, DB-backed packages skip rather than fail.
+
+**Container-backed (non-Postgres)** — a test that needs some other container (the OTel sink's collector, for example) uses `testutil/container.RunContainer` instead of `NewTestDB`. It lives in its own package so sink packages can import it without an import cycle.
 
 ## Rule 2: Package Naming
 
-- **White-box** (`package foo`): use when testing unexported functions. Required for `api/config`, `api/services`, `api/db/scoring` (unit), `agent`.
-- **Black-box** (`package foo_test`): use for DB-backed tests and any test that only needs exported APIs. Required for all `api/db/*/` DB-backed tests, all `api/routes/*/` tests.
+- **White-box** (`package foo`): use when testing unexported functions. Required for `api/config`, `api/services`, `api/sinks/postgres/scoring` (unit), `api/sinks/opentelemetry`, `agent`, `cmd`, `common/middleware`.
+- **Black-box** (`package foo_test`): use for DB-backed tests and any test that only needs exported APIs. Required for all `api/sinks/postgres/*/` DB-backed tests, all `api/routes/*/` tests.
 
 Never use `package foo` for DB-backed tests — the `testutil` import would create coupling that makes package-level state harder to reason about.
 
@@ -76,7 +99,7 @@ func TestMain(m *testing.M) {
 
     pool, cleanup, err := testutil.NewTestDB(ctx)
     if err != nil {
-        panic(err)
+        testutil.SkipDBTests(err) // emits a SKIP record and exits 0 — never panic on a missing Docker
     }
     defer cleanup()
 
@@ -147,6 +170,8 @@ func TestSomething(t *testing.T) {
 }
 ```
 
+The competition pause flag is a separate package-level global that `resetForTest` does **not** clear. Any test that pauses must restore the running state itself — `t.Cleanup(Unpause)` — or every later test in the package gets no-op checks instead of real ones.
+
 Also set `config.TeamRange` directly — never call `config.SetConfig` in tests (it panics on second call):
 
 ```go
@@ -199,7 +224,7 @@ Seed data lives in the `final_scores` and `scoring_users` tables after `TestMain
 
 1. **The function/handler under test** — actual signatures, return types, error paths
 2. **`src/testutil/`** — what helpers already exist; don't duplicate
-3. **`src/api/db/schema.sql`** — table shapes for direct SQL assertions
+3. **`src/api/sinks/postgres/schema.sql`** — table shapes for direct SQL assertions
 4. **Existing test files in the same package** — match their style and `TestMain` if one exists
 
 ## Running Tests
@@ -208,10 +233,10 @@ From `src/`:
 ```bash
 go test ./...                          # all tests
 go test -count=1 -race ./...           # with race detector (recommended)
-go test -run TestFoo ./api/db/agent/   # single package, single test
+go test -run TestFoo ./api/sinks/postgres/agent/   # single package, single test
 ```
 
-DB-backed tests require Docker. If using a non-standard socket (e.g. Colima, Podman), set `DOCKER_HOST` before running:
+DB-backed tests require Docker. When Docker is unavailable, `TestMain` calls `testutil.SkipDBTests`, which prints a SKIP record and exits 0 — the suite must never fail for that reason. If using a non-standard socket (e.g. Colima, Podman), set `DOCKER_HOST` before running:
 ```bash
 DOCKER_HOST=unix:///path/to/docker.sock go test ./...
 ```
@@ -226,6 +251,7 @@ Only update `testutil/` if:
 - A new table is added to the schema and needs seeding
 - A new shared router setup pattern is needed for a new route group
 - `MinimalConfig` is structurally wrong for an entire category of tests
+- A new category of test needs a container type that `testutil/container` cannot already launch
 
 Do NOT modify `testutil/` just to handle one test's special case — construct what you need inline in that test's `TestMain`.
 

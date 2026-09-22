@@ -241,6 +241,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/pause": {
+            "post": {
+                "description": "Halts scoring for planned interruptions such as a lunch break. While paused, agents requesting a check receive a no-op assignment instead, so no checks run and no scores are recorded. Returns 418 if the competition is already paused. The pause state is held in memory and does not survive an API server restart.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "misc"
+                ],
+                "summary": "Pause the competition",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "/scores/box": {
             "get": {
                 "description": "Returns pass/fail check stats aggregated across all teams and services, keyed by box name.",
@@ -418,6 +444,32 @@ const docTemplate = `{
                     },
                     "501": {
                         "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/unpause": {
+            "post": {
+                "description": "Resumes scoring after a pause. Agents begin receiving real checks again from wherever the queue left off. Returns 418 if the competition is not currently paused.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "misc"
+                ],
+                "summary": "Resume the competition",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
                         "schema": {
                             "type": "object"
                         }
@@ -775,6 +827,10 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "blog"
+                },
+                "no_op": {
+                    "type": "boolean",
+                    "example": false
                 },
                 "team_num": {
                     "type": "integer",

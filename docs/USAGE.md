@@ -250,3 +250,14 @@ During a competition, teams may change passwords on their machines. Quincy track
 - `POST /api/v1/users` -- Submit a password change for a specific user and team.
 
 Updated passwords are stored in the database and persist across restarts.
+
+## Pausing the Competition
+
+Scoring can be halted temporarily -- for a lunch break, an infrastructure problem, or anything else that should not count against teams.
+
+- `POST /api/v1/pause` -- Stop handing out checks to agents.
+- `POST /api/v1/unpause` -- Resume normal scoring.
+
+While paused, agents keep polling but receive a no-op instead of a check, so nothing is run and no results are recorded. No team loses uptime for the duration. Pausing when already paused, or unpausing when already running, returns `418 I'm a Teapot` and changes nothing.
+
+The pause state lives in memory only -- restarting the API server resumes scoring.
