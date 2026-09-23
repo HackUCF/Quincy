@@ -18,14 +18,16 @@ The API server reads a YAML config file on startup. By default it looks for `con
 
 ```yaml
 num_teams: 5
+start_paused: false
 
-db:
-  host: localhost
-  port: 5432
-  username: postgres
-  password: postgres
-  database: quincy
-  ssl_mode: prefer
+sinks:
+  postgres:
+    host: localhost
+    port: 5432
+    username: postgres
+    password: postgres
+    database: quincy
+    ssl_mode: prefer
 
 user_lists:
   - name: local
@@ -54,6 +56,22 @@ num_teams: 5
 ```
 
 Quincy assumes every team has an identical set of servers and services. The `{}` placeholder in host addresses and domain names gets replaced with the team number (1 through `num_teams`).
+
+### Starting Paused
+
+Control whether the competition is already running when the API server boots:
+
+```yaml
+start_paused: false            # true = hand out no-ops until unpaused
+```
+
+With `start_paused: true`, agents connect and poll as normal but receive no-ops until someone calls the unpause endpoint, so you can bring the whole stack up before scoring begins:
+
+```bash
+curl -X POST http://127.0.0.1:8888/api/v1/unpause
+```
+
+Because this is read from the config on every boot, it also decides what happens after a restart -- see [Pausing the Competition](#pausing-the-competition).
 
 ### Boxes (Servers)
 
@@ -103,6 +121,43 @@ http:
 
 Use `0.0.0.0` as the host to accept connections from other machines.
 
+### Sinks (Storage Backends)
+
+Sinks are where Quincy sends results. Both are optional and enabled by the presence of their block under `sinks`:
+
+```yaml
+sinks:
+  postgres:
+    host: localhost
+    port: 5432
+    username: postgres
+    password: postgres
+    database: quincy
+    ssl_mode: prefer
+    max_conns: 10                # Optional -- connection pool size
+
+  otel:
+    endpoint: http://localhost:4318
+    stream_name: quincy          # Optional -- OpenObserve stream routing header
+    username: admin              # Optional -- HTTP Basic auth
+    password: secret
+    batching:                    # All optional
+      batch_size: 20
+      export_interval: 5         # Seconds
+      max_queue_size: 200
+```
+
+The `postgres` sink stores scores and password changes. Without it, every endpoint that needs the database returns `501 Not Implemented` -- scoring still runs, but nothing is persisted and the scores and graphs endpoints stop working.
+
+The `otel` sink ships each score result to an OTLP-compatible backend as a batched log record. Instead of `username` and `password` you can supply a pre-encoded `basic_auth` credential string. Omitted batching fields fall back to the defaults shown above.
+
+Any field can be overridden by an environment variable named `QU_` plus the field path in upper case with dots replaced by underscores, which is the usual way to keep secrets out of the config file:
+
+```bash
+export QU_SINKS_POSTGRES_PASSWORD=hunter2
+export QU_SINKS_OTEL_BASIC_AUTH=dXNlcjpwYXNz
+```
+
 ### Config Rules
 
 - Box names must be unique. Service names must be unique within their box. Userlist names must be unique.
@@ -125,7 +180,7 @@ The binary can be run from any directory -- it reads `config.yaml` from the curr
 ./quincy api start --config /path/to/my-config.yaml
 ```
 
-The API server connects to PostgreSQL using the `db` block in the config. The target database is created automatically on the first run if it does not already exist.
+The API server connects to PostgreSQL using the `sinks.postgres` block in the config. The target database is created automatically on the first run if it does not already exist.
 
 To generate a default config file:
 
@@ -257,7 +312,8 @@ Scoring can be halted temporarily -- for a lunch break, an infrastructure proble
 
 - `POST /api/v1/pause` -- Stop handing out checks to agents.
 - `POST /api/v1/unpause` -- Resume normal scoring.
+- `GET /api/v1/pause-status` -- Report whether scoring is paused, and since when.
 
 While paused, agents keep polling but receive a no-op instead of a check, so nothing is run and no results are recorded. No team loses uptime for the duration. Pausing when already paused, or unpausing when already running, returns `418 I'm a Teapot` and changes nothing.
 
-The pause state lives in memory only -- restarting the API server resumes scoring.
+The pause state lives in memory only. Restarting the API server discards it and falls back to the `start_paused` setting in the config -- see [Starting Paused](#starting-paused).

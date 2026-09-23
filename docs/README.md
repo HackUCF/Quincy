@@ -7,7 +7,7 @@ Quincy is a cybersecurity competition scoring engine. Start with the [project ov
 Running a competition: writing the config, starting the server and agents, and reading scores.
 
 - [Overview](USAGE.md#overview)
-- [Configuration](USAGE.md#configuration) -- [minimal example](USAGE.md#minimal-example), [teams](USAGE.md#teams), [boxes](USAGE.md#boxes-servers), [user lists](USAGE.md#user-lists), [HTTP settings](USAGE.md#http-settings), [config rules](USAGE.md#config-rules)
+- [Configuration](USAGE.md#configuration) -- [minimal example](USAGE.md#minimal-example), [teams](USAGE.md#teams), [starting paused](USAGE.md#starting-paused), [boxes](USAGE.md#boxes-servers), [user lists](USAGE.md#user-lists), [HTTP settings](USAGE.md#http-settings), [sinks](USAGE.md#sinks-storage-backends), [config rules](USAGE.md#config-rules)
 - [Starting the API Server](USAGE.md#starting-the-api-server) -- [settings](USAGE.md#api-server-settings)
 - [Starting the Agent](USAGE.md#starting-the-agent) -- [settings](USAGE.md#agent-settings)
 - [Check Scripts](USAGE.md#check-scripts) -- [how they work](USAGE.md#how-they-work), [writing a new script](USAGE.md#writing-a-new-script)

@@ -236,7 +236,7 @@
         },
         "/pause": {
             "post": {
-                "description": "Halts scoring for planned interruptions such as a lunch break. While paused, agents requesting a check receive a no-op assignment instead, so no checks run and no scores are recorded. Returns 418 if the competition is already paused. The pause state is held in memory and does not survive an API server restart.",
+                "description": "Halts scoring for planned interruptions such as a lunch break. While paused, agents requesting a check receive a no-op assignment instead, so no checks run and no scores are recorded. Returns 418 if the competition is already paused. The pause state is held in memory: an API server restart discards it and falls back to the start_paused setting in the config.",
                 "produces": [
                     "application/json"
                 ],
@@ -253,6 +253,26 @@
                     },
                     "418": {
                         "description": "I'm a teapot",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/pause-status": {
+            "get": {
+                "description": "Reports whether the competition is currently paused and when it entered that state. Returns an object with two fields: `is_paused` (bool) and `since` (RFC 3339 timestamp). The timestamp is the moment of the last pause or unpause, or the time the API server started if the state has not changed since boot.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "misc"
+                ],
+                "summary": "Get the competition pause status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "object"
                         }
@@ -575,6 +595,10 @@
                 },
                 "sinks": {
                     "$ref": "#/definitions/config.Sinks"
+                },
+                "start_paused": {
+                    "type": "boolean",
+                    "example": false
                 },
                 "user_lists": {
                     "type": "array",
