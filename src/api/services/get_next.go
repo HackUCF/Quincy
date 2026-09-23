@@ -14,10 +14,8 @@ import (
 func GetNext(ctx context.Context, cfg *config.APIConfigSpec, db *pgxpool.Pool) (types.Service, error) {
 
 	// return a no-op service if competition is paused
-	if isPaused.Load() {
-		return types.Service{
-			NoOp: true,
-		}, nil
+	if pauseState.Load().paused {
+		return types.Service{NoOp: true}, nil
 	}
 
 	// atomically read the next service

@@ -9,6 +9,7 @@ package services
 import (
 	// "math/rand/v2"
 	"sync/atomic"
+	"time"
 
 	"github.com/HackUCF/Quincy/src/api/config"
 	"github.com/HackUCF/Quincy/src/common/types"
@@ -22,6 +23,12 @@ var (
 
 // InitServices reads the config and generates a list containing every service for every team.
 func InitServices(cfg *config.APIConfigSpec) error {
+
+	// set up quincy pause state
+	pauseState.Store(&pauseStateType{
+		paused: cfg.StartPaused,
+		since:  time.Now(),
+	})
 
 	// loop through every box, its checks, for every team
 	for _, box := range cfg.Boxes {

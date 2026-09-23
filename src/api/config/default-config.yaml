@@ -2,7 +2,18 @@
 # the number of teams playing in this event
 num_teams: 5
 
-# postgres settings
+# whether to start checking services on boot
+#   otherwise requires curl -X POST http://host/api/v1/unpause
+start_paused: true
+
+# http server settings
+http:
+  host: 127.0.0.1
+  port: 8888
+
+# sinks are storage backends for quincy
+# postgres is required for some functionality
+# available options are postgres, prometheus, and otel
 sinks:
   postgres:
     host: localhost
@@ -70,8 +81,3 @@ boxes:
         check: 0percent.py
         user_list: complex domain # optional userlist name
         timeout: 30 # can be very long or very short
-
-# http server settings
-http:
-  host: 127.0.0.1
-  port: 8888

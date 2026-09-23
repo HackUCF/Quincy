@@ -18,12 +18,12 @@ import (
 //	@Router			/pause [post]
 func Pause(c *gin.Context) {
 
-	if services.IsPaused() {
+	changed := services.Pause()
+
+	if !changed {
 		c.AbortWithStatusJSON(http.StatusTeapot, gin.H{"message": "quincy already paused"})
 		return
 	}
-
-	services.Pause()
 
 	c.JSON(http.StatusOK, gin.H{"message": "quincy paused"})
 }
@@ -39,12 +39,18 @@ func Pause(c *gin.Context) {
 //	@Router			/unpause [post]
 func Unpause(c *gin.Context) {
 
-	if !services.IsPaused() {
+	changed := services.Unpause()
+
+	if !changed {
 		c.AbortWithStatusJSON(http.StatusTeapot, gin.H{"message": "quincy already unpaused"})
 		return
 	}
 
-	services.Unpause()
-
 	c.JSON(http.StatusOK, gin.H{"message": "quincy unpaused"})
+}
+
+func PauseStatus(c *gin.Context) {
+
+	isPaused, since := services.PauseStatus()
+	c.JSON(http.StatusOK, gin.H{"is_paused": isPaused, "since": since})
 }
