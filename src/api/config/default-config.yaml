@@ -4,7 +4,7 @@ num_teams: 5
 
 # whether to start checking services on boot
 #   otherwise requires curl -X POST http://host/api/v1/unpause
-start_paused: true
+start_paused: false
 
 # http server settings
 http:
