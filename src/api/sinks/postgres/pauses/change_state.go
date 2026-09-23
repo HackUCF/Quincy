@@ -20,6 +20,13 @@ func ChangePauseState(ctx context.Context, db *pgxpool.Pool, desiredState types.
 	}
 	defer tx.Rollback(ctx)
 
+	// cleanup current state
+	err = CleanupPauses(ctx, tx)
+	if err != nil {
+		err = fmt.Errorf("failed to cleanup pauses table in db: %w", err)
+		return false, err
+	}
+
 	// check current state
 	currentState, err := IsPaused(ctx, tx)
 	if err != nil {
