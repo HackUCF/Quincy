@@ -16,17 +16,13 @@ func InitPauses(ctx context.Context, db *pgxpool.Pool, cfg *config.APIConfigSpec
 
 	// insert the configured pause start configuration
 	// the NOT EXISTS guard means this is a no-op post first boot
-	tag, err := db.Exec(
+	_, err := db.Exec(
 		ctx,
-		"INSERT INTO pause_states (timestamp, state) VALUES ($1, $2) NOT EXISTS (SELECT 1 FROM pause_states)",
+		"INSERT INTO pause_states (timestamp, state) SELECT $1, $2 WHERE NOT EXISTS (SELECT 1 FROM pause_states)",
 		ts, cfg.StartPaused,
 	)
 	if err != nil {
-		err = fmt.Errorf("failed initialize pause state: %w", err)
-		return err
-	}
-	if tag.RowsAffected() == 0 {
-		err = fmt.Errorf("failed to initialize pause state: no rows affected")
+		err = fmt.Errorf("failed to initialize pause state: %w", err)
 		return err
 	}
 

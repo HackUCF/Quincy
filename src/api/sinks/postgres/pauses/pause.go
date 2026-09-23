@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// IsPausedTx returns whether or not the competition is currently paused.
+// IsPaused returns whether or not the competition is currently paused.
 // Takes a tx instead of the entire db pool for use in reliable logic.
 func IsPaused(ctx context.Context, tx pgx.Tx) (types.PauseState, error) {
 
@@ -27,6 +27,7 @@ func IsPaused(ctx context.Context, tx pgx.Tx) (types.PauseState, error) {
 	return current, nil
 }
 
+// GetPauseRecord returns the current pause state, as well as the time that state went into effect.
 func GetPauseRecord(ctx context.Context, db *pgxpool.Pool) (types.PauseRecord, error) {
 
 	var record = types.PauseRecord{
