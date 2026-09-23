@@ -243,7 +243,7 @@ const docTemplate = `{
         },
         "/pause": {
             "post": {
-                "description": "Halts scoring for planned interruptions such as a lunch break. Agents keep receiving checks and keep running them while paused; results are still archived and still reported as the current status, but they are not added to a team's pass and total counters, so no team loses uptime. Returns 418 if the competition is already paused. The pause state is stored in the database and survives an API server restart, so this endpoint requires the PostgreSQL sink.",
+                "description": "Halts scoring for planned interruptions such as a lunch break. Agents keep receiving checks and keep running them while paused; results are still archived and still reported as the current status, but they are not added to a team's pass and total counters, so no team loses uptime. Returns 418 if the competition is already paused. The pause state is stored in the database and survives an API server restart, so this endpoint requires the PostgreSQL sink and returns 501 without it.",
                 "produces": [
                     "application/json"
                 ],
@@ -269,13 +269,19 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
         },
         "/pause-status": {
             "get": {
-                "description": "Reports whether the competition is currently paused and when it entered that state. Returns an object with two fields: ` + "`" + `is_paused` + "`" + ` (bool) and ` + "`" + `since` + "`" + ` (RFC 3339 timestamp). The timestamp is the moment of the last recorded pause or unpause, read from the database. Requires the PostgreSQL sink.",
+                "description": "Reports whether the competition is currently paused and when it entered that state. Returns an object with two fields: ` + "`" + `is_paused` + "`" + ` (bool) and ` + "`" + `since` + "`" + ` (RFC 3339 timestamp). The timestamp is the moment of the last recorded pause or unpause, read from the database. Requires the PostgreSQL sink; returns 501 without it.",
                 "produces": [
                     "application/json"
                 ],
@@ -292,6 +298,12 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "type": "object"
                         }
@@ -485,7 +497,7 @@ const docTemplate = `{
         },
         "/unpause": {
             "post": {
-                "description": "Resumes scoring after a pause. Check results begin counting toward team pass and total counters again from the moment of the call. Returns 418 if the competition is not currently paused. Requires the PostgreSQL sink.",
+                "description": "Resumes scoring after a pause. Check results begin counting toward team pass and total counters again from the moment of the call. Returns 418 if the competition is not currently paused. Requires the PostgreSQL sink; returns 501 without it.",
                 "produces": [
                     "application/json"
                 ],
@@ -508,6 +520,12 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
                         "schema": {
                             "type": "object"
                         }

@@ -426,7 +426,7 @@ paths:
         added to a team's pass and total counters, so no team loses uptime. Returns
         418 if the competition is already paused. The pause state is stored in the
         database and survives an API server restart, so this endpoint requires the
-        PostgreSQL sink.
+        PostgreSQL sink and returns 501 without it.
       produces:
       - application/json
       responses:
@@ -442,6 +442,10 @@ paths:
           description: Internal Server Error
           schema:
             type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
       summary: Pause the competition
       tags:
       - misc
@@ -451,7 +455,7 @@ paths:
         entered that state. Returns an object with two fields: `is_paused` (bool)
         and `since` (RFC 3339 timestamp). The timestamp is the moment of the last
         recorded pause or unpause, read from the database. Requires the PostgreSQL
-        sink.'
+        sink; returns 501 without it.'
       produces:
       - application/json
       responses:
@@ -461,6 +465,10 @@ paths:
             type: object
         "500":
           description: Internal Server Error
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
           schema:
             type: object
       summary: Get the competition pause status
@@ -596,7 +604,8 @@ paths:
     post:
       description: Resumes scoring after a pause. Check results begin counting toward
         team pass and total counters again from the moment of the call. Returns 418
-        if the competition is not currently paused. Requires the PostgreSQL sink.
+        if the competition is not currently paused. Requires the PostgreSQL sink;
+        returns 501 without it.
       produces:
       - application/json
       responses:
@@ -610,6 +619,10 @@ paths:
             type: object
         "500":
           description: Internal Server Error
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
           schema:
             type: object
       summary: Resume the competition

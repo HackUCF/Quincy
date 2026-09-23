@@ -269,3 +269,100 @@ func TestCleanupPauses_collapsesRepeatedStates(t *testing.T) {
 		}
 	}
 }
+
+// seedRun writes a run of identical states straight into the table, bypassing
+// the state changer, which refuses to create one.
+func seedRun(t *testing.T, pool *pgxpool.Pool, states ...types.PauseState) int64 {
+	t.Helper()
+	ctx := context.Background()
+
+	ts := time.Now().UnixMicro()
+	for i, state := range states {
+		if _, err := pool.Exec(ctx,
+			`INSERT INTO pause_states (timestamp, state) VALUES ($1, $2)`, ts+int64(i), state,
+		); err != nil {
+			t.Fatalf("insert %d: %v", i, err)
+		}
+	}
+	return ts
+}
+
+func countRows(t *testing.T, pool *pgxpool.Pool) int {
+	t.Helper()
+	var n int
+	if err := pool.QueryRow(context.Background(), `SELECT COUNT(*) FROM pause_states`).Scan(&n); err != nil {
+		t.Fatalf("count pause_states: %v", err)
+	}
+	return n
+}
+
+func TestGetPauseRecord_collapsesDuplicatesBeforeReading(t *testing.T) {
+	ctx := context.Background()
+
+	pool, cleanup, err := testutil.NewTestDB(ctx)
+	if err != nil {
+		t.Fatalf("NewTestDB: %v", err)
+	}
+	defer cleanup()
+
+	// three pauses in a row, as two racing requests would leave behind
+	first := seedRun(t, pool, types.Paused, types.Paused, types.Paused)
+
+	record, err := pauses.GetPauseRecord(ctx, pool)
+	if err != nil {
+		t.Fatalf("GetPauseRecord: %v", err)
+	}
+
+	if n := countRows(t, pool); n != 1 {
+		t.Errorf("pause_states holds %d rows after a read, want 1 — the read must collapse the run", n)
+	}
+	if record.State != types.Paused {
+		t.Errorf("State = %v, want %v", record.State, types.Paused)
+	}
+	// the surviving entry is the first of the run, so the reported moment is
+	// when the pause actually began rather than when the duplicate landed
+	if got := record.Since.UnixMicro(); got != first {
+		t.Errorf("Since = %d, want %d — the first entry of the run is the one that survives", got, first)
+	}
+}
+
+func TestChangePauseState_collapsesDuplicatesBeforeDeciding(t *testing.T) {
+	ctx := context.Background()
+
+	pool, cleanup, err := testutil.NewTestDB(ctx)
+	if err != nil {
+		t.Fatalf("NewTestDB: %v", err)
+	}
+	defer cleanup()
+
+	seedRun(t, pool, types.Paused, types.Paused)
+
+	// the duplicate must not confuse the decision: the state is still paused,
+	// so unpausing is a real transition and pausing again is not
+	changed, err := pauses.ChangePauseState(ctx, pool, types.Paused)
+	if err != nil {
+		t.Fatalf("ChangePauseState(paused): %v", err)
+	}
+	if changed {
+		t.Error("ChangePauseState(paused) = true over a duplicated pause run, want false")
+	}
+
+	// the no-change path returns before committing, so its cleanup is rolled
+	// back with the rest of the transaction and the duplicate is still there
+	if n := countRows(t, pool); n != 2 {
+		t.Errorf("pause_states holds %d rows after a no-op transition, want the 2 seeded", n)
+	}
+
+	changed, err = pauses.ChangePauseState(ctx, pool, types.Unpaused)
+	if err != nil {
+		t.Fatalf("ChangePauseState(unpaused): %v", err)
+	}
+	if !changed {
+		t.Error("ChangePauseState(unpaused) = false, want true")
+	}
+	// a committed transition does persist the collapse: the duplicated pause
+	// becomes one row, plus the unpause just written
+	if n := countRows(t, pool); n != 2 {
+		t.Errorf("pause_states holds %d rows, want 2 — one collapsed pause plus one unpause", n)
+	}
+}

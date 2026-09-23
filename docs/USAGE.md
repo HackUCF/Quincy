@@ -316,4 +316,4 @@ Scoring can be halted temporarily -- for a lunch break, an infrastructure proble
 
 While paused, agents keep polling and keep running checks. Results are still archived and still show up as the current status of each service, but they are not added to a team's pass and total counters, so no team loses uptime for the duration. Unpausing resumes counting immediately. Pausing when already paused, or unpausing when already running, returns `418 I'm a Teapot` and changes nothing.
 
-The pause state is stored in the database as a history of pause and unpause events, so it survives an API server restart. The `start_paused` config setting only applies on the first boot against a fresh database -- see [Starting Paused](#starting-paused). All three endpoints require the PostgreSQL sink.
+The pause state is stored in the database as a history of pause and unpause events, so it survives an API server restart. The `start_paused` config setting only applies on the first boot against a fresh database -- see [Starting Paused](#starting-paused). All three endpoints require the PostgreSQL sink and return `501 Not Implemented` without it.

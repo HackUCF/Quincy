@@ -9,7 +9,9 @@ import (
 	"testing"
 
 	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/routes"
 	"github.com/HackUCF/Quincy/src/api/services"
+	"github.com/HackUCF/Quincy/src/common/middleware"
 	"github.com/HackUCF/Quincy/src/testutil"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -222,5 +224,60 @@ func TestPauseStatus_sinceMovesWithTheTransition(t *testing.T) {
 	}
 	if got := sinceOf(); got != after {
 		t.Errorf("since moved from %s to %s on a rejected pause", after, got)
+	}
+}
+
+// noSinkRouter builds the real route tree with no sinks configured, which is how
+// a deployment without the database runs.
+func noSinkRouter() *gin.Engine {
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+	r.Use(
+		middleware.Recovery(false),
+		func(c *gin.Context) {
+			// the config middleware is applied whether or not a sink exists,
+			// so mirror it here; only the db middleware is sink-dependent
+			c.Set(config.CfgKey, testCfg)
+			c.Next()
+		},
+	)
+	routes.RegisterRoutes(r, config.Sinks{})
+	return r
+}
+
+func TestPauseRoutes_return501WithoutTheDatabase(t *testing.T) {
+	router := noSinkRouter()
+
+	for _, tc := range []struct {
+		method string
+		path   string
+	}{
+		{http.MethodPost, "/api/v1/pause"},
+		{http.MethodPost, "/api/v1/unpause"},
+		{http.MethodGet, "/api/v1/pause-status"},
+	} {
+		t.Run(tc.method+" "+tc.path, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest(tc.method, tc.path, nil)
+			router.ServeHTTP(w, req)
+
+			// these handlers read the pool with no nil guard, so if the gate
+			// is ever dropped this returns a recovered 500 instead
+			if w.Code != http.StatusNotImplemented {
+				t.Errorf("status = %d, want 501; body: %s", w.Code, w.Body.String())
+			}
+		})
+	}
+}
+
+func TestGetConfig_stillServedWithoutTheDatabase(t *testing.T) {
+	// the config route needs no sink, so gating the pause routes must not have
+	// swept it up
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/config", nil)
+	noSinkRouter().ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want 200; body: %s", w.Code, w.Body.String())
 	}
 }
