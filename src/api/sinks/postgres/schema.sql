@@ -60,3 +60,5 @@ CREATE TABLE IF NOT EXISTS pause_states (
   state     BOOLEAN NOT NULL,
   id        SERIAL  PRIMARY KEY
 );
+
+CREATE INDEX IF NOT EXISTS idx_pause_states_ts ON pause_states(timestamp DESC, id DESC);

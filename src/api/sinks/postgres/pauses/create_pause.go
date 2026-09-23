@@ -22,7 +22,7 @@ func CreatePause(ctx context.Context, db *pgxpool.Pool, start, end time.Time) er
 	// insert pause start and end
 	tag, err := tx.Exec(
 		ctx,
-		"INSERT INTO pause_states (timestamp, state) VALUES (?, ?), (?, ?);",
+		"INSERT INTO pause_states (timestamp, state) VALUES ($1, $2), ($3, $4);",
 		start.UnixMicro(), types.Paused,
 		end.UnixMicro(), types.Unpaused,
 	)

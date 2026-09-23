@@ -33,16 +33,19 @@ func GetPauseRecord(ctx context.Context, db *pgxpool.Pool) (types.PauseRecord, e
 		State: types.PauseDefault,
 		Since: time.Time{},
 	}
+	var rawTime int64
 
 	// get pause record from db
-	row := db.QueryRow(ctx, "SELECT (state, timestamp) FROM pause_states ORDER BY timestamp DESC LIMIT 1;")
+	row := db.QueryRow(ctx, "SELECT state, timestamp FROM pause_states ORDER BY timestamp DESC LIMIT 1;")
 
 	// scan into variable
-	err := row.Scan(&record.State, &record.Since)
+	err := row.Scan(&record.State, &rawTime)
 	if err != nil {
 		err = fmt.Errorf("failed to get state from db: %w", err)
 		return record, err
 	}
+
+	record.Since = time.UnixMicro(rawTime)
 
 	return record, nil
 }

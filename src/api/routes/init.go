@@ -56,7 +56,10 @@ func RegisterRoutes(router *gin.Engine, s config.Sinks) {
 			graphsGroup.GET("heatmap", s.DBOr501(graphs.GetHeatmap))       // /api/v1/graphs/heatmap
 		}
 
-		v1.GET("/config", misc.GetConfig) // /api/v1/config
+		v1.GET("/config", misc.GetConfig)         // /api/v1/config
+		v1.POST("/pause", misc.Pause)             // /api/v1/pause
+		v1.POST("/unpause", misc.Unpause)         // /api/v1/unpause
+		v1.GET("/pause-status", misc.PauseStatus) // /api/v1/pause-status
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

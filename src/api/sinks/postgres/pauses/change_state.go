@@ -35,7 +35,7 @@ func ChangePauseState(ctx context.Context, db *pgxpool.Pool, desiredState types.
 	ts := time.Now().UnixMicro()
 
 	// insert new state
-	tag, err := tx.Exec(ctx, "INSERT INTO pause_states (timestamp, state) VALUES (?, ?);", ts, desiredState)
+	tag, err := tx.Exec(ctx, "INSERT INTO pause_states (timestamp, state) VALUES ($1, $2);", ts, desiredState)
 	if err != nil {
 		err = fmt.Errorf("failed to update pause state: %w", err)
 		return false, err

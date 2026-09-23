@@ -41,12 +41,6 @@ func (cfg *AgentConfig) Loop() {
 			continue
 		}
 
-		// loop again if comp paused
-		if svc.NoOp {
-			log.Info("competition paused, looping")
-			continue
-		}
-
 		// run it (with the configured timeout)
 		timeout := getTimeout(cfg, svc)
 		output, err := runCheck(svc, timeout)
