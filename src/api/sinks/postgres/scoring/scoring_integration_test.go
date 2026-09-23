@@ -32,6 +32,9 @@ func TestMain(m *testing.M) {
 	if err := testutil.SeedScoring(ctx, pool, testCfg); err != nil {
 		panic(err)
 	}
+	if err := testutil.SeedPauses(ctx, pool, testCfg); err != nil {
+		panic(err)
+	}
 
 	// seed one passing score for team 1, box testbox, service http
 	_ = dbagent.AddScore(ctx, pool, types.Score{

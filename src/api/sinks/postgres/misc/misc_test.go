@@ -31,6 +31,9 @@ func TestMain(m *testing.M) {
 	if err := testutil.SeedScoring(ctx, pool, testCfg); err != nil {
 		panic(err)
 	}
+	if err := testutil.SeedPauses(ctx, pool, testCfg); err != nil {
+		panic(err)
+	}
 
 	// Seed two scores with distinct timestamps for GetCompDuration.
 	_, err = pool.Exec(ctx, `

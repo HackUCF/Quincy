@@ -62,16 +62,16 @@ Quincy assumes every team has an identical set of servers and services. The `{}`
 Control whether the competition is already running when the API server boots:
 
 ```yaml
-start_paused: false            # true = hand out no-ops until unpaused
+start_paused: true             # true = run checks but count nothing until unpaused
 ```
 
-With `start_paused: true`, agents connect and poll as normal but receive no-ops until someone calls the unpause endpoint, so you can bring the whole stack up before scoring begins:
+With `start_paused: true`, agents connect, poll, and run checks as normal, but no result counts toward team scores until someone calls the unpause endpoint, so you can bring the whole stack up and confirm every check works before scoring begins:
 
 ```bash
 curl -X POST http://127.0.0.1:8888/api/v1/unpause
 ```
 
-Because this is read from the config on every boot, it also decides what happens after a restart -- see [Pausing the Competition](#pausing-the-competition).
+This setting only seeds the very first boot against an empty database. After that the pause state is stored in the database and survives restarts, so a later restart resumes whatever state the competition was actually left in -- see [Pausing the Competition](#pausing-the-competition).
 
 ### Boxes (Servers)
 
@@ -310,10 +310,10 @@ Updated passwords are stored in the database and persist across restarts.
 
 Scoring can be halted temporarily -- for a lunch break, an infrastructure problem, or anything else that should not count against teams.
 
-- `POST /api/v1/pause` -- Stop handing out checks to agents.
+- `POST /api/v1/pause` -- Stop counting check results toward team scores.
 - `POST /api/v1/unpause` -- Resume normal scoring.
 - `GET /api/v1/pause-status` -- Report whether scoring is paused, and since when.
 
-While paused, agents keep polling but receive a no-op instead of a check, so nothing is run and no results are recorded. No team loses uptime for the duration. Pausing when already paused, or unpausing when already running, returns `418 I'm a Teapot` and changes nothing.
+While paused, agents keep polling and keep running checks. Results are still archived and still show up as the current status of each service, but they are not added to a team's pass and total counters, so no team loses uptime for the duration. Unpausing resumes counting immediately. Pausing when already paused, or unpausing when already running, returns `418 I'm a Teapot` and changes nothing.
 
-The pause state lives in memory only. Restarting the API server discards it and falls back to the `start_paused` setting in the config -- see [Starting Paused](#starting-paused).
+The pause state is stored in the database as a history of pause and unpause events, so it survives an API server restart. The `start_paused` config setting only applies on the first boot against a fresh database -- see [Starting Paused](#starting-paused). All three endpoints require the PostgreSQL sink.

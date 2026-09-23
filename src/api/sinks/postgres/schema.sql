@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS scores (
   stdout    TEXT         NOT NULL,
   stderr    TEXT         NOT NULL,
   timestamp BIGINT       NOT NULL, -- unix microseconds as integer
-  scored    BOOLEAN      NOT NULL,
   id        SERIAL       PRIMARY KEY
 );
 
@@ -27,7 +26,6 @@ CREATE TABLE IF NOT EXISTS recent_scores (
   stdout    TEXT        NOT NULL,
   stderr    TEXT        NOT NULL,
   timestamp BIGINT      NOT NULL,
-  scored    BOOLEAN     NOT NULL,
   PRIMARY KEY (team_num, service, box)
 );
 
@@ -57,12 +55,8 @@ CREATE TABLE IF NOT EXISTS scoring_users (
 );
 
 -- store a history of when the comp was paused and unpaused
--- allows for specific pauses to be implemented
 CREATE TABLE IF NOT EXISTS pause_states (
-  timestamp BIGINT      NOT NULL UNIQUE,
-  state     BOOLEAN     NOT NULL, -- pause or unpause action. pause == true, unpause == false
-  service   VARCHAR(16) NOT NULL, -- whether to pause scoring for a specific service or not. '' means all services 
-  box       VARCHAR(16) NOT NULL, -- whether to pause scoring for a specific box or not. '' means all boxes  
-  team_num  INTEGER     NOT NULL, -- whether to pause scoring for a specific team or not. 0 means all teams 
-  id        SERIAL      PRIMARY KEY
+  timestamp BIGINT  NOT NULL UNIQUE,
+  state     BOOLEAN NOT NULL, -- pause or unpause action. pause == true, unpause == false
+  id        SERIAL  PRIMARY KEY
 );  

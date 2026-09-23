@@ -243,7 +243,7 @@ const docTemplate = `{
         },
         "/pause": {
             "post": {
-                "description": "Halts scoring for planned interruptions such as a lunch break. While paused, agents requesting a check receive a no-op assignment instead, so no checks run and no scores are recorded. Returns 418 if the competition is already paused. The pause state is held in memory: an API server restart discards it and falls back to the start_paused setting in the config.",
+                "description": "Halts scoring for planned interruptions such as a lunch break. Agents keep receiving checks and keep running them while paused; results are still archived and still reported as the current status, but they are not added to a team's pass and total counters, so no team loses uptime. Returns 418 if the competition is already paused. The pause state is stored in the database and survives an API server restart, so this endpoint requires the PostgreSQL sink.",
                 "produces": [
                     "application/json"
                 ],
@@ -263,13 +263,19 @@ const docTemplate = `{
                         "schema": {
                             "type": "object"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
                     }
                 }
             }
         },
         "/pause-status": {
             "get": {
-                "description": "Reports whether the competition is currently paused and when it entered that state. Returns an object with two fields: ` + "`" + `is_paused` + "`" + ` (bool) and ` + "`" + `since` + "`" + ` (RFC 3339 timestamp). The timestamp is the moment of the last pause or unpause, or the time the API server started if the state has not changed since boot.",
+                "description": "Reports whether the competition is currently paused and when it entered that state. Returns an object with two fields: ` + "`" + `is_paused` + "`" + ` (bool) and ` + "`" + `since` + "`" + ` (RFC 3339 timestamp). The timestamp is the moment of the last recorded pause or unpause, read from the database. Requires the PostgreSQL sink.",
                 "produces": [
                     "application/json"
                 ],
@@ -280,6 +286,12 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object"
                         }
@@ -473,7 +485,7 @@ const docTemplate = `{
         },
         "/unpause": {
             "post": {
-                "description": "Resumes scoring after a pause. Agents begin receiving real checks again from wherever the queue left off. Returns 418 if the competition is not currently paused.",
+                "description": "Resumes scoring after a pause. Check results begin counting toward team pass and total counters again from the moment of the call. Returns 418 if the competition is not currently paused. Requires the PostgreSQL sink.",
                 "produces": [
                     "application/json"
                 ],
@@ -490,6 +502,12 @@ const docTemplate = `{
                     },
                     "418": {
                         "description": "I'm a teapot",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "type": "object"
                         }
@@ -851,10 +869,6 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "blog"
-                },
-                "no_op": {
-                    "type": "boolean",
-                    "example": false
                 },
                 "team_num": {
                     "type": "integer",
