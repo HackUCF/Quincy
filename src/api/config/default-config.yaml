@@ -2,7 +2,8 @@
 # the number of teams playing in this event
 num_teams: 5
 
-# whether to start checking services on boot
+# whether to count points on boot.
+# when paused, checks don't effect final scores.
 #   otherwise requires curl -X POST http://host/api/v1/unpause
 start_paused: false
 

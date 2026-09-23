@@ -39,12 +39,17 @@ func GetPauseRecord(ctx context.Context, db *pgxpool.Pool) (types.PauseRecord, e
 
 	tx, err := db.Begin(ctx)
 	if err != nil {
-		err = fmt.Errorf("failed to cleanup pauses table in db: %w", err)
+		err = fmt.Errorf("failed to begin transaction: %w", err)
 		return record, err
 	}
+	defer tx.Rollback(ctx)
 
 	// cleanup the db
 	err = CleanupPauses(ctx, tx)
+	if err != nil {
+		err = fmt.Errorf("failed to cleanup pauses table in db: %w", err)
+		return record, err
+	}
 
 	// get pause record from db
 	row := tx.QueryRow(ctx, "SELECT state, timestamp FROM pause_states ORDER BY timestamp DESC LIMIT 1;")

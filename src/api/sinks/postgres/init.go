@@ -45,7 +45,7 @@ func InitDB(cfg *config.APIConfigSpec) error {
 	// make sure final scores table is populated
 	err = scoring.InitScoring(ctx, db, cfg)
 	if err != nil {
-		return fmt.Errorf("failed to initialize users: %w", err)
+		return fmt.Errorf("failed to initialize scoring: %w", err)
 	}
 
 	err = pauses.InitPauses(ctx, db, cfg)

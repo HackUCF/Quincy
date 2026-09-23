@@ -23,6 +23,7 @@ func InitScoring(ctx context.Context, db *pgxpool.Pool, cfg *config.APIConfigSpe
 	if err != nil {
 		return fmt.Errorf("could not begin database transaction: %w", err)
 	}
+	defer tx.Rollback(ctx)
 
 	for _, t := range config.TeamRange {
 		for _, box := range cfg.Boxes {
