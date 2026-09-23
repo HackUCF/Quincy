@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// ChangePauseState returns whether or not the competition is currently paused.
+// ChangePauseState pauses or unpauses the competition.
 func ChangePauseState(ctx context.Context, db *pgxpool.Pool, desiredState types.PauseState) (changed bool, err error) {
 
 	// start a transaction

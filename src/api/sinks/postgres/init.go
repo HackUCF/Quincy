@@ -11,6 +11,7 @@ import (
 
 	"github.com/HackUCF/Quincy/src/api/config"
 	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/pauses"
 	"github.com/HackUCF/Quincy/src/api/sinks/postgres/scoring"
 	"github.com/HackUCF/Quincy/src/api/sinks/postgres/users"
 )
@@ -45,6 +46,11 @@ func InitDB(cfg *config.APIConfigSpec) error {
 	err = scoring.InitScoring(ctx, db, cfg)
 	if err != nil {
 		return fmt.Errorf("failed to initialize users: %w", err)
+	}
+
+	err = pauses.InitPauses(ctx, db, cfg)
+	if err != nil {
+		return fmt.Errorf("failed to initialize pauses: %w", err)
 	}
 
 	return nil
