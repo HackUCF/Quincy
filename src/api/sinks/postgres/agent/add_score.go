@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/pauses"
 	"github.com/HackUCF/Quincy/src/common/types"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -47,18 +48,27 @@ func AddScore(ctx context.Context, db *pgxpool.Pool, score types.Score) error {
 		return fmt.Errorf("failed to upsert into recent_scores table: no rows affected")
 	}
 
-	tag, err = tx.Exec(ctx, `
-		UPDATE final_scores
-		SET total  = total + 1,
-		    passed = passed + CASE WHEN $1 THEN 1 ELSE 0 END
-		WHERE service = $2 AND box = $3 AND team_num = $4
-	`, score.Status, score.ServiceName, score.BoxName, score.TeamNum)
+	isPaused, err := pauses.IsPaused(ctx, tx)
 	if err != nil {
-		return fmt.Errorf("failed to update final_scores table: %w", err)
+		return fmt.Errorf("failed to get pause state from db: %w", err)
 	}
-	if tag.RowsAffected() == 0 {
-		return fmt.Errorf("no matching row in final_scores for service=%s, box=%s, team_num=%d",
-			score.ServiceName, score.BoxName, score.TeamNum)
+
+	if !isPaused {
+
+		// only update final scores if the competition is unpaused
+		tag, err = tx.Exec(ctx, `
+			UPDATE final_scores
+			SET total  = total + 1,
+					passed = passed + CASE WHEN $1 THEN 1 ELSE 0 END
+			WHERE service = $2 AND box = $3 AND team_num = $4
+		`, score.Status, score.ServiceName, score.BoxName, score.TeamNum)
+		if err != nil {
+			return fmt.Errorf("failed to update final_scores table: %w", err)
+		}
+		if tag.RowsAffected() == 0 {
+			return fmt.Errorf("no matching row in final_scores for service=%s, box=%s, team_num=%d",
+				score.ServiceName, score.BoxName, score.TeamNum)
+		}
 	}
 
 	if err = tx.Commit(ctx); err != nil {

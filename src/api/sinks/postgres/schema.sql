@@ -53,3 +53,10 @@ CREATE TABLE IF NOT EXISTS scoring_users (
   netbios   TEXT,
   PRIMARY KEY (team_num, user_list, username)
 );
+
+-- 
+CREATE TABLE IF NOT EXISTS pause_states (
+  timestamp BIGINT  NOT NULL,
+  state     BOOLEAN NOT NULL,
+  id        SERIAL  PRIMARY KEY
+);

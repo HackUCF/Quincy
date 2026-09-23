@@ -4,6 +4,8 @@ Has no dependencies and is easily importable for any Golang frontend.
 */
 package types
 
+import "time"
+
 // generic type aliases
 // these just make code more readable
 // lets you see which specific string is being passed where
@@ -27,3 +29,22 @@ type BoxName string
 // This has no uniqueness constraint.
 // It has no meaning to the API; is only used by the agent.
 type CheckName string
+
+// PauseState describes whether quincy should count scores during a period or not.
+type PauseState bool
+
+const (
+	// Paused is the state where no scores are counted.
+	Paused PauseState = true
+	// Unpause is the state where scores are counted.
+	Unpaused PauseState = false
+	// PauseDefault can be used in error cases as a safe failure incase the caller ignores errors.
+	PauseDefault PauseState = Paused
+)
+
+// PauseRecord is an instance of the competition being paused or unpaused.
+// It includes the new state, as well as the time it was changed.
+type PauseRecord struct {
+	State PauseState
+	Since time.Time
+}
