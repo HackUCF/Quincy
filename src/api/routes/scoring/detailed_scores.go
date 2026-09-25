@@ -27,7 +27,7 @@ func GetDetailedScores(c *gin.Context) {
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get final scores",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, resp)
 		return

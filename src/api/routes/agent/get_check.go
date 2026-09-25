@@ -28,41 +28,45 @@ func GetCheck(c *gin.Context) {
 	cfg := config.Get(c)
 	db, err := conn.GetE(c)
 
-	// check for db errors, failed if the db sink is enabled
-	// if this fails `db` is safely null and will be ignored by GetNext.
-	if err != nil && cfg.Sinks.DBEnabled() {
-		resp := gin.H{
-			"message": "failed to get database connection from request context",
-			"error":   err,
-		}
-		c.JSON(http.StatusInternalServerError, resp)
-		return
-	}
+	// some db specific logic
+	if cfg.Sinks.DBEnabled() {
 
-	// check if the comp is paused rn
-	isPaused, err := pauses.IsPaused(c.Request.Context(), db, types.CheckPause)
-	if err != nil {
-		resp := gin.H{
-			"message": "failed to check competition pause status",
-			"error":   err,
+		// check for db errors, failed if the db sink is enabled
+		// if this fails `db` is safely null and will be ignored by GetNext.
+		if err != nil {
+			resp := gin.H{
+				"message": "failed to get database connection from request context",
+				"error":   err.Error(),
+			}
+			c.JSON(http.StatusInternalServerError, resp)
+			return
 		}
-		c.JSON(http.StatusInternalServerError, resp)
-		return
-	}
 
-	if isPaused {
-		// return a no-op check if scoring is paused
-		c.JSON(http.StatusOK, types.Service{
-			NoOp: true,
-		})
-		return
+		// check if the comp is paused rn
+		isPaused, err := pauses.IsPaused(c.Request.Context(), db, types.CheckPause)
+		if err != nil {
+			resp := gin.H{
+				"message": "failed to check competition pause status",
+				"error":   err.Error(),
+			}
+			c.JSON(http.StatusInternalServerError, resp)
+			return
+		}
+
+		if isPaused {
+			// return a no-op check if scoring is paused
+			c.JSON(http.StatusOK, types.Service{
+				NoOp: true,
+			})
+			return
+		}
 	}
 
 	check, err := services.GetNext(c.Request.Context(), cfg, db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get check",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, resp)
 		return

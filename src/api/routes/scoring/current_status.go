@@ -33,7 +33,7 @@ func GetRecentChecks(c *gin.Context) {
 	if err != nil {
 		resp := gin.H{
 			"message": "could not get current service status",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, resp)
 		return

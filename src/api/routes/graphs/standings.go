@@ -25,7 +25,7 @@ func GetStandings(c *gin.Context) {
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get standings data",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusInternalServerError, resp)
 		return
@@ -36,7 +36,7 @@ func GetStandings(c *gin.Context) {
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to render standings graph",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusInternalServerError, resp)
 		return
