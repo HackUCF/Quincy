@@ -30,9 +30,9 @@ type User struct {
 }
 
 // Service is a fully rendered service ready to be run by the agent.
-// Is just a ServiceTemplate with an added user.
+// Is just a ServiceTemplate with an added user and a potential no-op order.
 type Service struct {
 	ServiceTemplate
 	User *User `json:"user,omitempty,omitzero"`
-	NoOp bool  `json:"no_op,omitempty,omitzero" example:"false"`
+	NoOp bool  `json:"no_op,omitempty,omitzero"  example:"false"`
 }

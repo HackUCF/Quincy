@@ -7,6 +7,7 @@ import (
 
 	"github.com/HackUCF/Quincy/src/api/config"
 	dbagent "github.com/HackUCF/Quincy/src/api/sinks/postgres/agent"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/pauses"
 	"github.com/HackUCF/Quincy/src/common/types"
 	"github.com/HackUCF/Quincy/src/testutil"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -32,6 +33,9 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 	if err := testutil.SeedScoring(ctx, pool, testCfg); err != nil {
+		panic(err)
+	}
+	if err := testutil.SeedPauses(ctx, pool, testCfg); err != nil {
 		panic(err)
 	}
 
@@ -263,5 +267,165 @@ func TestAddScore_emptyStdoutAndStderr(t *testing.T) {
 	}
 	if stdout != "" || stderr != "" {
 		t.Errorf("stdout/stderr = %q/%q, want empty/empty", stdout, stderr)
+	}
+}
+
+// pauseScoringFor pauses scoring for the duration of the test and restores the
+// running state afterwards, so a pause cannot leak into a later test.
+func pauseScoringFor(t *testing.T) {
+	t.Helper()
+	ctx := context.Background()
+
+	if _, err := pauses.ChangePauseState(ctx, testPool, types.Paused, types.ScoringPause); err != nil {
+		t.Fatalf("pause: %v", err)
+	}
+	t.Cleanup(func() {
+		if _, err := pauses.ChangePauseState(ctx, testPool, types.Unpaused, types.ScoringPause); err != nil {
+			t.Fatalf("unpause: %v", err)
+		}
+	})
+}
+
+func TestAddScore_scoringPausedArchivesButDoesNotCount(t *testing.T) {
+	ctx := context.Background()
+
+	testPool.Exec(ctx,
+		`UPDATE final_scores SET passed = 0, total = 0 WHERE service = $1 AND box = $2 AND team_num = $3`,
+		"http", "testbox", 2,
+	)
+
+	pauseScoringFor(t)
+
+	score := types.Score{
+		ServiceName: "http",
+		BoxName:     "testbox",
+		TeamNum:     2,
+		Status:      true,
+		Stdout:      "paused run",
+		Stderr:      "",
+	}
+	if err := dbagent.AddScore(ctx, testPool, score); err != nil {
+		t.Fatalf("AddScore: %v", err)
+	}
+
+	// the result is still history and still the current status...
+	var count int
+	if err := testPool.QueryRow(ctx,
+		`SELECT COUNT(*) FROM scores WHERE service = $1 AND box = $2 AND team_num = $3 AND stdout = $4`,
+		"http", "testbox", 2, "paused run",
+	).Scan(&count); err != nil {
+		t.Fatalf("query scores: %v", err)
+	}
+	if count != 1 {
+		t.Errorf("scores holds %d rows for the paused check, want 1 — a pause must not discard results", count)
+	}
+
+	var stdout string
+	if err := testPool.QueryRow(ctx,
+		`SELECT stdout FROM recent_scores WHERE service = $1 AND box = $2 AND team_num = $3`,
+		"http", "testbox", 2,
+	).Scan(&stdout); err != nil {
+		t.Fatalf("query recent_scores: %v", err)
+	}
+	if stdout != "paused run" {
+		t.Errorf("recent_scores.stdout = %q, want %q", stdout, "paused run")
+	}
+
+	// ...but it costs the team nothing either way
+	var passed, total int
+	if err := testPool.QueryRow(ctx,
+		`SELECT passed, total FROM final_scores WHERE service = $1 AND box = $2 AND team_num = $3`,
+		"http", "testbox", 2,
+	).Scan(&passed, &total); err != nil {
+		t.Fatalf("query final_scores: %v", err)
+	}
+	if total != 0 || passed != 0 {
+		t.Errorf("final_scores = passed %d / total %d after a paused check, want 0 / 0", passed, total)
+	}
+}
+
+func TestAddScore_unpausingScoringResumesCounting(t *testing.T) {
+	ctx := context.Background()
+
+	testPool.Exec(ctx,
+		`UPDATE final_scores SET passed = 0, total = 0 WHERE service = $1 AND box = $2 AND team_num = $3`,
+		"ssh", "testbox", 1,
+	)
+
+	score := types.Score{
+		ServiceName: "ssh",
+		BoxName:     "testbox",
+		TeamNum:     1,
+		Status:      true,
+		Stdout:      "ok",
+		Stderr:      "",
+	}
+
+	// the same check submitted once on each side of an unpause
+	if _, err := pauses.ChangePauseState(ctx, testPool, types.Paused, types.ScoringPause); err != nil {
+		t.Fatalf("pause: %v", err)
+	}
+	if err := dbagent.AddScore(ctx, testPool, score); err != nil {
+		t.Fatalf("AddScore (paused): %v", err)
+	}
+	if _, err := pauses.ChangePauseState(ctx, testPool, types.Unpaused, types.ScoringPause); err != nil {
+		t.Fatalf("unpause: %v", err)
+	}
+
+	if err := dbagent.AddScore(ctx, testPool, score); err != nil {
+		t.Fatalf("AddScore (running): %v", err)
+	}
+
+	var passed, total int
+	if err := testPool.QueryRow(ctx,
+		`SELECT passed, total FROM final_scores WHERE service = $1 AND box = $2 AND team_num = $3`,
+		"ssh", "testbox", 1,
+	).Scan(&passed, &total); err != nil {
+		t.Fatalf("query final_scores: %v", err)
+	}
+	if passed != 1 || total != 1 {
+		t.Errorf("final_scores = passed %d / total %d, want 1 / 1 — only the unpaused check counts", passed, total)
+	}
+}
+
+// A check pause stops work being dispatched, upstream of this package. If a
+// result arrives anyway it was meant to run, so it must still count.
+func TestAddScore_checkPauseDoesNotSuppressCounting(t *testing.T) {
+	ctx := context.Background()
+
+	testPool.Exec(ctx,
+		`UPDATE final_scores SET passed = 0, total = 0 WHERE service = $1 AND box = $2 AND team_num = $3`,
+		"http", "testbox", 1,
+	)
+
+	if _, err := pauses.ChangePauseState(ctx, testPool, types.Paused, types.CheckPause); err != nil {
+		t.Fatalf("pause checks: %v", err)
+	}
+	t.Cleanup(func() {
+		if _, err := pauses.ChangePauseState(ctx, testPool, types.Unpaused, types.CheckPause); err != nil {
+			t.Fatalf("unpause checks: %v", err)
+		}
+	})
+
+	score := types.Score{
+		ServiceName: "http",
+		BoxName:     "testbox",
+		TeamNum:     1,
+		Status:      true,
+		Stdout:      "ran anyway",
+	}
+	if err := dbagent.AddScore(ctx, testPool, score); err != nil {
+		t.Fatalf("AddScore: %v", err)
+	}
+
+	var passed, total int
+	if err := testPool.QueryRow(ctx,
+		`SELECT passed, total FROM final_scores WHERE service = $1 AND box = $2 AND team_num = $3`,
+		"http", "testbox", 1,
+	).Scan(&passed, &total); err != nil {
+		t.Fatalf("query final_scores: %v", err)
+	}
+	if passed != 1 || total != 1 {
+		t.Errorf("final_scores = passed %d / total %d, want 1 / 1 — a check pause must not gate the score write", passed, total)
 	}
 }

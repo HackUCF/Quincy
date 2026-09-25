@@ -24,7 +24,7 @@ func GetAllUsers(c *gin.Context) {
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get all users",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, resp)
 		return

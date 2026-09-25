@@ -41,9 +41,8 @@ func (cfg *AgentConfig) Loop() {
 			continue
 		}
 
-		// loop again if comp paused
 		if svc.NoOp {
-			log.Info("competition paused, looping")
+			// skip if the checks are paused
 			continue
 		}
 

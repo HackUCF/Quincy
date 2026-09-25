@@ -31,6 +31,9 @@ func TestMain(m *testing.M) {
 	if err := testutil.SeedScoring(ctx, pool, testCfg); err != nil {
 		panic(err)
 	}
+	if err := testutil.SeedPauses(ctx, pool, testCfg); err != nil {
+		panic(err)
+	}
 
 	// Seed scores with distinct timestamps so GetScoresData/GetCompDuration work.
 	// bucketUs = (2000000000 - 1000000000) / 100 = 10000000 µs = 10s, safe for bucketing.

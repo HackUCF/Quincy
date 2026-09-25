@@ -26,7 +26,7 @@ func GetScores(c *gin.Context) {
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get scores data",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusInternalServerError, resp)
 		log.Panic(err.Error())
@@ -38,7 +38,7 @@ func GetScores(c *gin.Context) {
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to render scores graph",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusInternalServerError, resp)
 		log.Panic(err.Error())

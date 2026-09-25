@@ -62,16 +62,17 @@ Quincy assumes every team has an identical set of servers and services. The `{}`
 Control whether the competition is already running when the API server boots:
 
 ```yaml
-start_paused: false            # true = hand out no-ops until unpaused
+start_paused: true             # true = boot fully paused, unpause when ready
 ```
 
-With `start_paused: true`, agents connect and poll as normal but receive no-ops until someone calls the unpause endpoint, so you can bring the whole stack up before scoring begins:
+With `start_paused: true`, both kinds of pause start on: agents are handed no work, and nothing counts. Bring the whole stack up, confirm the agents connect, then release the two pauses in whichever order suits you -- unpausing checks first lets you watch real results land on the scoreboard before any of them count:
 
 ```bash
-curl -X POST http://127.0.0.1:8888/api/v1/unpause
+curl -X POST http://127.0.0.1:8888/api/v1/comp/unpause-checks
+curl -X POST http://127.0.0.1:8888/api/v1/comp/unpause-scoring
 ```
 
-Because this is read from the config on every boot, it also decides what happens after a restart -- see [Pausing the Competition](#pausing-the-competition).
+This setting only seeds the very first boot against an empty database. After that both pause states are stored in the database and survive restarts, so a later restart resumes whatever state the competition was actually left in -- see [Pausing the Competition](#pausing-the-competition).
 
 ### Boxes (Servers)
 
@@ -308,12 +309,35 @@ Updated passwords are stored in the database and persist across restarts.
 
 ## Pausing the Competition
 
-Scoring can be halted temporarily -- for a lunch break, an infrastructure problem, or anything else that should not count against teams.
+The competition can be halted temporarily -- for a lunch break, an infrastructure problem, or anything else that should not count against teams. There are two independent pauses, and you can run either one alone or both at once.
 
-- `POST /api/v1/pause` -- Stop handing out checks to agents.
-- `POST /api/v1/unpause` -- Resume normal scoring.
-- `GET /api/v1/pause-status` -- Report whether scoring is paused, and since when.
+A **scoring pause** stops results from counting. Agents keep polling and keep running checks, results are still archived and still show up as the current status of each service, but they are not added to a team's pass and total counters, so no team loses uptime for the duration.
 
-While paused, agents keep polling but receive a no-op instead of a check, so nothing is run and no results are recorded. No team loses uptime for the duration. Pausing when already paused, or unpausing when already running, returns `418 I'm a Teapot` and changes nothing.
+A **check pause** stops the work itself. Agents are handed a no-op instead of an assignment and idle until it lifts, so nothing is run against team infrastructure at all. Use this one when the problem is the checks -- a broken script hammering boxes, or a network you want quiet.
 
-The pause state lives in memory only. Restarting the API server discards it and falls back to the `start_paused` setting in the config -- see [Starting Paused](#starting-paused).
+| Endpoint | Method | Effect |
+| --- | --- | --- |
+| `/api/v1/comp/pause-scoring` | POST | Stop counting check results toward team scores |
+| `/api/v1/comp/unpause-scoring` | POST | Resume counting |
+| `/api/v1/comp/pause-checks` | POST | Stop handing out checks to agents |
+| `/api/v1/comp/unpause-checks` | POST | Resume handing out checks |
+| `/api/v1/comp/pause-status` | GET | Report both pause states and when each was entered |
+
+A pause that would change nothing is rejected rather than silently accepted: pausing when already paused, or unpausing when already running, returns `418 I'm a Teapot` and leaves the state untouched. A real change returns `200`.
+
+Status comes back as both states at once:
+
+```bash
+curl http://127.0.0.1:8888/api/v1/comp/pause-status
+```
+
+```json
+{
+  "scoring_is_paused": false,
+  "scoring_since": "2026-09-25T14:02:11.482913Z",
+  "checks_are_paused": true,
+  "checks_since": "2026-09-25T14:37:50.119204Z"
+}
+```
+
+Both pause states are stored in the database as a history of pause and unpause events, so they survive an API server restart. The `start_paused` config setting only applies on the first boot against a fresh database -- see [Starting Paused](#starting-paused). All five endpoints require the PostgreSQL sink and return `501 Not Implemented` without it.

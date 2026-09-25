@@ -36,6 +36,9 @@ func TestMain(m *testing.M) {
 	if err := testutil.SeedScoring(ctx, pool, testCfg); err != nil {
 		panic(err)
 	}
+	if err := testutil.SeedPauses(ctx, pool, testCfg); err != nil {
+		panic(err)
+	}
 
 	// seed one score so current status has a row
 	dbagent.AddScore(ctx, pool, types.Score{

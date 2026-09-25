@@ -2,8 +2,12 @@
 # the number of teams playing in this event
 num_teams: 5
 
-# whether to start checking services on boot
-#   otherwise requires curl -X POST http://host/api/v1/unpause
+# whether the competition is already running on boot.
+# when true, both pauses start on: agents get no checks and nothing counts.
+#   release them with:
+#   curl -X POST http://host/api/v1/comp/unpause-checks
+#   curl -X POST http://host/api/v1/comp/unpause-scoring
+# only seeds the first boot against an empty database.
 start_paused: false
 
 # http server settings

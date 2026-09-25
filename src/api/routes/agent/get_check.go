@@ -6,6 +6,8 @@ import (
 	"github.com/HackUCF/Quincy/src/api/config"
 	"github.com/HackUCF/Quincy/src/api/services"
 	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/pauses"
+	"github.com/HackUCF/Quincy/src/common/types"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,7 +15,7 @@ import (
 // This is meant for interaction from the agents.
 //
 //	@Summary		Get next check to run
-//	@Description	Returns the next fully-rendered service check for the agent to execute. Rotates round-robin across all services and teams.
+//	@Description	Returns the next fully-rendered service check for the agent to execute. Rotates round-robin across all services and teams. While checks are paused this returns a no-op assignment instead (`no_op: true`) with no check details, which tells the agent to idle until its next poll; the queue is not advanced, so no check is lost to the pause.
 //	@Tags			agent
 //	@Produce		json
 //	@Success		200	{object}	types.Service
@@ -26,22 +28,45 @@ func GetCheck(c *gin.Context) {
 	cfg := config.Get(c)
 	db, err := conn.GetE(c)
 
-	// check for db errors, failed if the db sink is enabled
-	// if this fails `db` is safely null and will be ignored by GetNext.
-	if err != nil && cfg.Sinks.DBEnabled() {
-		resp := gin.H{
-			"message": "failed to get database connection from request context",
-			"error":   err,
+	// some db specific logic
+	if cfg.Sinks.DBEnabled() {
+
+		// check for db errors, failed if the db sink is enabled
+		// if this fails `db` is safely null and will be ignored by GetNext.
+		if err != nil {
+			resp := gin.H{
+				"message": "failed to get database connection from request context",
+				"error":   err.Error(),
+			}
+			c.JSON(http.StatusInternalServerError, resp)
+			return
 		}
-		c.JSON(http.StatusInternalServerError, resp)
-		return
+
+		// check if the comp is paused rn
+		isPaused, err := pauses.IsPaused(c.Request.Context(), db, types.CheckPause)
+		if err != nil {
+			resp := gin.H{
+				"message": "failed to check competition pause status",
+				"error":   err.Error(),
+			}
+			c.JSON(http.StatusInternalServerError, resp)
+			return
+		}
+
+		if isPaused {
+			// return a no-op check if scoring is paused
+			c.JSON(http.StatusOK, types.Service{
+				NoOp: true,
+			})
+			return
+		}
 	}
 
 	check, err := services.GetNext(c.Request.Context(), cfg, db)
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get check",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, resp)
 		return

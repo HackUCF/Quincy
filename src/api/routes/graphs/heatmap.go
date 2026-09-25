@@ -25,7 +25,7 @@ func GetHeatmap(c *gin.Context) {
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to get heatmap data",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusInternalServerError, resp)
 		return
@@ -36,7 +36,7 @@ func GetHeatmap(c *gin.Context) {
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to render heatmap",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusInternalServerError, resp)
 		return

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/HackUCF/Quincy/src/api/config"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/pauses"
 	"github.com/HackUCF/Quincy/src/api/sinks/postgres/scoring"
 	"github.com/HackUCF/Quincy/src/api/sinks/postgres/users"
 	"github.com/HackUCF/Quincy/src/common/types"
@@ -53,4 +54,10 @@ func SeedUsers(ctx context.Context, db *pgxpool.Pool, cfg *config.APIConfigSpec)
 // SeedScoring inserts zero-count rows into final_scores. Requires SetupConfig to have been called.
 func SeedScoring(ctx context.Context, db *pgxpool.Pool, cfg *config.APIConfigSpec) error {
 	return scoring.InitScoring(ctx, db, cfg)
+}
+
+// SeedPauses seeds pause_states with the config's starting state. Score writes read
+// this table, so a DB-backed test that records a score must call this first.
+func SeedPauses(ctx context.Context, db *pgxpool.Pool, cfg *config.APIConfigSpec) error {
+	return pauses.InitPauses(ctx, db, cfg)
 }

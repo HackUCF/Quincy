@@ -4,12 +4,12 @@ import "github.com/HackUCF/Quincy/src/common/types"
 
 // APIConfigSpec defines the entire API configuration file.
 type APIConfigSpec struct {
-	NumTeams    types.TeamNum  `yaml:"num_teams"    mapstructure:"num_teams"     json:"num_teams"     example:"5"`
-	StartPaused bool           `yaml:"start_paused" mapstructure:"start_paused"  json:"start_paused"  example:"false"`
-	Sinks       Sinks          `yaml:"sinks"        mapstructure:"sinks"         json:"sinks"`
-	Boxes       []BoxSpec      `yaml:"boxes"        mapstructure:"boxes"         json:"boxes"`
-	UserLists   []UserListSpec `yaml:"user_lists"   mapstructure:"user_lists"    json:"user_lists"`
-	HTTP        HTTPSpec       `yaml:"http"         mapstructure:"http"          json:"http"`
+	NumTeams    types.TeamNum    `yaml:"num_teams"    mapstructure:"num_teams"     json:"num_teams"     example:"5"`
+	StartPaused types.PauseState `yaml:"start_paused" mapstructure:"start_paused"  json:"start_paused"  example:"false"`
+	Sinks       Sinks            `yaml:"sinks"        mapstructure:"sinks"         json:"sinks"`
+	Boxes       []BoxSpec        `yaml:"boxes"        mapstructure:"boxes"         json:"boxes"`
+	UserLists   []UserListSpec   `yaml:"user_lists"   mapstructure:"user_lists"    json:"user_lists"`
+	HTTP        HTTPSpec         `yaml:"http"         mapstructure:"http"          json:"http"`
 }
 
 // BoxSpec contains the config specification of one box.

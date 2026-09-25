@@ -53,7 +53,7 @@ func SubmitPCR(c *gin.Context) {
 	if err != nil {
 		resp := gin.H{
 			"message": "failed to unmarshall json from request body",
-			"error":   err,
+			"error":   err.Error(),
 			"pcr":     pcr,
 		}
 		c.JSON(http.StatusBadRequest, resp)
