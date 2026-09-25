@@ -6,6 +6,8 @@ import (
 	"github.com/HackUCF/Quincy/src/api/config"
 	"github.com/HackUCF/Quincy/src/api/services"
 	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
+	"github.com/HackUCF/Quincy/src/api/sinks/postgres/pauses"
+	"github.com/HackUCF/Quincy/src/common/types"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,6 +27,23 @@ func GetCheck(c *gin.Context) {
 	// grab globals from gin context
 	cfg := config.Get(c)
 	db, err := conn.GetE(c)
+
+	isPaused, err := pauses.IsPaused(c.Request.Context(), db, types.CheckPause)
+	if err != nil {
+		resp := gin.H{
+			"message": "failed to check competition pause status",
+			"error":   err,
+		}
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	if isPaused {
+		// return a no-op check if scoring is paused
+		c.JSON(http.StatusOK, types.Service{
+			NoOp: true,
+		})
+	}
 
 	// check for db errors, failed if the db sink is enabled
 	// if this fails `db` is safely null and will be ignored by GetNext.

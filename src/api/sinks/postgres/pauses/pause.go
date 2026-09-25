@@ -12,8 +12,24 @@ import (
 
 // IsPaused returns whether or not the competition is currently paused.
 // Takes a tx instead of the entire db pool for use in reliable logic.
-// hot path, no cleanup is run against the pauses table.
-func IsPaused(ctx context.Context, tx pgx.Tx, pauseType types.PauseType) (types.PauseState, error) {
+func IsPaused(ctx context.Context, db *pgxpool.Pool, pauseType types.PauseType) (types.PauseState, error) {
+
+	var current types.PauseState
+
+	row := db.QueryRow(ctx, "SELECT state FROM pauses WHERE type = $1 ORDER BY timestamp DESC LIMIT 1;", pauseType)
+
+	err := row.Scan(&current)
+	if err != nil {
+		err = fmt.Errorf("failed to get state from db: %w", err)
+		return types.PauseDefault, err
+	}
+
+	return current, nil
+}
+
+// IsPausedTx returns whether or not the competition is currently paused.
+// Takes a tx instead of the entire db pool for use in reliable logic.
+func IsPausedTx(ctx context.Context, tx pgx.Tx, pauseType types.PauseType) (types.PauseState, error) {
 
 	var current types.PauseState
 
@@ -56,7 +72,7 @@ func GetPauseRecord(ctx context.Context, db *pgxpool.Pool) (types.PauseRecord, e
 		)
 
 		// scan into variables
-		err = row.Scan(&record.CheckState, &rawTime)
+		err = row.Scan(&record.ScoringSince, &rawTime)
 		if err != nil {
 			err = fmt.Errorf("failed to get state from db: %w", err)
 			return record, err

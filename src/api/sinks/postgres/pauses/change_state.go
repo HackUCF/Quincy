@@ -32,7 +32,7 @@ func ChangePauseState(
 	}
 
 	// check current state
-	currentState, err := IsPaused(ctx, tx, desiredType)
+	currentState, err := IsPausedTx(ctx, tx, desiredType)
 	if err != nil {
 		err = fmt.Errorf("failed to check current pause state: %w", err)
 		return false, err

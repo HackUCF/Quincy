@@ -25,15 +25,18 @@ func InitPauses(ctx context.Context, db *pgxpool.Pool, cfg *config.APIConfigSpec
 
 	// prevent double inits
 	got, err := tryLock(ctx, tx, pauseLock)
+	if err != nil {
+		err := fmt.Errorf("failed to lock pauses table while initializing pauses")
+		return err
+	}
 	if !got {
 		// someone else is messing with pauses. they got it.
 		return nil
 	}
 
-	ts := time.Now().UnixMicro()
-
 	// insert the configured pause start configuration
 	// the NOT EXISTS guard means this is a no-op post first boot
+	ts := time.Now().UnixMicro()
 	_, err = tx.Exec(
 		ctx,
 		"INSERT INTO pauses (timestamp, state, type) SELECT $1, $2, $3 WHERE NOT EXISTS (SELECT 1 FROM pauses WHERE type = $3)",
@@ -44,6 +47,7 @@ func InitPauses(ctx context.Context, db *pgxpool.Pool, cfg *config.APIConfigSpec
 		return err
 	}
 
+	ts = time.Now().UnixMicro()
 	_, err = tx.Exec(
 		ctx,
 		"INSERT INTO pauses (timestamp, state, type) SELECT $1, $2, $3 WHERE NOT EXISTS (SELECT 1 FROM pauses WHERE type = $3)",
