@@ -41,6 +41,11 @@ func (cfg *AgentConfig) Loop() {
 			continue
 		}
 
+		if svc.NoOp {
+			// skip if the checks are paused
+			continue
+		}
+
 		// run it (with the configured timeout)
 		timeout := getTimeout(cfg, svc)
 		output, err := runCheck(svc, timeout)

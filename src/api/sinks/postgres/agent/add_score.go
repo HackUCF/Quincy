@@ -48,7 +48,7 @@ func AddScore(ctx context.Context, db *pgxpool.Pool, score types.Score) error {
 		return fmt.Errorf("failed to upsert into recent_scores table: no rows affected")
 	}
 
-	isPaused, err := pauses.IsPaused(ctx, tx)
+	isPaused, err := pauses.IsPaused(ctx, tx, types.ScoringPause)
 	if err != nil {
 		return fmt.Errorf("failed to get pause state from db: %w", err)
 	}

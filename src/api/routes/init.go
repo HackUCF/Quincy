@@ -11,12 +11,14 @@ import (
 	"github.com/HackUCF/Quincy/src/api/config"
 	_ "github.com/HackUCF/Quincy/src/api/openapi"
 	"github.com/HackUCF/Quincy/src/api/routes/agent"
+	"github.com/HackUCF/Quincy/src/api/routes/competition"
 	"github.com/HackUCF/Quincy/src/api/routes/graphs"
 	"github.com/HackUCF/Quincy/src/api/routes/misc"
 	"github.com/HackUCF/Quincy/src/api/routes/scoring"
 	"github.com/HackUCF/Quincy/src/api/routes/users"
 	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
 	"github.com/HackUCF/Quincy/src/common/middleware"
+	"github.com/HackUCF/Quincy/src/common/types"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -56,10 +58,29 @@ func RegisterRoutes(router *gin.Engine, s config.Sinks) {
 			graphsGroup.GET("heatmap", s.DBOr501(graphs.GetHeatmap))       // /api/v1/graphs/heatmap
 		}
 
-		v1.GET("/config", misc.GetConfig)                    // /api/v1/config
-		v1.POST("/pause", s.DBOr501(misc.Pause))             // /api/v1/pause
-		v1.POST("/unpause", s.DBOr501(misc.Unpause))         // /api/v1/unpause
-		v1.GET("/pause-status", s.DBOr501(misc.PauseStatus)) // /api/v1/pause-status
+		compGroup := v1.Group("/comp")
+		{
+			// one shared route, just different arguments for all pause/unpause action
+			compGroup.POST(
+				"/pause-checks", s.DBOr501(
+					competition.ChangePauseState(types.Paused, types.CheckPause),
+				)) // /api/v1/comp/pause-checks
+			compGroup.POST(
+				"/unpause-checks", s.DBOr501(
+					competition.ChangePauseState(types.Unpaused, types.CheckPause),
+				)) // /api/v1/comp/unpause-checks
+			compGroup.POST(
+				"/pause-scoring", s.DBOr501(
+					competition.ChangePauseState(types.Paused, types.ScoringPause),
+				)) // /api/v1/comp/pause-scoring
+			compGroup.POST(
+				"/unpause-scoring", s.DBOr501(
+					competition.ChangePauseState(types.Unpaused, types.ScoringPause),
+				)) // /api/v1/comp/unpause-scoring
+
+			compGroup.GET("/pause-status", s.DBOr501(competition.PauseStatus)) // /api/v1/comp/pause-status
+		}
+
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

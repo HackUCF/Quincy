@@ -7,6 +7,7 @@ import (
 	"github.com/HackUCF/Quincy/src/api/config"
 	"github.com/HackUCF/Quincy/src/api/sinks"
 	"github.com/HackUCF/Quincy/src/api/sinks/postgres/conn"
+	"github.com/HackUCF/Quincy/src/common/log"
 	"github.com/HackUCF/Quincy/src/common/types"
 	"github.com/gin-gonic/gin"
 )
@@ -39,9 +40,10 @@ func AddScore(c *gin.Context) {
 	if err != nil && cfg.Sinks.DBEnabled() {
 		resp := gin.H{
 			"message": "failed to get database connection from request context",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusInternalServerError, resp)
+		log.Info("failure in AddScore", "resp", resp)
 		return
 	}
 
@@ -51,9 +53,10 @@ func AddScore(c *gin.Context) {
 	if err != nil {
 		resp := gin.H{
 			"message": "couldn't marshall json from request body",
-			"error":   err,
+			"error":   err.Error(),
 		}
 		c.JSON(http.StatusBadRequest, resp)
+		log.Info("failure in AddScore", "resp", resp)
 		return
 	}
 
@@ -61,20 +64,22 @@ func AddScore(c *gin.Context) {
 	if err := validateScore(score); err != nil {
 		resp := gin.H{
 			"message": "score failed to verify",
-			"error":   err,
+			"error":   err.Error(),
 			"score":   score,
 		}
 		c.JSON(http.StatusBadRequest, resp)
+		log.Info("failure in AddScore", "resp", resp)
 		return
 	}
 
 	if err := sinks.AddScore(c.Request.Context(), cfg.Sinks, db, score); err != nil {
 		resp := gin.H{
 			"message": "failed to add score",
-			"error":   err,
+			"error":   err.Error(),
 			"score":   score,
 		}
 		c.JSON(http.StatusBadRequest, resp)
+		log.Info("failure in AddScore", "resp", resp)
 		return
 	}
 

@@ -13,11 +13,11 @@ import (
 // IsPaused returns whether or not the competition is currently paused.
 // Takes a tx instead of the entire db pool for use in reliable logic.
 // hot path, no cleanup is run against the pauses table.
-func IsPaused(ctx context.Context, tx pgx.Tx) (types.PauseState, error) {
+func IsPaused(ctx context.Context, tx pgx.Tx, pauseType types.PauseType) (types.PauseState, error) {
 
 	var current types.PauseState
 
-	row := tx.QueryRow(ctx, "SELECT state FROM pause_states ORDER BY timestamp DESC LIMIT 1;")
+	row := tx.QueryRow(ctx, "SELECT state FROM pauses WHERE type = $1 ORDER BY timestamp DESC LIMIT 1;", pauseType)
 
 	err := row.Scan(&current)
 	if err != nil {
@@ -32,8 +32,10 @@ func IsPaused(ctx context.Context, tx pgx.Tx) (types.PauseState, error) {
 func GetPauseRecord(ctx context.Context, db *pgxpool.Pool) (types.PauseRecord, error) {
 
 	var record = types.PauseRecord{
-		State: types.PauseDefault,
-		Since: time.Time{},
+		ScoringState: types.PauseDefault,
+		ScoringSince: time.Time{},
+		CheckState:   types.PauseDefault,
+		CheckSince:   time.Time{},
 	}
 	var rawTime int64
 
@@ -44,24 +46,43 @@ func GetPauseRecord(ctx context.Context, db *pgxpool.Pool) (types.PauseRecord, e
 	}
 	defer tx.Rollback(ctx)
 
-	// cleanup the db
-	err = CleanupPauses(ctx, tx)
-	if err != nil {
-		err = fmt.Errorf("failed to cleanup pauses table in db: %w", err)
-		return record, err
+	// scoring pause
+	{
+		// get pause record from db
+		row := tx.QueryRow(
+			ctx,
+			"SELECT state, timestamp FROM pauses WHERE type = $1 ORDER BY timestamp DESC LIMIT 1;",
+			types.ScoringPause,
+		)
+
+		// scan into variables
+		err = row.Scan(&record.CheckState, &rawTime)
+		if err != nil {
+			err = fmt.Errorf("failed to get state from db: %w", err)
+			return record, err
+		}
+
+		record.ScoringSince = time.UnixMicro(rawTime)
 	}
 
-	// get pause record from db
-	row := tx.QueryRow(ctx, "SELECT state, timestamp FROM pause_states ORDER BY timestamp DESC LIMIT 1;")
+	// checks pause
+	{
+		// get pause record from db
+		row := tx.QueryRow(
+			ctx,
+			"SELECT state, timestamp FROM pauses WHERE type = $1 ORDER BY timestamp DESC LIMIT 1;",
+			types.CheckPause,
+		)
 
-	// scan into variables
-	err = row.Scan(&record.State, &rawTime)
-	if err != nil {
-		err = fmt.Errorf("failed to get state from db: %w", err)
-		return record, err
+		// scan into variables
+		err = row.Scan(&record.CheckState, &rawTime)
+		if err != nil {
+			err = fmt.Errorf("failed to get state from db: %w", err)
+			return record, err
+		}
+
+		record.CheckSince = time.UnixMicro(rawTime)
 	}
-
-	record.Since = time.UnixMicro(rawTime)
 
 	// commit transaction
 	if err = tx.Commit(ctx); err != nil {

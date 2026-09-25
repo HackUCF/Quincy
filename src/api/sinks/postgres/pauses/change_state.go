@@ -10,7 +10,12 @@ import (
 )
 
 // ChangePauseState pauses or unpauses the competition.
-func ChangePauseState(ctx context.Context, db *pgxpool.Pool, desiredState types.PauseState) (changed bool, err error) {
+func ChangePauseState(
+	ctx context.Context,
+	db *pgxpool.Pool,
+	desiredState types.PauseState,
+	desiredType types.PauseType,
+) (changed bool, err error) {
 
 	// start a transaction
 	tx, err := db.Begin(ctx)
@@ -20,15 +25,14 @@ func ChangePauseState(ctx context.Context, db *pgxpool.Pool, desiredState types.
 	}
 	defer tx.Rollback(ctx)
 
-	// cleanup current state
-	err = CleanupPauses(ctx, tx)
+	// lock the pauses table
+	err = blockLock(ctx, tx, pauseLock)
 	if err != nil {
-		err = fmt.Errorf("failed to cleanup pauses table in db: %w", err)
 		return false, err
 	}
 
 	// check current state
-	currentState, err := IsPaused(ctx, tx)
+	currentState, err := IsPaused(ctx, tx, desiredType)
 	if err != nil {
 		err = fmt.Errorf("failed to check current pause state: %w", err)
 		return false, err
@@ -42,7 +46,13 @@ func ChangePauseState(ctx context.Context, db *pgxpool.Pool, desiredState types.
 	ts := time.Now().UnixMicro()
 
 	// insert new state
-	tag, err := tx.Exec(ctx, "INSERT INTO pause_states (timestamp, state) VALUES ($1, $2);", ts, desiredState)
+	tag, err := tx.Exec(
+		ctx,
+		"INSERT INTO pauses (timestamp, state, type) VALUES ($1, $2, $3);",
+		ts,
+		desiredState,
+		desiredType,
+	)
 	if err != nil {
 		err = fmt.Errorf("failed to update pause state: %w", err)
 		return false, err

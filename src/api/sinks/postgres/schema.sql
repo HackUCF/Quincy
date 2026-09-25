@@ -54,9 +54,23 @@ CREATE TABLE IF NOT EXISTS scoring_users (
   PRIMARY KEY (team_num, user_list, username)
 );
 
+-- postgres doesn't support IF NOT EXISTS for types for some reason
+DO $$
+BEGIN
+  CREATE TYPE pause_type AS ENUM (
+    'scoring',  -- keep running checks, but stop updating scores
+    'check'     -- stop running checks entirely
+  );
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END
+$$;
+
 -- store a history of when the comp was paused and unpaused
-CREATE TABLE IF NOT EXISTS pause_states (
-  timestamp BIGINT  NOT NULL UNIQUE,
-  state     BOOLEAN NOT NULL, -- pause or unpause action. pause == true, unpause == false
-  id        SERIAL  PRIMARY KEY
-);  
+-- these track the pauses that leave checks running, but don't stop checks from running
+CREATE TABLE IF NOT EXISTS pauses (
+  timestamp BIGINT     NOT NULL UNIQUE,
+  state     BOOLEAN    NOT NULL, -- pause or unpause action. pause == true, unpause == false
+  type      pause_type NOT NULL,
+  id        SERIAL     PRIMARY KEY
+);
