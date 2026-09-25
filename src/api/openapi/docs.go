@@ -63,7 +63,7 @@ const docTemplate = `{
         },
         "/agent/new-check": {
             "get": {
-                "description": "Returns the next fully-rendered service check for the agent to execute. Rotates round-robin across all services and teams.",
+                "description": "Returns the next fully-rendered service check for the agent to execute. Rotates round-robin across all services and teams. While checks are paused this returns a no-op assignment instead (` + "`" + `no_op: true` + "`" + `) with no check details, which tells the agent to idle until its next poll; the queue is not advanced, so no check is lost to the pause.",
                 "produces": [
                     "application/json"
                 ],
@@ -93,21 +93,185 @@ const docTemplate = `{
                 }
             }
         },
-        "/config": {
-            "get": {
-                "description": "Returns the loaded API config, including box definitions, user lists, and team count. Useful for building dynamic PCR forms.",
+        "/comp/pause-checks": {
+            "post": {
+                "description": "Moves one of the two independent pauses into the requested state. A scoring pause leaves checks running but stops results counting toward team totals; a check pause stops checks being handed to agents entirely. The target state and pause kind are fixed by the path, so there is no request body. Requesting a state the competition is already in changes nothing and returns 418.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "misc"
+                    "comp"
                 ],
-                "summary": "Get API configuration",
+                "summary": "Pause or unpause the competition",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/config.APIConfigSpec"
+                            "type": "object"
+                        }
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/comp/pause-scoring": {
+            "post": {
+                "description": "Moves one of the two independent pauses into the requested state. A scoring pause leaves checks running but stops results counting toward team totals; a check pause stops checks being handed to agents entirely. The target state and pause kind are fixed by the path, so there is no request body. Requesting a state the competition is already in changes nothing and returns 418.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comp"
+                ],
+                "summary": "Pause or unpause the competition",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/comp/pause-status": {
+            "get": {
+                "description": "Reports both pause kinds at once — whether scoring is paused and whether checks are paused — each with the moment it entered its current state.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comp"
+                ],
+                "summary": "Get competition pause status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.PauseRecord"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/comp/unpause-checks": {
+            "post": {
+                "description": "Moves one of the two independent pauses into the requested state. A scoring pause leaves checks running but stops results counting toward team totals; a check pause stops checks being handed to agents entirely. The target state and pause kind are fixed by the path, so there is no request body. Requesting a state the competition is already in changes nothing and returns 418.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comp"
+                ],
+                "summary": "Pause or unpause the competition",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
+        "/comp/unpause-scoring": {
+            "post": {
+                "description": "Moves one of the two independent pauses into the requested state. A scoring pause leaves checks running but stops results counting toward team totals; a check pause stops checks being handed to agents entirely. The target state and pause kind are fixed by the path, so there is no request body. Requesting a state the competition is already in changes nothing and returns 418.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comp"
+                ],
+                "summary": "Pause or unpause the competition",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
                         }
                     }
                 }
@@ -224,76 +388,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object"
-                        }
-                    },
-                    "501": {
-                        "description": "Not Implemented",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
-        "/pause": {
-            "post": {
-                "description": "Halts scoring for planned interruptions such as a lunch break. Agents keep receiving checks and keep running them while paused; results are still archived and still reported as the current status, but they are not added to a team's pass and total counters, so no team loses uptime. Returns 418 if the competition is already paused. The pause state is stored in the database and survives an API server restart, so this endpoint requires the PostgreSQL sink and returns 501 without it.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "misc"
-                ],
-                "summary": "Pause the competition",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
-                    },
-                    "418": {
-                        "description": "I'm a teapot",
-                        "schema": {
-                            "type": "object"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object"
-                        }
-                    },
-                    "501": {
-                        "description": "Not Implemented",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
-        "/pause-status": {
-            "get": {
-                "description": "Reports whether the competition is currently paused and when it entered that state. Returns an object with two fields: ` + "`" + `is_paused` + "`" + ` (bool) and ` + "`" + `since` + "`" + ` (RFC 3339 timestamp). The timestamp is the moment of the last recorded pause or unpause, read from the database. Requires the PostgreSQL sink; returns 501 without it.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "misc"
-                ],
-                "summary": "Get the competition pause status",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object"
                         }
                     },
                     "500": {
@@ -495,44 +589,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/unpause": {
-            "post": {
-                "description": "Resumes scoring after a pause. Check results begin counting toward team pass and total counters again from the moment of the call. Returns 418 if the competition is not currently paused. Requires the PostgreSQL sink; returns 501 without it.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "misc"
-                ],
-                "summary": "Resume the competition",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object"
-                        }
-                    },
-                    "418": {
-                        "description": "I'm a teapot",
-                        "schema": {
-                            "type": "object"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object"
-                        }
-                    },
-                    "501": {
-                        "description": "Not Implemented",
-                        "schema": {
-                            "type": "object"
-                        }
-                    }
-                }
-            }
-        },
         "/users": {
             "get": {
                 "description": "Returns every user in every userlist for every team, including current passwords. Shape: {\"team\": {\"userlist\": [User]}}.",
@@ -620,197 +676,24 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "config.APIConfigSpec": {
+        "types.PauseRecord": {
             "type": "object",
             "properties": {
-                "boxes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/config.BoxSpec"
-                    }
+                "checks_are_paused": {
+                    "type": "boolean",
+                    "example": true
                 },
-                "http": {
-                    "$ref": "#/definitions/config.HTTPSpec"
+                "checks_since": {
+                    "type": "string",
+                    "example": "2026-09-25T14:37:50.119204Z"
                 },
-                "num_teams": {
-                    "type": "integer",
-                    "example": 5
-                },
-                "sinks": {
-                    "$ref": "#/definitions/config.Sinks"
-                },
-                "start_paused": {
+                "scoring_is_paused": {
                     "type": "boolean",
                     "example": false
                 },
-                "user_lists": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/config.UserListSpec"
-                    }
-                }
-            }
-        },
-        "config.BoxSpec": {
-            "type": "object",
-            "properties": {
-                "host": {
+                "scoring_since": {
                     "type": "string",
-                    "example": "127.0.0.{}"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "scrapyard"
-                },
-                "services": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/types.ServiceSpec"
-                    }
-                }
-            }
-        },
-        "config.HTTPSpec": {
-            "type": "object",
-            "properties": {
-                "host": {
-                    "type": "string",
-                    "example": "127.0.0.1"
-                },
-                "port": {
-                    "type": "integer",
-                    "example": 8888
-                }
-            }
-        },
-        "config.OTelBatching": {
-            "type": "object",
-            "properties": {
-                "batch_size": {
-                    "type": "integer",
-                    "example": 20
-                },
-                "export_interval": {
-                    "type": "integer",
-                    "example": 5
-                },
-                "max_queue_size": {
-                    "type": "integer",
-                    "example": 200
-                }
-            }
-        },
-        "config.OTelConfig": {
-            "type": "object",
-            "properties": {
-                "basic_auth": {
-                    "type": "string",
-                    "example": "dXNlcjpwYXNz"
-                },
-                "batching": {
-                    "description": "Batching settings",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/config.OTelBatching"
-                        }
-                    ]
-                },
-                "endpoint": {
-                    "type": "string",
-                    "example": "http://localhost:4318"
-                },
-                "password": {
-                    "type": "string",
-                    "example": "secret"
-                },
-                "stream_name": {
-                    "description": "OpenObserve specific header",
-                    "type": "string",
-                    "example": "quincy"
-                },
-                "username": {
-                    "type": "string",
-                    "example": "admin"
-                }
-            }
-        },
-        "config.PGConfig": {
-            "type": "object",
-            "properties": {
-                "database": {
-                    "type": "string",
-                    "example": "quincy"
-                },
-                "host": {
-                    "type": "string",
-                    "example": "localhost"
-                },
-                "max_conns": {
-                    "type": "integer",
-                    "example": 10
-                },
-                "password": {
-                    "type": "string",
-                    "example": "postgres"
-                },
-                "port": {
-                    "type": "integer",
-                    "example": 5432
-                },
-                "ssl_mode": {
-                    "type": "string",
-                    "example": "prefer"
-                },
-                "username": {
-                    "type": "string",
-                    "example": "postgres"
-                }
-            }
-        },
-        "config.Sinks": {
-            "type": "object",
-            "properties": {
-                "otel": {
-                    "$ref": "#/definitions/config.OTelConfig"
-                },
-                "postgres": {
-                    "$ref": "#/definitions/config.PGConfig"
-                }
-            }
-        },
-        "config.UserListSpec": {
-            "type": "object",
-            "properties": {
-                "domain": {
-                    "type": "string",
-                    "example": "quin.cy"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "local users"
-                },
-                "netbios": {
-                    "type": "string",
-                    "example": "QUIN"
-                },
-                "users": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/config.UserSpec"
-                    }
-                }
-            }
-        },
-        "config.UserSpec": {
-            "type": "object",
-            "properties": {
-                "password": {
-                    "type": "string",
-                    "example": "BuyMyNFT1!"
-                },
-                "username": {
-                    "type": "string",
-                    "example": "geraldo"
+                    "example": "2026-09-25T14:02:11.482913Z"
                 }
             }
         },
@@ -888,6 +771,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "blog"
                 },
+                "no_op": {
+                    "type": "boolean",
+                    "example": false
+                },
                 "team_num": {
                     "type": "integer",
                     "example": 1
@@ -898,27 +785,6 @@ const docTemplate = `{
                 },
                 "user": {
                     "$ref": "#/definitions/types.User"
-                },
-                "user_list": {
-                    "type": "string",
-                    "example": "local users"
-                }
-            }
-        },
-        "types.ServiceSpec": {
-            "type": "object",
-            "properties": {
-                "check": {
-                    "type": "string",
-                    "example": "100percent.py"
-                },
-                "name": {
-                    "type": "string",
-                    "example": "blog"
-                },
-                "timeout": {
-                    "type": "number",
-                    "example": 30
                 },
                 "user_list": {
                     "type": "string",

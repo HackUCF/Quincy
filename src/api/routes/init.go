@@ -80,7 +80,6 @@ func RegisterRoutes(router *gin.Engine, s config.Sinks) {
 
 			compGroup.GET("/pause-status", s.DBOr501(competition.PauseStatus)) // /api/v1/comp/pause-status
 		}
-
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

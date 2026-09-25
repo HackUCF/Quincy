@@ -34,5 +34,5 @@ type User struct {
 type Service struct {
 	ServiceTemplate
 	User *User `json:"user,omitempty,omitzero"`
-	NoOp bool  `json:"no_op,omitempty,omitzero"`
+	NoOp bool  `json:"no_op,omitempty,omitzero"  example:"false"`
 }

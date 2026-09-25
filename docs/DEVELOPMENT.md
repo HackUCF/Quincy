@@ -78,8 +78,8 @@ The API server. On startup it loads the YAML config, initializes the PostgreSQL 
 
 - **config** -- Loads and validates the YAML config file. The parsed config is stored globally and accessed by the rest of the server.
 - **sinks** -- The sink abstraction layer. Dispatches score writes and credential lookups to whichever backends are enabled, each optional and independently configured. `sinks/postgres` is the database layer: it manages the connection pool, executes the schema on startup, and provides query functions organized by domain (agent, scoring, users, graphs, pauses, misc); its `conn` subpackage also exposes Gin middleware that injects the database connection into each request's context. `sinks/opentelemetry` ships score results to an OTLP-compatible backend as batched log records.
-- **routes** -- HTTP route handlers built on Gin, with recovery, request logging, CORS, and database middleware. Handlers are grouped into subpackages by domain (agent, scoring, users, graphs, misc).
-- **services** -- Generates the full check queue by combining every team with every box and service, and serves checks round-robin to agents. Checks are handed out unconditionally; the competition pause state lives in the database and is applied when a result is submitted, not when work is dispatched.
+- **routes** -- HTTP route handlers built on Gin, with recovery, request logging, CORS, and database middleware. Handlers are grouped into subpackages by domain (agent, scoring, users, graphs, competition, misc).
+- **services** -- Generates the full check queue by combining every team with every box and service, and serves checks round-robin to agents. The queue itself applies no pause state; both pauses live in the database and are enforced around this package -- a scoring pause when a result is submitted, a check pause in the agent route ahead of it, which returns a no-op without advancing the queue.
 - **openapi** -- The generated OpenAPI description of the HTTP surface, produced by swaggo from handler annotations and embedded in the binary. Never edited by hand.
 
 ### `src/agent/`
@@ -92,13 +92,13 @@ The scoring agent. Spawns a pool of goroutines that each loop independently: fet
 
 Shared packages used by both the API server and agent:
 
-- **types** -- Shared type aliases and structs (scores, services, team numbers, names).
+- **types** -- Shared type aliases and structs (scores, services, team numbers, names, pause states and kinds).
 - **log** -- Thin structured logging wrapper around Zap.
 - **middleware** -- Gin middleware for panic recovery and request logging.
 
 ### `src/testutil/`
 
-Shared test infrastructure used by database-backed and container-backed tests across the module. Provides a Postgres container factory with Docker-unavailable skip handling, fixture helpers for seeding a minimal config and dataset, and a test router that wires the full production route tree without requiring global server state. The `container/` sub-package provides a generic container launcher for integration tests that need containers other than Postgres; it lives in a separate package to avoid an import cycle with the OTel sink. Never compiled into production binaries.
+Shared test infrastructure used by database-backed and container-backed tests across the module. Provides a Postgres container factory with Docker-unavailable skip handling, fixture helpers for seeding a minimal config and dataset (including the initial pause state, which the score write path reads on every submission), and a test router that wires the full production route tree without requiring global server state. The `container/` sub-package provides a generic container launcher for integration tests that need containers other than Postgres; it lives in a separate package to avoid an import cycle with the OTel sink. Never compiled into production binaries.
 
 ## Initialization Flow
 

@@ -8,6 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// PauseStatus reports the current state of both competition pauses.
+//
+//	@Summary		Get competition pause status
+//	@Description	Reports both pause kinds at once — whether scoring is paused and whether checks are paused — each with the moment it entered its current state.
+//	@Tags			comp
+//	@Produce		json
+//	@Success		200	{object}	types.PauseRecord
+//	@Failure		500	{object}	object
+//	@Failure		501	{object}	object
+//	@Router			/comp/pause-status [get]
 func PauseStatus(c *gin.Context) {
 
 	db := conn.Get(c)

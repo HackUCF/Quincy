@@ -1,137 +1,18 @@
 basePath: /api/v1
 definitions:
-  config.APIConfigSpec:
+  types.PauseRecord:
     properties:
-      boxes:
-        items:
-          $ref: '#/definitions/config.BoxSpec'
-        type: array
-      http:
-        $ref: '#/definitions/config.HTTPSpec'
-      num_teams:
-        example: 5
-        type: integer
-      sinks:
-        $ref: '#/definitions/config.Sinks'
-      start_paused:
+      checks_are_paused:
+        example: true
+        type: boolean
+      checks_since:
+        example: "2026-09-25T14:37:50.119204Z"
+        type: string
+      scoring_is_paused:
         example: false
         type: boolean
-      user_lists:
-        items:
-          $ref: '#/definitions/config.UserListSpec'
-        type: array
-    type: object
-  config.BoxSpec:
-    properties:
-      host:
-        example: 127.0.0.{}
-        type: string
-      name:
-        example: scrapyard
-        type: string
-      services:
-        items:
-          $ref: '#/definitions/types.ServiceSpec'
-        type: array
-    type: object
-  config.HTTPSpec:
-    properties:
-      host:
-        example: 127.0.0.1
-        type: string
-      port:
-        example: 8888
-        type: integer
-    type: object
-  config.OTelBatching:
-    properties:
-      batch_size:
-        example: 20
-        type: integer
-      export_interval:
-        example: 5
-        type: integer
-      max_queue_size:
-        example: 200
-        type: integer
-    type: object
-  config.OTelConfig:
-    properties:
-      basic_auth:
-        example: dXNlcjpwYXNz
-        type: string
-      batching:
-        allOf:
-        - $ref: '#/definitions/config.OTelBatching'
-        description: Batching settings
-      endpoint:
-        example: http://localhost:4318
-        type: string
-      password:
-        example: secret
-        type: string
-      stream_name:
-        description: OpenObserve specific header
-        example: quincy
-        type: string
-      username:
-        example: admin
-        type: string
-    type: object
-  config.PGConfig:
-    properties:
-      database:
-        example: quincy
-        type: string
-      host:
-        example: localhost
-        type: string
-      max_conns:
-        example: 10
-        type: integer
-      password:
-        example: postgres
-        type: string
-      port:
-        example: 5432
-        type: integer
-      ssl_mode:
-        example: prefer
-        type: string
-      username:
-        example: postgres
-        type: string
-    type: object
-  config.Sinks:
-    properties:
-      otel:
-        $ref: '#/definitions/config.OTelConfig'
-      postgres:
-        $ref: '#/definitions/config.PGConfig'
-    type: object
-  config.UserListSpec:
-    properties:
-      domain:
-        example: quin.cy
-        type: string
-      name:
-        example: local users
-        type: string
-      netbios:
-        example: QUIN
-        type: string
-      users:
-        items:
-          $ref: '#/definitions/config.UserSpec'
-        type: array
-    type: object
-  config.UserSpec:
-    properties:
-      password:
-        example: BuyMyNFT1!
-        type: string
-      username:
-        example: geraldo
+      scoring_since:
+        example: "2026-09-25T14:02:11.482913Z"
         type: string
     type: object
   types.Score:
@@ -192,6 +73,9 @@ definitions:
       name:
         example: blog
         type: string
+      no_op:
+        example: false
+        type: boolean
       team_num:
         example: 1
         type: integer
@@ -200,21 +84,6 @@ definitions:
         type: number
       user:
         $ref: '#/definitions/types.User'
-      user_list:
-        example: local users
-        type: string
-    type: object
-  types.ServiceSpec:
-    properties:
-      check:
-        example: 100percent.py
-        type: string
-      name:
-        example: blog
-        type: string
-      timeout:
-        example: 30
-        type: number
       user_list:
         example: local users
         type: string
@@ -296,8 +165,11 @@ paths:
       - agent
   /agent/new-check:
     get:
-      description: Returns the next fully-rendered service check for the agent to
-        execute. Rotates round-robin across all services and teams.
+      description: 'Returns the next fully-rendered service check for the agent to
+        execute. Rotates round-robin across all services and teams. While checks are
+        paused this returns a no-op assignment instead (`no_op: true`) with no check
+        details, which tells the agent to idle until its next poll; the queue is not
+        advanced, so no check is lost to the pause.'
       produces:
       - application/json
       responses:
@@ -316,20 +188,144 @@ paths:
       summary: Get next check to run
       tags:
       - agent
-  /config:
-    get:
-      description: Returns the loaded API config, including box definitions, user
-        lists, and team count. Useful for building dynamic PCR forms.
+  /comp/pause-checks:
+    post:
+      description: Moves one of the two independent pauses into the requested state.
+        A scoring pause leaves checks running but stops results counting toward team
+        totals; a check pause stops checks being handed to agents entirely. The target
+        state and pause kind are fixed by the path, so there is no request body. Requesting
+        a state the competition is already in changes nothing and returns 418.
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/config.APIConfigSpec'
-      summary: Get API configuration
+            type: object
+        "418":
+          description: I'm a teapot
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
+      summary: Pause or unpause the competition
       tags:
-      - misc
+      - comp
+  /comp/pause-scoring:
+    post:
+      description: Moves one of the two independent pauses into the requested state.
+        A scoring pause leaves checks running but stops results counting toward team
+        totals; a check pause stops checks being handed to agents entirely. The target
+        state and pause kind are fixed by the path, so there is no request body. Requesting
+        a state the competition is already in changes nothing and returns 418.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "418":
+          description: I'm a teapot
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
+      summary: Pause or unpause the competition
+      tags:
+      - comp
+  /comp/pause-status:
+    get:
+      description: Reports both pause kinds at once — whether scoring is paused and
+        whether checks are paused — each with the moment it entered its current state.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.PauseRecord'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
+      summary: Get competition pause status
+      tags:
+      - comp
+  /comp/unpause-checks:
+    post:
+      description: Moves one of the two independent pauses into the requested state.
+        A scoring pause leaves checks running but stops results counting toward team
+        totals; a check pause stops checks being handed to agents entirely. The target
+        state and pause kind are fixed by the path, so there is no request body. Requesting
+        a state the competition is already in changes nothing and returns 418.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "418":
+          description: I'm a teapot
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
+      summary: Pause or unpause the competition
+      tags:
+      - comp
+  /comp/unpause-scoring:
+    post:
+      description: Moves one of the two independent pauses into the requested state.
+        A scoring pause leaves checks running but stops results counting toward team
+        totals; a check pause stops checks being handed to agents entirely. The target
+        state and pause kind are fixed by the path, so there is no request body. Requesting
+        a state the competition is already in changes nothing and returns 418.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "418":
+          description: I'm a teapot
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
+      summary: Pause or unpause the competition
+      tags:
+      - comp
   /graphs/heatmap:
     get:
       description: Returns an embeddable HTML/JS fragment showing historical uptime
@@ -418,62 +414,6 @@ paths:
       summary: Standings bar chart
       tags:
       - graphs
-  /pause:
-    post:
-      description: Halts scoring for planned interruptions such as a lunch break.
-        Agents keep receiving checks and keep running them while paused; results are
-        still archived and still reported as the current status, but they are not
-        added to a team's pass and total counters, so no team loses uptime. Returns
-        418 if the competition is already paused. The pause state is stored in the
-        database and survives an API server restart, so this endpoint requires the
-        PostgreSQL sink and returns 501 without it.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: object
-        "418":
-          description: I'm a teapot
-          schema:
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            type: object
-        "501":
-          description: Not Implemented
-          schema:
-            type: object
-      summary: Pause the competition
-      tags:
-      - misc
-  /pause-status:
-    get:
-      description: 'Reports whether the competition is currently paused and when it
-        entered that state. Returns an object with two fields: `is_paused` (bool)
-        and `since` (RFC 3339 timestamp). The timestamp is the moment of the last
-        recorded pause or unpause, read from the database. Requires the PostgreSQL
-        sink; returns 501 without it.'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            type: object
-        "501":
-          description: Not Implemented
-          schema:
-            type: object
-      summary: Get the competition pause status
-      tags:
-      - misc
   /scores/box:
     get:
       description: Returns pass/fail check stats aggregated across all teams and services,
@@ -600,34 +540,6 @@ paths:
       summary: Get cumulative scores per team
       tags:
       - scores
-  /unpause:
-    post:
-      description: Resumes scoring after a pause. Check results begin counting toward
-        team pass and total counters again from the moment of the call. Returns 418
-        if the competition is not currently paused. Requires the PostgreSQL sink;
-        returns 501 without it.
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: object
-        "418":
-          description: I'm a teapot
-          schema:
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            type: object
-        "501":
-          description: Not Implemented
-          schema:
-            type: object
-      summary: Resume the competition
-      tags:
-      - misc
   /users:
     get:
       description: 'Returns every user in every userlist for every team, including

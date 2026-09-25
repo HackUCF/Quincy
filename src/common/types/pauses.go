@@ -28,8 +28,8 @@ const (
 
 // PauseRecord is the state of the competitions pauses.
 type PauseRecord struct {
-	ScoringState PauseState `json:"scoring_is_paused"`
-	ScoringSince time.Time  `json:"scoring_since"`
-	CheckState   PauseState `json:"checks_are_paused"`
-	CheckSince   time.Time  `json:"checks_since"`
+	ScoringState PauseState `json:"scoring_is_paused"   example:"false"`
+	ScoringSince time.Time  `json:"scoring_since"       example:"2026-09-25T14:02:11.482913Z"`
+	CheckState   PauseState `json:"checks_are_paused"   example:"true"`
+	CheckSince   time.Time  `json:"checks_since"        example:"2026-09-25T14:37:50.119204Z"`
 }

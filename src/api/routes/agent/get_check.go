@@ -15,7 +15,7 @@ import (
 // This is meant for interaction from the agents.
 //
 //	@Summary		Get next check to run
-//	@Description	Returns the next fully-rendered service check for the agent to execute. Rotates round-robin across all services and teams.
+//	@Description	Returns the next fully-rendered service check for the agent to execute. Rotates round-robin across all services and teams. While checks are paused this returns a no-op assignment instead (`no_op: true`) with no check details, which tells the agent to idle until its next poll; the queue is not advanced, so no check is lost to the pause.
 //	@Tags			agent
 //	@Produce		json
 //	@Success		200	{object}	types.Service

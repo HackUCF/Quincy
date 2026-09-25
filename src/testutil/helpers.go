@@ -26,6 +26,13 @@ func NewTestRouter(pool *pgxpool.Pool, cfg *config.APIConfigSpec) *gin.Engine {
 	if pool != nil && !sinks.DBEnabled() {
 		sinks.PGConfig = config.PGConfig{Host: "test"}
 	}
+
+	// handlers branch on the sinks in their own config, not on the value the
+	// router was gated with. In production those are the same object; keep them
+	// in step here too, or a handler takes its no-database path behind a route
+	// the router believes is database-backed.
+	cfg.Sinks = sinks
+
 	routes.RegisterRoutes(r, sinks)
 	return r
 }

@@ -9,9 +9,7 @@ import (
 	"testing"
 
 	"github.com/HackUCF/Quincy/src/api/config"
-	"github.com/HackUCF/Quincy/src/api/routes"
 	"github.com/HackUCF/Quincy/src/api/services"
-	"github.com/HackUCF/Quincy/src/common/middleware"
 	"github.com/HackUCF/Quincy/src/testutil"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -54,21 +52,6 @@ func get(path string) *httptest.ResponseRecorder {
 	return w
 }
 
-func TestGetConfig_OK(t *testing.T) {
-	w := get("/api/v1/config")
-	if w.Code != http.StatusOK {
-		t.Errorf("status = %d, want 200; body: %s", w.Code, w.Body.String())
-	}
-
-	var body map[string]any
-	if err := json.Unmarshal(w.Body.Bytes(), &body); err != nil {
-		t.Fatalf("response is not JSON: %v", err)
-	}
-	if _, ok := body["num_teams"]; !ok {
-		t.Error("response missing num_teams field")
-	}
-}
-
 func TestNoRoute_Returns404(t *testing.T) {
 	w := get("/api/v1/nonexistent")
 	if w.Code != http.StatusNotFound {
@@ -108,176 +91,12 @@ func TestNoRoute_HasMessageField(t *testing.T) {
 	}
 }
 
-func post(path string) *httptest.ResponseRecorder {
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, path, nil)
-	testRouter.ServeHTTP(w, req)
-	return w
-}
-
-// pauseState reads the pause status endpoint and returns the reported flag.
-func pauseState(t *testing.T) bool {
-	t.Helper()
-
-	w := get("/api/v1/pause-status")
-	if w.Code != http.StatusOK {
-		t.Fatalf("pause-status status = %d, want 200; body: %s", w.Code, w.Body.String())
-	}
-
-	var body struct {
-		IsPaused bool   `json:"is_paused"`
-		Since    string `json:"since"`
-	}
-	if err := json.Unmarshal(w.Body.Bytes(), &body); err != nil {
-		t.Fatalf("pause-status response is not JSON: %v", err)
-	}
-	if body.Since == "" {
-		t.Error("pause-status response missing since field")
-	}
-	return body.IsPaused
-}
-
-// restoreRunning leaves the competition unpaused for later tests regardless of
-// what this one did to it.
-func restoreRunning(t *testing.T) {
-	t.Helper()
-	t.Cleanup(func() {
-		if w := post("/api/v1/unpause"); w.Code != http.StatusOK && w.Code != http.StatusTeapot {
-			t.Fatalf("restoring the running state: status = %d; body: %s", w.Code, w.Body.String())
-		}
-	})
-}
-
-func TestPauseStatus_reportsRunningBeforeAnyPause(t *testing.T) {
-	if pauseState(t) {
-		t.Error("is_paused = true before anything paused the competition")
-	}
-}
-
-func TestPause_thenUnpause(t *testing.T) {
-	restoreRunning(t)
-
-	if w := post("/api/v1/pause"); w.Code != http.StatusOK {
-		t.Fatalf("pause status = %d, want 200; body: %s", w.Code, w.Body.String())
-	}
-	if !pauseState(t) {
-		t.Error("is_paused = false after a successful pause")
-	}
-
-	if w := post("/api/v1/unpause"); w.Code != http.StatusOK {
-		t.Fatalf("unpause status = %d, want 200; body: %s", w.Code, w.Body.String())
-	}
-	if pauseState(t) {
-		t.Error("is_paused = true after a successful unpause")
-	}
-}
-
-func TestPause_redundantCallsAreTeapots(t *testing.T) {
-	restoreRunning(t)
-
-	// unpausing while already running changes nothing
-	if w := post("/api/v1/unpause"); w.Code != http.StatusTeapot {
-		t.Errorf("unpause while running = %d, want 418; body: %s", w.Code, w.Body.String())
-	}
-
-	if w := post("/api/v1/pause"); w.Code != http.StatusOK {
-		t.Fatalf("pause status = %d, want 200; body: %s", w.Code, w.Body.String())
-	}
-
-	// and pausing while already paused does too
-	if w := post("/api/v1/pause"); w.Code != http.StatusTeapot {
-		t.Errorf("pause while paused = %d, want 418; body: %s", w.Code, w.Body.String())
-	}
-	if !pauseState(t) {
-		t.Error("is_paused = false after a redundant pause — the state must be left alone")
-	}
-}
-
-func TestPauseStatus_sinceMovesWithTheTransition(t *testing.T) {
-	restoreRunning(t)
-
-	sinceOf := func() string {
-		t.Helper()
-		w := get("/api/v1/pause-status")
-		var body struct {
-			Since string `json:"since"`
-		}
-		if err := json.Unmarshal(w.Body.Bytes(), &body); err != nil {
-			t.Fatalf("pause-status response is not JSON: %v", err)
-		}
-		return body.Since
-	}
-
-	before := sinceOf()
-
-	if w := post("/api/v1/pause"); w.Code != http.StatusOK {
-		t.Fatalf("pause status = %d, want 200; body: %s", w.Code, w.Body.String())
-	}
-	after := sinceOf()
-	if after == before {
-		t.Errorf("since = %s before and after a real transition, want the moment of the pause", after)
-	}
-
-	// a rejected transition must not move it
-	if w := post("/api/v1/pause"); w.Code != http.StatusTeapot {
-		t.Fatalf("pause while paused = %d, want 418", w.Code)
-	}
-	if got := sinceOf(); got != after {
-		t.Errorf("since moved from %s to %s on a rejected pause", after, got)
-	}
-}
-
-// noSinkRouter builds the real route tree with no sinks configured, which is how
-// a deployment without the database runs.
-func noSinkRouter() *gin.Engine {
-	gin.SetMode(gin.TestMode)
-	r := gin.New()
-	r.Use(
-		middleware.Recovery(false),
-		func(c *gin.Context) {
-			// the config middleware is applied whether or not a sink exists,
-			// so mirror it here; only the db middleware is sink-dependent
-			c.Set(config.CfgKey, testCfg)
-			c.Next()
-		},
-	)
-	routes.RegisterRoutes(r, config.Sinks{})
-	return r
-}
-
-func TestPauseRoutes_return501WithoutTheDatabase(t *testing.T) {
-	router := noSinkRouter()
-
-	for _, tc := range []struct {
-		method string
-		path   string
-	}{
-		{http.MethodPost, "/api/v1/pause"},
-		{http.MethodPost, "/api/v1/unpause"},
-		{http.MethodGet, "/api/v1/pause-status"},
-	} {
-		t.Run(tc.method+" "+tc.path, func(t *testing.T) {
-			w := httptest.NewRecorder()
-			req, _ := http.NewRequest(tc.method, tc.path, nil)
-			router.ServeHTTP(w, req)
-
-			// these handlers read the pool with no nil guard, so if the gate
-			// is ever dropped this returns a recovered 500 instead
-			if w.Code != http.StatusNotImplemented {
-				t.Errorf("status = %d, want 501; body: %s", w.Code, w.Body.String())
-			}
-		})
-	}
-}
-
-func TestGetConfig_stillServedWithoutTheDatabase(t *testing.T) {
-	// the config route needs no sink, so gating the pause routes must not have
-	// swept it up
-	w := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodGet, "/api/v1/config", nil)
-	noSinkRouter().ServeHTTP(w, req)
-
-	if w.Code != http.StatusOK {
-		t.Errorf("status = %d, want 200; body: %s", w.Code, w.Body.String())
+// The config endpoint was removed deliberately: it served the whole parsed
+// config, which carries every team's credentials along with the sink passwords.
+// It must stay unrouted rather than come back as an unauthenticated route.
+func TestConfigEndpoint_isNotServed(t *testing.T) {
+	if w := get("/api/v1/config"); w.Code != http.StatusNotFound {
+		t.Errorf("status = %d, want 404; the config endpoint exposes credentials and must stay removed. body: %s",
+			w.Code, w.Body.String())
 	}
 }
