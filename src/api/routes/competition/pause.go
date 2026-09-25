@@ -20,7 +20,7 @@ func ChangePauseState(desiredState types.PauseState, pauseType types.PauseType) 
 				http.StatusInternalServerError,
 				gin.H{
 					"message":       "failed to change pause state",
-					"error":         err,
+					"error":         err.Error(),
 					"desired_state": desiredState,
 					"pause_type":    pauseType,
 				},

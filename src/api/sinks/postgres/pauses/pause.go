@@ -72,7 +72,7 @@ func GetPauseRecord(ctx context.Context, db *pgxpool.Pool) (types.PauseRecord, e
 		)
 
 		// scan into variables
-		err = row.Scan(&record.ScoringSince, &rawTime)
+		err = row.Scan(&record.ScoringState, &rawTime)
 		if err != nil {
 			err = fmt.Errorf("failed to get state from db: %w", err)
 			return record, err

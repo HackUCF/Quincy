@@ -43,6 +43,7 @@ func GetCheck(c *gin.Context) {
 		c.JSON(http.StatusOK, types.Service{
 			NoOp: true,
 		})
+		return
 	}
 
 	// check for db errors, failed if the db sink is enabled
