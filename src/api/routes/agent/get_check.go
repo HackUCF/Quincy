@@ -28,6 +28,18 @@ func GetCheck(c *gin.Context) {
 	cfg := config.Get(c)
 	db, err := conn.GetE(c)
 
+	// check for db errors, failed if the db sink is enabled
+	// if this fails `db` is safely null and will be ignored by GetNext.
+	if err != nil && cfg.Sinks.DBEnabled() {
+		resp := gin.H{
+			"message": "failed to get database connection from request context",
+			"error":   err,
+		}
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	// check if the comp is paused rn
 	isPaused, err := pauses.IsPaused(c.Request.Context(), db, types.CheckPause)
 	if err != nil {
 		resp := gin.H{
@@ -43,17 +55,6 @@ func GetCheck(c *gin.Context) {
 		c.JSON(http.StatusOK, types.Service{
 			NoOp: true,
 		})
-		return
-	}
-
-	// check for db errors, failed if the db sink is enabled
-	// if this fails `db` is safely null and will be ignored by GetNext.
-	if err != nil && cfg.Sinks.DBEnabled() {
-		resp := gin.H{
-			"message": "failed to get database connection from request context",
-			"error":   err,
-		}
-		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
 

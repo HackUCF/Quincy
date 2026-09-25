@@ -18,7 +18,7 @@ func InitPauses(ctx context.Context, db *pgxpool.Pool, cfg *config.APIConfigSpec
 	// start a transaction
 	tx, err := db.Begin(ctx)
 	if err != nil {
-		err := fmt.Errorf("failed to begin transaction while initializing pauses")
+		err := fmt.Errorf("failed to begin transaction while initializing pauses: %w", err)
 		return err
 	}
 	defer tx.Rollback(ctx)
@@ -26,7 +26,7 @@ func InitPauses(ctx context.Context, db *pgxpool.Pool, cfg *config.APIConfigSpec
 	// prevent double inits
 	got, err := tryLock(ctx, tx, pauseLock)
 	if err != nil {
-		err := fmt.Errorf("failed to lock pauses table while initializing pauses")
+		err := fmt.Errorf("failed to lock pauses table while initializing pauses: %w", err)
 		return err
 	}
 	if !got {

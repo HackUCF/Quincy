@@ -16,7 +16,7 @@ func PauseStatus(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatusJSON(
 			http.StatusInternalServerError,
-			gin.H{"message": "failed to get pause status from db", "error": err},
+			gin.H{"message": "failed to get pause status from db", "error": err.Error()},
 		)
 		return
 	}
