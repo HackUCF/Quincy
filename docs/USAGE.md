@@ -295,8 +295,19 @@ Quincy records every check result and makes scores available through its API. Sc
 | `/api/v1/scores/service` | Scores broken down by service |
 | `/api/v1/scores/current` | The most recent result for each check |
 | `/api/v1/scores/detailed` | Full detailed breakdown |
+| `/api/v1/scores/recent/{team}` | The most recent checks for one team, per service |
 
 Each score includes checks passed, checks failed, total checks, and uptime percentage.
+
+The recent endpoint is the exception: it returns raw check results rather than
+aggregates, newest first, for every service belonging to the team in the path.
+Pass `?n=` to choose how many checks to return per service -- the default is 10
+and the maximum is 100.
+
+```bash
+# the last 25 checks of every service on team 3
+curl "http://127.0.0.1:8888/api/v1/scores/recent/3?n=25"
+```
 
 ## Password Changes
 

@@ -490,6 +490,40 @@ paths:
       summary: Get fully detailed scores
       tags:
       - scores
+  /scores/recent/{team}:
+    get:
+      description: Returns the most recent checks for every service on every box of
+        a single team. Sorted by box, then service, then newest check first.
+      parameters:
+      - description: Team number
+        in: path
+        name: team
+        required: true
+        type: integer
+      - description: Checks to return per service (default 10, max 100)
+        in: query
+        name: "n"
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.Score'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+        "501":
+          description: Not Implemented
+          schema:
+            type: object
+      summary: Get the N most recent checks for a team
+      tags:
+      - scores
   /scores/service:
     get:
       description: 'Returns pass/fail check stats keyed by box name, then service

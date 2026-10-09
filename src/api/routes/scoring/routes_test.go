@@ -98,3 +98,85 @@ func TestGetDetailedScores_OK(t *testing.T) {
 		t.Fatalf("status = %d, want 200; body: %s", w.Code, w.Body.String())
 	}
 }
+
+// seedRecent inserts rows for team 2 with explicit timestamps so the recent
+// endpoint has a history to page through. Team 2 is used so the scores seeded
+// for team 1 in TestMain stay untouched.
+func seedRecent(t *testing.T, service types.ServiceName, count int) {
+	t.Helper()
+	ctx := context.Background()
+
+	for i := range count {
+		_, err := testPool.Exec(ctx, `
+			INSERT INTO scores (service, box, team_num, status, stdout, stderr, timestamp)
+			VALUES ($1, $2, $3, $4, $5, $6, $7)
+		`, service, "testbox", 2, true, "out", "", 1_700_000_000_000_000+int64(i))
+		if err != nil {
+			t.Fatalf("seed recent score: %v", err)
+		}
+	}
+}
+
+func TestGetRecentChecks_OK(t *testing.T) {
+	seedRecent(t, "http", 3)
+
+	w := get(testRouter, "/api/v1/scores/recent/2")
+	if w.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200; body: %s", w.Code, w.Body.String())
+	}
+
+	var scores []types.Score
+	if err := json.Unmarshal(w.Body.Bytes(), &scores); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	if len(scores) == 0 {
+		t.Error("expected at least one recent check")
+	}
+}
+
+func TestGetRecentChecks_respectsNParam(t *testing.T) {
+	seedRecent(t, "http", 5)
+
+	w := get(testRouter, "/api/v1/scores/recent/2?n=1")
+	if w.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200; body: %s", w.Code, w.Body.String())
+	}
+
+	var scores []types.Score
+	if err := json.Unmarshal(w.Body.Bytes(), &scores); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+
+	perService := make(map[types.ServiceName]int)
+	for _, s := range scores {
+		perService[s.ServiceName]++
+	}
+	for service, n := range perService {
+		if n > 1 {
+			t.Errorf("service %q returned %d rows, want at most 1", service, n)
+		}
+	}
+}
+
+func TestGetRecentChecks_rejectsBadInput(t *testing.T) {
+	cases := []struct {
+		name string
+		path string
+	}{
+		{"non-numeric team", "/api/v1/scores/recent/abc"},
+		{"team zero", "/api/v1/scores/recent/0"},
+		{"team above configured count", "/api/v1/scores/recent/99"},
+		{"non-numeric n", "/api/v1/scores/recent/1?n=abc"},
+		{"n zero", "/api/v1/scores/recent/1?n=0"},
+		{"n above cap", "/api/v1/scores/recent/1?n=101"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			w := get(testRouter, tc.path)
+			if w.Code != http.StatusBadRequest {
+				t.Errorf("status = %d, want 400; body: %s", w.Code, w.Body.String())
+			}
+		})
+	}
+}
