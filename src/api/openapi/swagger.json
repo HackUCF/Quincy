@@ -509,6 +509,56 @@
                 }
             }
         },
+        "/scores/recent/{team}": {
+            "get": {
+                "description": "Returns the most recent checks for every service on every box of a single team. Sorted by box, then service, then newest check first.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "scores"
+                ],
+                "summary": "Get the N most recent checks for a team",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team number",
+                        "name": "team",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Checks to return per service (default 10, max 100)",
+                        "name": "n",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.Score"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "/scores/service": {
             "get": {
                 "description": "Returns pass/fail check stats keyed by box name, then service name. Shape: {\"box\": {\"service\": ScoreResult}}.",

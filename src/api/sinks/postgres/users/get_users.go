@@ -14,9 +14,11 @@ func GetAllUsers(ctx context.Context, db *pgxpool.Pool) (AllUsers, error) {
 
 	allUsers := make(AllUsers)
 
+	// ORDER BY, so the scoreboard gets a consistent ordering
 	query := `
 		SELECT team_num, user_list, username, password, domain, netbios
 		FROM scoring_users
+		ORDER BY team_num, user_list, username
 	`
 
 	rows, err := db.Query(ctx, query)
