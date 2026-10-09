@@ -37,11 +37,12 @@ func RegisterRoutes(router *gin.Engine, s config.Sinks) {
 
 		scoringGroup := v1.Group("/scores")
 		{
-			scoringGroup.GET("/team", s.DBOr501(scoring.GetTeamScores))         // /api/v1/scores/team
-			scoringGroup.GET("/box", s.DBOr501(scoring.GetBoxScores))           // /api/v1/scores/box
-			scoringGroup.GET("/service", s.DBOr501(scoring.GetServiceScores))   // /api/v1/scores/service
-			scoringGroup.GET("/current", s.DBOr501(scoring.GetRecentChecks))    // /api/v1/scores/current
-			scoringGroup.GET("/detailed", s.DBOr501(scoring.GetDetailedScores)) // /api/v1/scores/detailed
+			scoringGroup.GET("/team", s.DBOr501(scoring.GetTeamScores))            // /api/v1/scores/team
+			scoringGroup.GET("/box", s.DBOr501(scoring.GetBoxScores))              // /api/v1/scores/box
+			scoringGroup.GET("/service", s.DBOr501(scoring.GetServiceScores))      // /api/v1/scores/service
+			scoringGroup.GET("/current", s.DBOr501(scoring.GetRecentChecks))       // /api/v1/scores/current
+			scoringGroup.GET("/detailed", s.DBOr501(scoring.GetDetailedScores))    // /api/v1/scores/detailed
+			scoringGroup.GET("/recent/:team", s.DBOr501(scoring.GetRecentNChecks)) // /api/v1/scores/recent/:team
 		}
 
 		userGroup := v1.Group("/users")

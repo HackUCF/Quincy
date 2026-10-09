@@ -11,9 +11,10 @@ CREATE TABLE IF NOT EXISTS scores (
   id        SERIAL       PRIMARY KEY
 );
 
-CREATE INDEX IF NOT EXISTS idx_scores_ts             ON scores(timestamp);
-CREATE INDEX IF NOT EXISTS idx_scores_team_status    ON scores(team_num, status);
-CREATE INDEX IF NOT EXISTS idx_scores_team_ts_status ON scores(team_num, timestamp, status);
+CREATE INDEX IF NOT EXISTS idx_scores_ts                  ON scores(timestamp);
+CREATE INDEX IF NOT EXISTS idx_scores_team_status         ON scores(team_num, status);
+CREATE INDEX IF NOT EXISTS idx_scores_team_ts_status      ON scores(team_num, timestamp, status);
+CREATE INDEX IF NOT EXISTS idx_scores_team_box_service_ts ON scores(team_num, box, service, timestamp DESC);
 
 -- recent scores table
 -- nearly identical: stores only the most recent of each check
